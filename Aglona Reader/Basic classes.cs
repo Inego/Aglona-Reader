@@ -679,10 +679,7 @@ namespace AglonaReader
 
             }
 
-
         }
-
-
         
     }
 

@@ -286,88 +286,11 @@ namespace AglonaReader
             primaryBG.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
         }
 
-
-        private void InitializeText()
-        {
-
-            pText = new ParallelText();
-
-            //pText.AddPair("......", "wergweg");
-            //pText.AddPair("the Aglona Reader 2012", "wergweg");
-            //pText.AddPair("........", "wergweg");
-
-            //pText.AddPair("длинное слово", "long word");
-
-            //pText.AddPair("длинное слово", "long word");
-            //pText.AddPair("в", "v");
-
-            //pText.AddPair("a\ne", "aa\nee");
-            //pText.AddPair("b\nf", "bb\nff", true, true);
-            //pText.AddPair("c\ng", "cc\ngg", true, true);
-            //pText.AddPair("d\nh", "dd\nhh", true, true);
-
-            //pText.AddPair("Это - длинное предложение, вперед.", "This is a very long sentence, go ahead!");
-            //pText.AddPair("Одно слово.", "One word.");
-            //pText.AddPair("Два слова.", "Two words.");
-
-            //pText.AddPair("Однажды весною, в час небывало жаркого заката, в Москве, на Патриарших прудах, появились два гражданина.",
-            //    "Reiz pavasari, neredzēti karsta saules rieta laikā, Maskavā, pie Patriarhu dīķiem, parādījās divi pilsoņi.");
-            //pText.AddPair("Первый из них, одетый в летнюю серенькую пару, был маленького роста, упитан, лыс,",
-            //    "Viens no viņiem, pelēkā vasaras uzvalkā ģērbies, bija mazs augumā, apaļīgs, ar pliku pauri,");
-            //pText.AddPair("свою приличную шляпу пирожком нес в руке,",
-            //    "pieklājīga izskata platmali nesa rokā, saņēmis aiz ielocījuma,");
-            //pText.AddPair("а на хорошо выбритом лице его помещались сверхъестественных размеров очки в черной роговой оправе.",
-            //    "bet uz viņa gludi skūtās sejas bija novietotas neiedomājami lielas brilles melnos raga rāmjos.");
-            //pText.AddPair("Второй – плечистый, рыжеватый, вихрастый молодой человек в заломленной на затылок клетчатой кепке –",
-            //    "Otrs — plecīgs, rūsganmatains, čirkains jauns cilvēks ar pakausī atbīdītu rūtainu naģeni —");
-            //pText.AddPair("был в ковбойке, жеваных белых брюках и в черных тапочках.",
-            //    "bija kovboju kreklā, saņurcītās, baltās biksēs un melnās čībiņās.");
-            //pText.AddPair("Первый был не кто иной, как Михаил Александрович Берлиоз, председатель правления одной из крупнейших московских литературных ассоциаций, сокращенно именуемой МАССОЛИТ, и редактор толстого художественного журнала,",
-            //    "Pirmais nebija neviens cits kā Mihails Aleksandrovičs Berliozs, priekšsēdētājs vienā no lielākajām Maskavas literātu asociācijām, saīsināti — MASLITASS, un bieza literārā žurnāla redaktors,");
-            //pText.AddPair("а молодой спутник его – поэт Иван Николаевич Понырев, пишущий под псевдонимом Бездомный.",
-            //    "bet viņa jaunais pavadonis — dzejnieks Ivans Nikolajevičs Ponirevs, pazīstams ar pseidonīmu Bezpajumtnieks.");
-            //pText.AddPair("Попав в тень чуть зеленеющих лип, писатели первым долгом бросились к пестро раскрашенной будочке с надписью «Пиво и воды».",
-            //    "Nonākuši tik tikko zaļot sākušo liepu paēnā, rakstnieki vispirms metās pie raibi izkrāsotās būdas ar uzrakstu «Alus un atspirdzinoši dzērieni».", true, true);
-            //pText.AddPair("Да, следует отметить первую странность этого страшного майского вечера.",
-            //    "Jā, jāatzīmē šī baismīgā maija vakara pirmā dīvainība.", true, true);
-            //pText.AddPair("Не только у будочки, но и во всей аллее, параллельной Малой Бронной улице, не оказалось ни одного человека.",
-            //    "Ne tikai pie būdas, bet visā Mazās Bronnajas ielai paralēlajā alejā nebija neviena cilvēka.");
-            //pText.AddPair("В тот час, когда уж, кажется, и сил не было дышать,",
-            //    "Tajā stundā, kad, šķita, vairs nav ko elpot,");
-            //pText.AddPair("когда солнце, раскалив Москву, в сухом тумане валилось куда то за Садовое кольцо,",
-            //    "kad saule, Maskavu nokveldējusi, sausā dūmakā gāzās lejā kaut kur aiz Dārzu loka,");
-            //pText.AddPair("– никто не пришел под липы, никто не сел на скамейку, пуста была аллея.",
-            //    "neviens ne nāca zem liepām, ne sēdās uz sola, aleja bija tukša.");
-            //pText.AddPair("– Дайте нарзану, – попросил Берлиоз.",
-            //    "—Dodiet narzānu, — Berliozs palūdza.", true, true);
-            //pText.AddPair("– Нарзану нету, – ответила женщина в будочке и почему то обиделась.",
-            //    "—Narzāna nava, — sieviete būdā atbildēja un nez kāpēc apvainojās.", true, true);
-            //pText.AddPair("– Пиво есть? – сиплым голосом осведомился Бездомный.",
-            //    "— Alus ir? — čerkstošā balsī painteresējās Bezpajumtnieks.", true, true);
-            //pText.AddPair("– Пиво привезут к вечеру, – ответила женщина.",
-            //    "— Alu atvedīs pret vakaru, — sieviete atbildēja.", true, true);
-            //pText.AddPair("– А что есть? – спросил Берлиоз.",
-            //    "— Bet kas ir? — jautāja Berliozs.", true, true);
-            //pText.AddPair("– Абрикосовая, только теплая, – сказала женщина.",
-            //    "— Aprikožu dzēriens, tikai silts, — teica sieviete.", true, true);
-            //pText.AddPair("– Ну, давайте, давайте, давайте!..",
-            //    "— Dodiet, dodiet, dodiet šurp!…", true, true);
-            //pText.AddPair("Абрикосовая дала обильную желтую пену, и в воздухе запахло парикмахерской.",
-            //    "Aprikožu dzēriens stipri putoja, un visapkārt iesmaržojās pēc frizētavas.", true, true);
-            //pText.AddPair("Напившись, литераторы немедленно начали икать, расплатились и уселись на скамейке лицом к пруду и спиной к Бронной.",
-            //    "Padzērušies literāti uzreiz sāka žagoties, samaksāja un apsēdās uz sola — ar sejām pret dīķi un mugurām pret Bronnajas ielu.");
-            
-
-            //pText.AddPair("","");
-            //pText.AddPair("","");
-        }
-
-
         public ParallelTextControl()
         {
             InitializeComponent();
 
-            InitializeText();
+            pText = new ParallelText();
 
             wordsOnScreen = new SortedList<int, List<ScreenWord>>();
 
@@ -417,8 +340,6 @@ namespace AglonaReader
             Graphics g = secondaryBG.Graphics;
 
             g.Clear(Color.White);
-
-            //g.FillRectangle(splitterBrush, 
 
             //g.FillRectangle(splitterBrush, splitterPosition, vMargin, splitterWidth, Height - 2 * vMargin);
         }
@@ -904,7 +825,6 @@ namespace AglonaReader
             }
 
         }
-          
 
 
         public void RenderPairs()
@@ -1611,41 +1531,10 @@ namespace AglonaReader
 
             pText.textPairs.Remove(first);
 
+        }
 
-
-            //if (first.sb1 == null)
-            //{
-            //    first.sb1 = new StringBuilder(first.text1);
-            //    first.text1 = null;
-            //}
-
-            //if (first.sb2 == null)
-            //{
-            //    first.sb2 = new StringBuilder(first.text2);
-            //    first.text2 = null;
-            //}
-
-            //if (second.startParagraph1)
-            //{
-            //    first.sb1.Append('\r');
-            //    first.sb1.Append('\n');
-            //}
-            //else
-            //    first.sb1.Append(' ');
-
-            //if (second.startParagraph2)
-            //{
-            //    first.sb2.Append('\r');
-            //    first.sb2.Append('\n');
-            //}
-            //else
-            //    first.sb2.Append(' ');
-
-            //first.sb1.Append(second.sb1 == null ? second.text1 : second.sb1.ToString());
-            //first.sb2.Append(second.sb2 == null ? second.text2 : second.sb2.ToString());
-
-            //pText.textPairs.Remove(second);
-
+        public float SplitterRatio {
+            get { return splitterRatio;  }
         }
     }
 

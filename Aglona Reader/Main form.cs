@@ -3,10 +3,10 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.Collections.Generic;
 using System.Text;
+using System.Configuration;
+using System.Xml.Serialization;
 
 
-
- 
 
 namespace AglonaReader
 {
@@ -14,8 +14,8 @@ namespace AglonaReader
     public partial class MainForm : Form
     {
 
-        
-        
+        AppSettings appSettings;
+
         byte opState;
         
         private int mouse_text_line = -1;
@@ -39,15 +39,27 @@ namespace AglonaReader
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            
-            pTC.SetSplitterPositionByRatio(0.5F);
-        }
 
-        private void MainForm_Shown(object sender, EventArgs e)
-        {
-            //pTC.pText.Load("D:\\Aglona\\RU\\EN\\Булгаков - Мастер и Маргарита\\1.xml");
-            //pTC.FindNaturalDividers(0);
-            //Recompute();
+            appSettings = Properties.Settings.Default.AppSettings;
+
+            if (appSettings == null)
+                appSettings = new AppSettings();
+
+            if (appSettings != null && appSettings.fileUsages.Count > 0)
+            {
+                FileUsageInfo f = appSettings.fileUsages[0];
+                pTC.reversed = f.reversed;
+                pTC.SetSplitterPositionByRatio(f.splitterRatio);
+                pTC.HighlightedPair = f.pair;
+                pTC.currentPair = f.topPair;
+                pTC.pText.Load(f.fileName);
+                pTC.FindNaturalDividers(0);
+                Recompute();
+            }
+            else
+                pTC.SetSplitterPositionByRatio(0.5F);
+
+
         }
 
         private bool XonSplitter(int x)
@@ -436,7 +448,30 @@ namespace AglonaReader
                 pTC.pText.Load(fileName);
                 pTC.FindNaturalDividers(0);
                 Recompute();
+
+                // Add a new FileUsage
+
+                FileUsageInfo f = new FileUsageInfo();
+                f.fileName = fileName;
+
+                appSettings.fileUsages.Insert(0, f);
+
             }
+        }
+
+        private void SaveAppSettings()
+        {
+            if (appSettings.fileUsages.Count > 0)
+            {
+                FileUsageInfo f = appSettings.fileUsages[0];
+                f.pair = pTC.HighlightedPair;
+                f.topPair = pTC.currentPair;
+                f.reversed = pTC.reversed;
+                f.splitterRatio = pTC.SplitterRatio;
+            }
+
+            Properties.Settings.Default.AppSettings = appSettings;
+            Properties.Settings.Default.Save();
         }
 
         private void pTC_KeyPress(object sender, KeyPressEventArgs e)
@@ -459,6 +494,16 @@ namespace AglonaReader
             SaveBook(true);
         }
 
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            SaveAppSettings();
+        }
+
     }
 
     public class DB_Common_Row : DB_Row
@@ -473,5 +518,29 @@ namespace AglonaReader
         }
             
     }
+
+    
+    public class FileUsageInfo
+    {
+        public string fileName;
+        public int pair;
+        public int topPair;
+        public bool reversed;
+        public float splitterRatio;
+        public bool editMode;
+    }
+
+    public class AppSettings
+    {
+        public List<FileUsageInfo> fileUsages;
+
+        public AppSettings()
+        {
+            fileUsages = new List<FileUsageInfo>();
+        }
+    }
+
+    
+
 
 }
