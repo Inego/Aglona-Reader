@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
 
-
+[assembly: CLSCompliant(true)]
 namespace AglonaReader
 {
     
@@ -45,41 +46,43 @@ namespace AglonaReader
             if (appSettings != null)
             {
 
-                pTC.HighlightFragments = appSettings.highlightFragments;
-                pTC.Brightness = appSettings.brightness;
+                pTC.HighlightFragments = appSettings.HighlightFragments;
+                pTC.Brightness = appSettings.Brightness;
 
-                if (appSettings.fileUsages.Count > 0)
+                if (appSettings.FileUsages.Count > 0)
                 {
 
-                    FileUsageInfo f = appSettings.fileUsages[0];
-                    pTC.reversed = f.reversed;
+                    FileUsageInfo f = appSettings.FileUsages[0];
+                    pTC.reversed = f.Reversed;
                     reverseToolStripMenuItem.Checked = pTC.reversed;
-                    pTC.SetSplitterPositionByRatio(f.splitterRatio);
+                    pTC.SetSplitterPositionByRatio(f.SplitterRatio);
 
-                    pTC.pText.Load(f.fileName);
+                    pTC.pText.Load(f.FileName);
+                    pTC.Modified = false;
 
                     if (pTC.Number > 0)
                     {
-                        if (f.pair >= pTC.Number)
+                        if (f.Pair >= pTC.Number)
                             pTC.HighlightedPair = pTC.Number - 1;
                         else
-                            pTC.HighlightedPair = f.pair;
+                            pTC.HighlightedPair = f.Pair;
 
-                        if (f.topPair >= pTC.Number)
+                        if (f.TopPair >= pTC.Number)
                             pTC.currentPair = pTC.Number - 1;
                         else
-                            pTC.currentPair = f.topPair;
+                            pTC.currentPair = f.TopPair;
 
                         pTC.FindNaturalDividers(0);
                         Recompute();
                     }
                 }
+                pTC.SetSplitterPositionByRatio(0.5F);
 
             }
             else
                 pTC.SetSplitterPositionByRatio(0.5F);
 
-            highlightFramgentsToolStripMenuItem.Checked = appSettings.highlightFragments;
+            highlightFramgentsToolStripMenuItem.Checked = appSettings.HighlightFragments;
         }
 
         private bool XonSplitter(int x)
@@ -118,13 +121,13 @@ namespace AglonaReader
 
             else if (opState == 0)
             {
-                // Let's check whether the cursor points to a word
+                // Let'word check whether the cursor points to a word
                 
                 // Compute current line
 
                 int line = (e.Y - pTC.vMargin) / pTC.lineHeight;
 
-                // Let's see what we've got on this line
+                // Let'word see what we've got on this line
 
                 int word_x = -1;
 
@@ -199,7 +202,7 @@ namespace AglonaReader
                         pTC.naturalDividerPosition1_w = pTC.mouse_text_currentword.next;
                         pTC.NaturalDividerPosition1 = pTC.naturalDividerPosition1_w.pos;
                         pTC.SetNippingFrameByScreenWord(1, pTC.naturalDividerPosition1_w);
-                        (pTC.nippingFrame.f1 as Frame).pen = pTC.correctedPen;
+                        (pTC.nippingFrame.F1 as Frame).pen = pTC.correctedPen;
                         pTC.Side1Set = true;
                     }
                     else
@@ -207,7 +210,7 @@ namespace AglonaReader
                         pTC.naturalDividerPosition2_w = pTC.mouse_text_currentword.next;
                         pTC.NaturalDividerPosition2 = pTC.naturalDividerPosition2_w.pos;
                         pTC.SetNippingFrameByScreenWord(2, pTC.naturalDividerPosition2_w);
-                        (pTC.nippingFrame.f2 as Frame).pen = pTC.correctedPen;
+                        (pTC.nippingFrame.F2 as Frame).pen = pTC.correctedPen;
                         pTC.Side2Set = true;
                     }
 
@@ -235,72 +238,16 @@ namespace AglonaReader
         {
             mouse_text_line = -1;
             pTC.mouse_text_currentword = null;
-            pTC.Recompute();
+            pTC.ProcessLayoutChange();
         }
 
         private void pTC_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyData == Keys.Down)
-            {
-
-                if (pTC.HighlightedPair == pTC.pText.Number() - 1)
-                {
-                    if (pTC.currentPair != pTC.HighlightedPair)
-                    {
-                        pTC.currentPair = pTC.HighlightedPair;
-                        pTC.PrepareScreen();
-                        pTC.RenderPairs();
-                        pTC.FindNaturalDividersOnScreen(0);
-                        pTC.Render();
-                    }
-                    return;
-                }
-
-                pTC.HighlightedPair++;
-
-                pTC.FindNaturalDividers(0);
-
-                TextPair p = pTC.pText.textPairs[pTC.HighlightedPair];
-
-                if (p.renderedInfo1.line2 == -1
-                    || p.renderedInfo1.line2 >= pTC.linesOnScreen - 1
-                    || p.renderedInfo2.line2 == -1
-                    || p.renderedInfo2.line2 >= pTC.linesOnScreen - 1)
-                {
-                    pTC.currentPair = pTC.HighlightedPair;
-                    pTC.PrepareScreen();
-                    pTC.RenderPairs();
-                }
-
-                pTC.FindNaturalDividersOnScreen(0);
-
-                pTC.Render();
-            }
+                ProcessKeyDown();
 
             else if (e.KeyData == Keys.Up)
-            {
-                if (pTC.HighlightedPair == 0)
-                    return;
-
-                TextPair prev_p = pTC.pText.textPairs[pTC.HighlightedPair];
-
-                pTC.HighlightedPair--;
-
-                pTC.FindNaturalDividers(0);
-
-                TextPair p = pTC.pText.textPairs[pTC.HighlightedPair];
-
-                if (prev_p.renderedInfo1.line1 == 0 && (prev_p.renderedInfo1.x1 == 0 || p.height > 0)
-                    || prev_p.renderedInfo2.line1 == 0 && (prev_p.renderedInfo2.x1 == 0 || p.height > 0))
-                {
-                    pTC.currentPair = pTC.HighlightedPair;
-                    pTC.PrepareScreen();
-                    pTC.RenderPairs();
-                }
-
-                pTC.FindNaturalDividersOnScreen(0);
-                pTC.Render();
-            }
+                ProcessKeyUp();
 
             else if (e.KeyData == (Keys.Control | Keys.Up))
             {
@@ -345,7 +292,7 @@ namespace AglonaReader
                     pTC.PrepareScreen();
                     pTC.RenderPairs();
                     pTC.FindNaturalDividers(0);
-                    pTC.FindNaturalDividersOnScreen(0);
+                    pTC.FindNaturalDividersScreen(0);
                     pTC.Render();
                 }
 
@@ -362,7 +309,7 @@ namespace AglonaReader
                     pTC.PrepareScreen();
                     pTC.RenderPairs();
                     pTC.FindNaturalDividers(0);
-                    pTC.FindNaturalDividersOnScreen(0);
+                    pTC.FindNaturalDividersScreen(0);
                     pTC.Render();
 
             }
@@ -386,9 +333,68 @@ namespace AglonaReader
                     pTC.Render();
                 }
             }
+            
+        }
 
-            
-            
+        private void ProcessKeyUp()
+        {
+            if (pTC.HighlightedPair == 0)
+                return;
+
+            TextPair prev_p = pTC.pText.textPairs[pTC.HighlightedPair];
+
+            pTC.HighlightedPair--;
+
+            pTC.FindNaturalDividers(0);
+
+            TextPair p = pTC.pText.textPairs[pTC.HighlightedPair];
+
+            if (prev_p.renderedInfo1.line1 == 0 && (prev_p.renderedInfo1.x1 == 0 || p.height > 0)
+                || prev_p.renderedInfo2.line1 == 0 && (prev_p.renderedInfo2.x1 == 0 || p.height > 0))
+            {
+                pTC.currentPair = pTC.HighlightedPair;
+                pTC.PrepareScreen();
+                pTC.RenderPairs();
+            }
+
+            pTC.FindNaturalDividersScreen(0);
+            pTC.Render();
+        }
+
+        private void ProcessKeyDown()
+        {
+            if (pTC.HighlightedPair == pTC.pText.Number() - 1)
+            {
+                if (pTC.currentPair != pTC.HighlightedPair)
+                {
+                    pTC.currentPair = pTC.HighlightedPair;
+                    pTC.PrepareScreen();
+                    pTC.RenderPairs();
+                    pTC.FindNaturalDividersScreen(0);
+                    pTC.Render();
+                }
+                return;
+            }
+
+            pTC.HighlightedPair++;
+
+            pTC.FindNaturalDividers(0);
+
+            TextPair p = pTC.pText.textPairs[pTC.HighlightedPair];
+
+            if (p.renderedInfo1.line2 == -1
+                || p.renderedInfo1.line2 >= pTC.NumberOfScreenLines - 1
+                || p.renderedInfo2.line2 == -1
+                || p.renderedInfo2.line2 >= pTC.NumberOfScreenLines - 1)
+            {
+                pTC.currentPair = pTC.HighlightedPair;
+                pTC.PrepareScreen();
+                pTC.RenderPairs();
+            }
+
+            pTC.FindNaturalDividersScreen(0);
+
+            pTC.Render();
         }
 
         private void ChangeNatural(byte screen_side, bool inc)
@@ -412,7 +418,7 @@ namespace AglonaReader
                     else
                         p.DecRecommendedNatural(1);
                     pTC.FindNaturalDividers(1);
-                    pTC.FindNaturalDividersOnScreen(1);
+                    pTC.FindNaturalDividersScreen(1);
                 }
 
             if (side == 0 || side == 2)
@@ -423,7 +429,7 @@ namespace AglonaReader
                     else
                         p.DecRecommendedNatural(2);
                     pTC.FindNaturalDividers(2);
-                    pTC.FindNaturalDividersOnScreen(2);
+                    pTC.FindNaturalDividersScreen(2);
                 }
 
             pTC.Render();
@@ -437,9 +443,12 @@ namespace AglonaReader
 
         private void importToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ImportTextForm iF = new ImportTextForm();
-            iF.pText = pTC.pText;
-            iF.ShowDialog();
+            using (ImportTextForm importTextForm = new ImportTextForm())
+            {
+                importTextForm.pText = pTC.pText;
+                importTextForm.ShowDialog();
+                importTextForm.Dispose();
+            }
 
             pTC.FindNaturalDividers(0);
             Recompute();
@@ -448,9 +457,12 @@ namespace AglonaReader
 
         private void informationToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            BookInfoForm f = new BookInfoForm();
-            f.pTC = pTC;
-            f.ShowDialog();
+            using (BookInfoForm f = new BookInfoForm())
+            {
+                f.ParallelTC = pTC;
+                f.ShowDialog();
+                f.Dispose();
+            }
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
@@ -462,68 +474,85 @@ namespace AglonaReader
         {
             string fileName;
 
-            if (pTC.pText.fileName == "" || askForFileName)
+            if (string.IsNullOrEmpty(pTC.pText.fileName) || askForFileName)
             {
                 // Ask for the file name
-                SaveFileDialog d = new SaveFileDialog();
-                d.Filter = "XML files (*.xml)|*.xml";
-                d.RestoreDirectory = true;
+                using (SaveFileDialog d = new SaveFileDialog())
+                {
+                    d.Filter = "XML files (*.xml)|*.xml";
+                    d.RestoreDirectory = true;
+                    DialogResult dialogResult = d.ShowDialog();
 
-                if (d.ShowDialog() != DialogResult.OK)
-                    return;
-                fileName = d.FileName;
+                    if (dialogResult != DialogResult.OK)
+                    {
+                        d.Dispose();
+                        return;
+                    }
+                    
+                    fileName = d.FileName;
+                    d.Dispose();
+                }
             }
             else
                 fileName = pTC.pText.fileName;
 
             pTC.pText.Save(fileName);
+            pTC.Modified = false;
         }
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
+            if (pTC.Modified)
+                if (AskToSaveModified(sender) == System.Windows.Forms.DialogResult.Cancel)
+                    return;
+
             string fileName;
 
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-
-            openFileDialog.Filter = "XML files (*.xml)|*.xml";
-            openFileDialog.RestoreDirectory = true;
-            //openFileDialog.AutoUpgradeEnabled = true;
-            
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
-                fileName = openFileDialog.FileName;
-                pTC.pText = new ParallelText();
-                mouse_text_line = -1;
-                pTC.currentPair = 0;
-                pTC.HighlightedPair = 0;
-                pTC.pText.Load(fileName);
-                pTC.FindNaturalDividers(0);
-                Recompute();
+                openFileDialog.Filter = "XML files (*.xml)|*.xml";
+                openFileDialog.RestoreDirectory = true;
+                //openFileDialog.AutoUpgradeEnabled = true;
 
-                // Add a new FileUsage
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    fileName = openFileDialog.FileName;
+                    pTC.pText = new ParallelText();
+                    mouse_text_line = -1;
+                    pTC.currentPair = 0;
+                    pTC.HighlightedPair = 0;
+                    pTC.pText.Load(fileName);
+                    pTC.Modified = false;
+                    pTC.FindNaturalDividers(0);
+                    Recompute();
 
-                FileUsageInfo f = new FileUsageInfo();
-                f.fileName = fileName;
+                    // Add a new FileUsage
 
-                appSettings.fileUsages.Insert(0, f);
+                    FileUsageInfo f = new FileUsageInfo();
+                    f.FileName = fileName;
 
+                    appSettings.FileUsages.Insert(0, f);
+
+                }
+
+                openFileDialog.Dispose();
             }
         }
 
         private void SaveAppSettings()
         {
-            if (appSettings.fileUsages.Count > 0)
+            if (appSettings.FileUsages.Count > 0)
             {
-                FileUsageInfo f = appSettings.fileUsages[0];
-                f.pair = pTC.HighlightedPair;
-                f.topPair = pTC.currentPair;
-                f.reversed = pTC.reversed;
-                f.splitterRatio = pTC.SplitterRatio;
+                FileUsageInfo f = appSettings.FileUsages[0];
+                f.Pair = pTC.HighlightedPair;
+                f.TopPair = pTC.currentPair;
+                f.Reversed = pTC.reversed;
+                f.SplitterRatio = pTC.SplitterRatio;
             }
 
-            appSettings.highlightFragments = pTC.HighlightFragments;
-            appSettings.brightness = pTC.Brightness;
+            appSettings.HighlightFragments = pTC.HighlightFragments;
+            appSettings.Brightness = pTC.Brightness;
 
             Properties.Settings.Default.AppSettings = appSettings;
             Properties.Settings.Default.Save();
@@ -551,14 +580,36 @@ namespace AglonaReader
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ColorTableForm f = new ColorTableForm();
-            f.ShowDialog();
+            using (ColorTableForm f = new ColorTableForm())
+                f.ShowDialog();
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
+            if (pTC.Modified)
+            {
+                if (AskToSaveModified(sender) == System.Windows.Forms.DialogResult.Cancel)
+                {
+                    e.Cancel = true;
+                    return;
+                }
+            }
+
             SaveAppSettings();
         }
+
+        DialogResult AskToSaveModified(Object sender)
+        {
+            DialogResult r = MessageBox.Show(
+                    "Save modified book?", "The book was modified", MessageBoxButtons.YesNoCancel);
+
+            if (r == System.Windows.Forms.DialogResult.Yes)
+                saveToolStripMenuItem_Click(sender, EventArgs.Empty);
+
+            return r;
+
+        }
+
 
         private void highlightFramgentsToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -569,14 +620,14 @@ namespace AglonaReader
 
     }
 
-    public class DBCommonRow : DB_Row
+    public class CommonWordInfo : WordInfo
     {
-        public TextPair textPair;
+        public TextPair TextPair { get; set; }
 
-        public DBCommonRow(TextPair textPair, string word, int line, int x, int x2, int pos)
-            : base(word, line, x, x2, pos)
+        public CommonWordInfo(TextPair textPair, string word, int line, int wordX, int wordX2, int pos)
+            : base(word, line, wordX, wordX2, pos)
         {
-            this.textPair = textPair;
+            this.TextPair = textPair;
 
         }
             
@@ -585,26 +636,26 @@ namespace AglonaReader
     
     public class FileUsageInfo
     {
-        public string fileName;
-        public int pair;
-        public int topPair;
-        public bool reversed;
-        public float splitterRatio;
-        public bool editMode;
+        public string FileName { get; set; }
+        public int Pair { get; set; }
+        public int TopPair { get; set; }
+        public bool Reversed { get; set; }
+        public float SplitterRatio { get; set; }
+        public bool EditMode { get; set; }
     }
 
     public class AppSettings
     {
-        public bool highlightFragments;
-        public double brightness;
+        public bool HighlightFragments { get; set; }
+        public double Brightness { get; set; }
 
-        public List<FileUsageInfo> fileUsages;
+        public Collection<FileUsageInfo> FileUsages { get; set; }
 
         public AppSettings()
         {
-            highlightFragments = true;
-            brightness = 0.96;
-            fileUsages = new List<FileUsageInfo>();
+            HighlightFragments = true;
+            Brightness = 0.96;
+            FileUsages = new Collection<FileUsageInfo>();
         }
     }
 

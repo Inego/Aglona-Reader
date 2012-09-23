@@ -12,6 +12,9 @@ namespace AglonaReader
 {
     public partial class ImportTextForm : Form
     {
+
+        public bool Result { get; set; }
+
         public ImportTextForm()
         {
             InitializeComponent();
@@ -59,7 +62,7 @@ namespace AglonaReader
 
         private void ImportTextForm_Shown(object sender, EventArgs e)
         {
-            
+            Result = false;   
         }
 
         private void cancelButton_Click(object sender, EventArgs e)

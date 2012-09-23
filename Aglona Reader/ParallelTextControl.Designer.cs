@@ -27,7 +27,7 @@ namespace AglonaReader
 
         protected override void OnPaintBackground(System.Windows.Forms.PaintEventArgs e)
         {
-            // Don't need no f
+            // Don't need no frame
             //base.OnPaintBackground(e);
         }
 

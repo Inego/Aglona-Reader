@@ -9,20 +9,21 @@ namespace AglonaReader
 
     public struct ColorRGB
     {
-        public byte R;
-        public byte G;
-        public byte B;
+        public byte Red { get; set; }
+        public byte Green { get; set; }
+        public byte Blue { get; set; }
        
-        public ColorRGB(Color value)
+        public ColorRGB(Color value) : this()
         {
-            this.R = value.R;
-            this.G = value.G;
-            this.B = value.B;
+            
+            this.Red = value.R;
+            this.Green = value.G;
+            this.Blue = value.B;
         }
 
         public static implicit operator Color(ColorRGB rgb)
         {
-            Color c = Color.FromArgb(rgb.R, rgb.G, rgb.B);
+            Color c = Color.FromArgb(rgb.Red, rgb.Green, rgb.Blue);
             return c;
         }
 
@@ -33,7 +34,7 @@ namespace AglonaReader
 
         // Given H,S,L in range of 0-1
         // Returns a Color (RGB struct) in range of 0-255
-        public static ColorRGB Hsl2Rgb(double hue, double saturation, double lighting)
+        public static ColorRGB HSL2RGB(double hue, double saturation, double lighting)
         {
             double v;
             double r, g, b;
@@ -93,12 +94,12 @@ namespace AglonaReader
                 }
             }
 
+
+            ColorRGB rgb = new ColorRGB();
             
-            ColorRGB rgb;
-            
-            rgb.R = Convert.ToByte(r * 255.0f);
-            rgb.G = Convert.ToByte(g * 255.0f);
-            rgb.B = Convert.ToByte(b * 255.0f);
+            rgb.Red = Convert.ToByte(r * 255.0f);
+            rgb.Green = Convert.ToByte(g * 255.0f);
+            rgb.Blue = Convert.ToByte(b * 255.0f);
             
             return rgb;
         }

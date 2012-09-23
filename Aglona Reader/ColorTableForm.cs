@@ -20,7 +20,7 @@ namespace AglonaReader
         {
             var hue = (double)trackBar1.Value / 1000;
             label1.Text = hue.ToString();
-            this.BackColor = ColorRGB.Hsl2Rgb(hue, 1, 0.5);
+            this.BackColor = ColorRGB.HSL2RGB(hue, 1, 0.5);
         }
     }
 }

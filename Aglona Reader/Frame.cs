@@ -7,22 +7,22 @@ using System.Drawing.Drawing2D;
 namespace AglonaReader
 {
 
-    public abstract class AbstractFrame : IDisposable
+    public abstract class AbstractFrame
     {
 
         /// <summary>
-        /// Denotes the side of the text where the frame is applied.
+        /// Denotes the newSide of the text where the frame is applied.
         /// 1 = second text; 2 = first text.
         /// </summary>
-        public byte side;
+        public byte Side { get; set; }
 
-        public bool visible;
-        
-        public int line1;
-        public int line2;
+        public bool Visible { get; set; }
 
-        public int x1;
-        public int x2;
+        public int Line1 { get; set; }
+        public int Line2 { get; set; }
+
+        public int X1 { get; set; }
+        public int X2 { get; set; }
 
         protected AbstractFrame(Collection<AbstractFrame> list)
         {
@@ -31,108 +31,114 @@ namespace AglonaReader
         }
 
 
-        public void FillByRenderInfo(RenderedTextInfo renderedTextInfo, byte side)
+        public void FillByRenderInfo(RenderedTextInfo renderedTextInfo, byte newSide)
         {
-            if (!renderedTextInfo.valid)
+            if (renderedTextInfo == null
+                || !renderedTextInfo.valid)
             {
-                visible = false;
+                this.Visible = false;
                 return;
             }
 
-            visible = true;
+            this.Visible = true;
 
-            this.side = side;
+            this.Side = newSide;
 
-            line1 = renderedTextInfo.line1;
-            line2 = renderedTextInfo.line2;
+            this.Line1 = renderedTextInfo.line1;
+            this.Line2 = renderedTextInfo.line2;
 
-            x1 = renderedTextInfo.x1;
-            x2 = renderedTextInfo.x2;
+            this.X1 = renderedTextInfo.x1;
+            this.X2 = renderedTextInfo.x2;
         }
 
-        public abstract void Draw(ParallelTextControl pTC);
+        public abstract void Draw(ParallelTextControl parallelTextControl);
 
-        public abstract void Dispose();
-        
     }
 
-    public class DoubleFrame
+    public class DoubleFrame : IDisposable
     {
-        public AbstractFrame f1;
-        public AbstractFrame f2;
+        public AbstractFrame F1 { get; set; }
+        public AbstractFrame F2 { get; set; }
 
         public DoubleFrame(Pen pen, Collection<AbstractFrame> list)
         {
-            f1 = new Frame(pen, list);
-            f1.side = 1;
+            F1 = new Frame(pen, list);
+            F1.Side = 1;
 
-            f2 = new Frame(pen, list);
-            f2.side = 2;
+            F2 = new Frame(pen, list);
+            F2.Side = 2;
         }
 
         public DoubleFrame(Brush brush, Collection<AbstractFrame> list)
         {
-            f1 = new Background(brush, list);
-            f1.side = 1;
+            this.F1 = new Background(brush, list);
+            this.F1.Side = 1;
 
-            f2 = new Background(brush, list);
-            f2.side = 2;
+            this.F2 = new Background(brush, list);
+            this.F2.Side = 2;
         }
 
         internal AbstractFrame Frame(byte side)
         {
-            return side == 1 ? f1 : f2;
+            return side == 1 ? F1 : F2;
+        }
+
+        public void Dispose()
+        {
+            
         }
     }
 
 
-    public class Background : AbstractFrame
+    public class Background : AbstractFrame, IDisposable
     {
-        public Brush brush;
+        public Brush BackgroundBrush { get; set; }
         
         public Background(Brush brush, Collection<AbstractFrame> list) : base(list)
         {
-            this.brush = brush;
+            this.BackgroundBrush = brush;
         }
 
-        public sealed override void Dispose()
+        public void Dispose()
         {
-            if (brush != null)
-                brush.Dispose();
+            if (BackgroundBrush != null)
+                BackgroundBrush.Dispose();
         }
 
-        public override void Draw(ParallelTextControl pTC)
+        public override void Draw(ParallelTextControl parallelTextControl)
         {
-            if (pTC != null)
-                pTC.DrawBackground(this);
+            if (parallelTextControl != null)
+                parallelTextControl.DrawBackground(this);
         }
     }
 
 
 
-    public class Frame : AbstractFrame
+    public class Frame : AbstractFrame, IDisposable
     {
 
         public Pen pen;
 
-        public static Pen CreatePen(Color _color, DashStyle _dashStyle, float _width)
+        public static Pen CreatePen(Color color, DashStyle dashStyle, float width)
         {
-            Pen result = new Pen(_color, _width);
+            Pen result = new Pen(color, width);
             result.StartCap = LineCap.Round;
             result.EndCap = LineCap.Round;
-            result.DashStyle = _dashStyle;
+            result.DashStyle = dashStyle;
             return result;
         }
 
         public Frame(Pen pen, Collection<AbstractFrame> list) : base(list)
         {
-            visible = false;
-            this.pen = pen;
-            list.Add(this);
+            Visible = false;
+            if (pen != null)
+                this.pen = pen;
+            if (list != null)
+                list.Add(this);
         }
 
         // Dispose() calls Dispose(true)
-        public override void Dispose()
+        public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);

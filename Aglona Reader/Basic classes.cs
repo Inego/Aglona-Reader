@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Xml;
@@ -7,7 +8,7 @@ using System.Xml;
 namespace AglonaReader
 {
 
-    public class DB_Row
+    public class WordInfo
     {
         public string word;
         public int line;
@@ -15,12 +16,12 @@ namespace AglonaReader
         public int x2;
         public int pos;
 
-        public DB_Row(string word, int line, int x, int x2, int pos)
+        public WordInfo(string word, int line, int wordX, int wordX2, int pos)
         {
             this.word = word;
             this.line = line;
-            this.x = x;
-            this.x2 = x2;
+            this.x = wordX;
+            this.x2 = wordX2;
             this.pos = pos;
         }
 
@@ -114,8 +115,8 @@ namespace AglonaReader
 
         
         /// <summary>
-        /// How many lines are required to be added in order to compute the start line of the next text pair.
-        /// Zero means that the next pair begins at the same line.
+        /// How many lines are required to be added in order to compute the start line of the next text Pair.
+        /// Zero means that the next Pair begins at the same line.
         /// </summary>
         public int height;
 
@@ -124,35 +125,40 @@ namespace AglonaReader
         public RenderedTextInfo renderedInfo1;
         public RenderedTextInfo renderedInfo2;
 
-        private List<DB_Row> computedWords1;
-        public List<DB_Row> computedWords2;
+        private Collection<WordInfo> computedWords1;
+        public Collection<WordInfo> computedWords2;
 
-        public char GetChar(byte side, int i)
+        public char GetChar(byte side, int charIndex)
         {
             if (side == 1)
                 if (sb1 == null)
-                    return text1[i];
+                    return text1[charIndex];
                 else
-                    return sb1[i];
+                    return sb1[charIndex];
             else
                 if (sb2 == null)
-                    return text2[i];
+                    return text2[charIndex];
                 else
-                    return sb2[i];
+                    return sb2[charIndex];
         }
 
-        public List<DB_Row> ComputedWords(byte side, bool createNew = false)
+        public Collection<WordInfo> ComputedWords(byte side, bool createNew)
         {
             if (side == 1)
             {
-                if (createNew && computedWords1 == null) computedWords1 = new List<DB_Row>();
+                if (createNew && computedWords1 == null) computedWords1 = new Collection<WordInfo>();
                 return computedWords1;
             }
             else
             {
-                if (createNew && computedWords2 == null) computedWords2 = new List<DB_Row>();
+                if (createNew && computedWords2 == null) computedWords2 = new Collection<WordInfo>();
                 return computedWords2;
             }
+        }
+
+        public Collection<WordInfo> ComputedWords(byte side)
+        {
+            return ComputedWords(side, false);
         }
 
         public TextPair()
@@ -170,20 +176,22 @@ namespace AglonaReader
 
         }
 
-        public TextPair(string _t1, string _t2, bool _s1, bool _s2) : this()
+        public TextPair(string text1, string text2, bool startParagraph1, bool startParagraph2) : this()
         {
-            if (_t1.Length >= ParallelTextControl.BigTextSize)
-                sb1 = new StringBuilder(_t1);
-            else
-                text1 = _t1;
+            if (text1 != null)
+                if (text1.Length >= ParallelTextControl.BigTextSize)
+                    this.sb1 = new StringBuilder(text1);
+                else
+                    this.text1 = text1;
 
-            if (_t2.Length >= ParallelTextControl.BigTextSize)
-                sb2 = new StringBuilder(_t2);
-            else
-                text2 = _t2;
+            if (text2 != null)
+                if (text2.Length >= ParallelTextControl.BigTextSize)
+                    this.sb2 = new StringBuilder(text2);
+                else
+                    this.text2 = text2;
 
-            startParagraph1 = _s1;
-            startParagraph2 = _s2;
+            this.startParagraph1 = startParagraph1;
+            this.startParagraph2 = startParagraph2;
 
         }
 
@@ -237,7 +245,7 @@ namespace AglonaReader
                     return NaturalDividerPosition(sb2, recommended_natural2);
         }
 
-        private int NaturalDividerPosition(StringBuilder text, int recommended_natural)
+        private static int NaturalDividerPosition(StringBuilder text, int recommended_natural)
         {
             int current_iteration = 0;
 
@@ -303,7 +311,7 @@ namespace AglonaReader
         }
 
 
-        private int NaturalDividerPosition(string text, int recommended_natural)
+        private static int NaturalDividerPosition(string text, int recommended_natural)
         {
             int current_iteration = 0;
 
@@ -416,16 +424,20 @@ namespace AglonaReader
             computedPairs = new List<TextPair>();
         }
 
-        public void AddPair(string _t1, string _t2, bool _e1 = false, bool _e2 = false)
+        public void AddPair(string text1, string text2, bool startParagraph1, bool startParagraph2)
         {
             TextPair newPair = textPairs.Count == 0 ?
-                new TextPair(_t1, _t2, true, true) :
-                new TextPair(_t1, _t2, _e1, _e2);
+                new TextPair(text1, text2, true, true) :
+                new TextPair(text1, text2, startParagraph1, startParagraph2);
 
             textPairs.Add(newPair);
             
         }
 
+        public void AddPair(string text1, string text2)
+        {
+            AddPair(text1, text2, true, true);
+        }
 
         public void Truncate()
         {
@@ -434,15 +446,19 @@ namespace AglonaReader
             computedPairs.Clear();
         }
 
-        public static void InsertWords(List<DBCommonRow> list, int spaceLeft, byte side)
+        public static void InsertWords(Collection<CommonWordInfo> list, int spaceLeft, byte side)
         {
-            List<DB_Row> l = null;
+
+            if (list == null)
+                return;
+
+            Collection<WordInfo> l = null;
             TextPair prev_p = null;
 
             int bias = 0;
             int counter = 0;
 
-            foreach (DBCommonRow r in list)
+            foreach (CommonWordInfo r in list)
             {
 
                 if (spaceLeft != 0 && counter > 0)
@@ -452,14 +468,14 @@ namespace AglonaReader
                     spaceLeft -= inc;
                 }
 
-                if (prev_p != r.textPair)
+                if (prev_p != r.TextPair)
                 {
-                    prev_p = r.textPair;
+                    prev_p = r.TextPair;
 
                     l = prev_p.ComputedWords(side, true);
                 }
 
-                l.Add(new DB_Row(r.word, r.line, r.x + bias, r.x2 + bias, r.pos));
+                l.Add(new WordInfo(r.word, r.line, r.x + bias, r.x2 + bias, r.pos));
 
                 counter++;
             }
@@ -468,12 +484,12 @@ namespace AglonaReader
         }
 
 
-        public void Save(string _fileName)
+        public void Save(string newFileName)
         {
 
             byte level;
 
-            using (XmlTextWriter writer = new XmlTextWriter(_fileName, Encoding.UTF8))
+            using (XmlTextWriter writer = new XmlTextWriter(newFileName, Encoding.UTF8))
             {
                 
                 writer.WriteStartElement("ParallelBook");
@@ -534,13 +550,13 @@ namespace AglonaReader
                 writer.Flush();
             }
 
-            fileName = _fileName;
+            this.fileName = newFileName;
         }
 
 
-        public bool Load(string _fileName)
+        public bool Load(string newFileName)
         {
-            using (XmlTextReader reader = new XmlTextReader(_fileName))
+            using (XmlTextReader reader = new XmlTextReader(newFileName))
             {
                 reader.Read();
 
@@ -677,7 +693,7 @@ namespace AglonaReader
 
                 reader.Close();
 
-                fileName = _fileName;
+                fileName = newFileName;
 
                 return true;
 

@@ -11,7 +11,7 @@ namespace AglonaReader
 {
     public partial class BookInfoForm : Form
     {
-        public ParallelTextControl pTC;
+        public ParallelTextControl ParallelTC { get; set; }
 
         public BookInfoForm()
         {
@@ -20,12 +20,12 @@ namespace AglonaReader
 
         private void BookInfoForm_Load(object sender, EventArgs e)
         {
-            if (pTC == null)
+            if (ParallelTC == null)
                 return;
 
-            ParallelText pText = pTC.pText;
+            ParallelText pText = ParallelTC.pText;
 
-            if (pTC.reversed)
+            if (ParallelTC.reversed)
             {
                 author1.Text = pText.author2;
                 title1.Text = pText.title2;
@@ -57,9 +57,9 @@ namespace AglonaReader
         private void okButton_Click(object sender, EventArgs e)
         {
 
-            ParallelText pText = pTC.pText;
+            ParallelText pText = ParallelTC.pText;
 
-            if (pTC.reversed)
+            if (ParallelTC.reversed)
             {
                 pText.author1 = author2.Text;
                 pText.title1 = title2.Text;
