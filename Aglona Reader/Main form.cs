@@ -1,10 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
-using System.Collections.Generic;
-using System.Text;
-using System.Configuration;
-using System.Xml.Serialization;
 
 
 
@@ -45,21 +42,44 @@ namespace AglonaReader
             if (appSettings == null)
                 appSettings = new AppSettings();
 
-            if (appSettings != null && appSettings.fileUsages.Count > 0)
+            if (appSettings != null)
             {
-                FileUsageInfo f = appSettings.fileUsages[0];
-                pTC.reversed = f.reversed;
-                pTC.SetSplitterPositionByRatio(f.splitterRatio);
-                pTC.HighlightedPair = f.pair;
-                pTC.currentPair = f.topPair;
-                pTC.pText.Load(f.fileName);
-                pTC.FindNaturalDividers(0);
-                Recompute();
+
+                pTC.HighlightFragments = appSettings.highlightFragments;
+                pTC.Brightness = appSettings.brightness;
+
+                if (appSettings.fileUsages.Count > 0)
+                {
+
+                    FileUsageInfo f = appSettings.fileUsages[0];
+                    pTC.reversed = f.reversed;
+                    reverseToolStripMenuItem.Checked = pTC.reversed;
+                    pTC.SetSplitterPositionByRatio(f.splitterRatio);
+
+                    pTC.pText.Load(f.fileName);
+
+                    if (pTC.Number > 0)
+                    {
+                        if (f.pair >= pTC.Number)
+                            pTC.HighlightedPair = pTC.Number - 1;
+                        else
+                            pTC.HighlightedPair = f.pair;
+
+                        if (f.topPair >= pTC.Number)
+                            pTC.currentPair = pTC.Number - 1;
+                        else
+                            pTC.currentPair = f.topPair;
+
+                        pTC.FindNaturalDividers(0);
+                        Recompute();
+                    }
+                }
+
             }
             else
                 pTC.SetSplitterPositionByRatio(0.5F);
 
-
+            highlightFramgentsToolStripMenuItem.Checked = appSettings.highlightFragments;
         }
 
         private bool XonSplitter(int x)
@@ -177,21 +197,21 @@ namespace AglonaReader
                     if (pTC.mouse_text_currentword.side == 1)
                     {
                         pTC.naturalDividerPosition1_w = pTC.mouse_text_currentword.next;
-                        pTC.naturalDividerPosition1 = pTC.naturalDividerPosition1_w.pos;
+                        pTC.NaturalDividerPosition1 = pTC.naturalDividerPosition1_w.pos;
                         pTC.SetNippingFrameByScreenWord(1, pTC.naturalDividerPosition1_w);
                         (pTC.nippingFrame.f1 as Frame).pen = pTC.correctedPen;
-                        pTC.side1Set = true;
+                        pTC.Side1Set = true;
                     }
                     else
                     {
                         pTC.naturalDividerPosition2_w = pTC.mouse_text_currentword.next;
-                        pTC.naturalDividerPosition2 = pTC.naturalDividerPosition2_w.pos;
+                        pTC.NaturalDividerPosition2 = pTC.naturalDividerPosition2_w.pos;
                         pTC.SetNippingFrameByScreenWord(2, pTC.naturalDividerPosition2_w);
                         (pTC.nippingFrame.f2 as Frame).pen = pTC.correctedPen;
-                        pTC.side2Set = true;
+                        pTC.Side2Set = true;
                     }
 
-                    if (pTC.side1Set && pTC.side2Set)
+                    if (pTC.Side1Set && pTC.Side2Set)
                         pTC.NipHighlightedPair();
                     else
                     {
@@ -228,7 +248,6 @@ namespace AglonaReader
                     if (pTC.currentPair != pTC.HighlightedPair)
                     {
                         pTC.currentPair = pTC.HighlightedPair;
-                        pTC.nippedPair = null;
                         pTC.PrepareScreen();
                         pTC.RenderPairs();
                         pTC.FindNaturalDividersOnScreen(0);
@@ -240,7 +259,6 @@ namespace AglonaReader
                 pTC.HighlightedPair++;
 
                 pTC.FindNaturalDividers(0);
-                pTC.nippedPair = null;
 
                 TextPair p = pTC.pText.textPairs[pTC.HighlightedPair];
 
@@ -269,7 +287,6 @@ namespace AglonaReader
                 pTC.HighlightedPair--;
 
                 pTC.FindNaturalDividers(0);
-                pTC.nippedPair = null;
 
                 TextPair p = pTC.pText.textPairs[pTC.HighlightedPair];
 
@@ -294,7 +311,6 @@ namespace AglonaReader
 
                     pTC.MergePairs(pTC.HighlightedPair - 1);
                     pTC.HighlightedPair--;
-                    pTC.nippedPair = null;
                     pTC.PairChanged(pTC.HighlightedPair);
                 }
             }
@@ -326,7 +342,6 @@ namespace AglonaReader
                 {
                     pTC.HighlightedPair = n - 1;
                     pTC.currentPair = pTC.HighlightedPair;
-                    pTC.nippedPair = null;
                     pTC.PrepareScreen();
                     pTC.RenderPairs();
                     pTC.FindNaturalDividers(0);
@@ -334,8 +349,45 @@ namespace AglonaReader
                     pTC.Render();
                 }
 
+            }
+
+            else if (e.KeyData == (Keys.Control | Keys.Home))
+            {
+                int n = pTC.pText.Number();
+                if (n == 0)
+                    return;
+                
+                    pTC.HighlightedPair = 0;
+                    pTC.currentPair = 0;
+                    pTC.PrepareScreen();
+                    pTC.RenderPairs();
+                    pTC.FindNaturalDividers(0);
+                    pTC.FindNaturalDividersOnScreen(0);
+                    pTC.Render();
 
             }
+
+            else if (e.KeyData == (Keys.Control | Keys.OemOpenBrackets))
+            {
+                if (pTC.Brightness > 0.6)
+                {
+                    pTC.Brightness -= 0.005;
+                    pTC.RenderPairs();
+                    pTC.Render();
+                }
+            }
+
+            else if (e.KeyData == (Keys.Control | Keys.OemCloseBrackets))
+            {
+                if (pTC.Brightness < 0.995)
+                {
+                    pTC.Brightness += 0.005;
+                    pTC.RenderPairs();
+                    pTC.Render();
+                }
+            }
+
+            
             
         }
 
@@ -470,6 +522,9 @@ namespace AglonaReader
                 f.splitterRatio = pTC.SplitterRatio;
             }
 
+            appSettings.highlightFragments = pTC.HighlightFragments;
+            appSettings.brightness = pTC.Brightness;
+
             Properties.Settings.Default.AppSettings = appSettings;
             Properties.Settings.Default.Save();
         }
@@ -496,7 +551,8 @@ namespace AglonaReader
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            ColorTableForm f = new ColorTableForm();
+            f.ShowDialog();
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -504,16 +560,23 @@ namespace AglonaReader
             SaveAppSettings();
         }
 
+        private void highlightFramgentsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            pTC.HighlightFragments = highlightFramgentsToolStripMenuItem.Checked;
+            pTC.RenderPairs();
+            pTC.Render();
+        }
+
     }
 
-    public class DB_Common_Row : DB_Row
+    public class DBCommonRow : DB_Row
     {
         public TextPair textPair;
 
-        public DB_Common_Row(TextPair _textPair, string _w, int _l, int _x, int _x2, int _pos)
-            : base(_w, _l, _x, _x2, _pos)
+        public DBCommonRow(TextPair textPair, string word, int line, int x, int x2, int pos)
+            : base(word, line, x, x2, pos)
         {
-            textPair = _textPair;
+            this.textPair = textPair;
 
         }
             
@@ -532,10 +595,15 @@ namespace AglonaReader
 
     public class AppSettings
     {
+        public bool highlightFragments;
+        public double brightness;
+
         public List<FileUsageInfo> fileUsages;
 
         public AppSettings()
         {
+            highlightFragments = true;
+            brightness = 0.96;
             fileUsages = new List<FileUsageInfo>();
         }
     }

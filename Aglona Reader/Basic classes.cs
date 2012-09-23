@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Data;
-using System.Drawing;
 using System.Xml;
 
 
@@ -18,13 +15,13 @@ namespace AglonaReader
         public int x2;
         public int pos;
 
-        public DB_Row(string _w, int _l, int _x, int _x2, int _pos)
+        public DB_Row(string word, int line, int x, int x2, int pos)
         {
-            word = _w;
-            line = _l;
-            x = _x;
-            x2 = _x2;
-            pos = _pos;
+            this.word = word;
+            this.line = line;
+            this.x = x;
+            this.x2 = x2;
+            this.pos = pos;
         }
 
     }
@@ -36,10 +33,18 @@ namespace AglonaReader
         public int line2;
         public int x1;
         public int x2;
+        public int x2b;
+        //public int x2b;
     }
 
     public class TextPair
     {
+
+        public RenderedTextInfo RenderedInfo(byte side)
+        {
+            return side == 1 ? renderedInfo1 : renderedInfo2;
+        }
+
         private int recommended_natural1;
         private int recommended_natural2;
 
@@ -72,8 +77,7 @@ namespace AglonaReader
         public string text1;
         public string text2;
 
-        // Length of a string to be considered a "big block"
-        public static int BigTextSize = 1000;
+        
 
         // Used if texts are large (typically in aligning mode for the "big block")
         public StringBuilder sb1;
@@ -168,12 +172,12 @@ namespace AglonaReader
 
         public TextPair(string _t1, string _t2, bool _s1, bool _s2) : this()
         {
-            if (_t1.Length >= BigTextSize)
+            if (_t1.Length >= ParallelTextControl.BigTextSize)
                 sb1 = new StringBuilder(_t1);
             else
                 text1 = _t1;
 
-            if (_t2.Length >= BigTextSize)
+            if (_t2.Length >= ParallelTextControl.BigTextSize)
                 sb2 = new StringBuilder(_t2);
             else
                 text2 = _t2;
@@ -430,7 +434,7 @@ namespace AglonaReader
             computedPairs.Clear();
         }
 
-        public static void InsertWords(List<DB_Common_Row> list, int spaceLeft, byte side)
+        public static void InsertWords(List<DBCommonRow> list, int spaceLeft, byte side)
         {
             List<DB_Row> l = null;
             TextPair prev_p = null;
@@ -438,7 +442,7 @@ namespace AglonaReader
             int bias = 0;
             int counter = 0;
 
-            foreach (DB_Common_Row r in list)
+            foreach (DBCommonRow r in list)
             {
 
                 if (spaceLeft != 0 && counter > 0)
@@ -648,7 +652,7 @@ namespace AglonaReader
                     if (reader.Name != "s")
                         return false;
 
-                    if (reader.Value.Length >= TextPair.BigTextSize)
+                    if (reader.Value.Length >= ParallelTextControl.BigTextSize)
                         p.sb1 = new StringBuilder(reader.Value);
                     else
                         p.text1 = reader.Value;
@@ -659,7 +663,7 @@ namespace AglonaReader
                     if (reader.Name != "t")
                         return false;
 
-                    if (reader.Value.Length >= TextPair.BigTextSize)
+                    if (reader.Value.Length >= ParallelTextControl.BigTextSize)
                         p.sb2 = new StringBuilder(reader.Value);
                     else
                         p.text2 = reader.Value;

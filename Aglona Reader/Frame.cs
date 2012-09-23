@@ -1,7 +1,6 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 
@@ -25,15 +24,16 @@ namespace AglonaReader
         public int x1;
         public int x2;
 
-        public AbstractFrame(List<AbstractFrame> list)
+        protected AbstractFrame(Collection<AbstractFrame> list)
         {
-            list.Add(this);
+            if (list != null)
+                list.Add(this);
         }
 
 
-        public void FillByRenderInfo(RenderedTextInfo r, byte _side)
+        public void FillByRenderInfo(RenderedTextInfo renderedTextInfo, byte side)
         {
-            if (!r.valid)
+            if (!renderedTextInfo.valid)
             {
                 visible = false;
                 return;
@@ -41,13 +41,13 @@ namespace AglonaReader
 
             visible = true;
 
-            side = _side;
+            this.side = side;
 
-            line1 = r.line1;
-            line2 = r.line2;
+            line1 = renderedTextInfo.line1;
+            line2 = renderedTextInfo.line2;
 
-            x1 = r.x1;
-            x2 = r.x2;
+            x1 = renderedTextInfo.x1;
+            x2 = renderedTextInfo.x2;
         }
 
         public abstract void Draw(ParallelTextControl pTC);
@@ -61,21 +61,21 @@ namespace AglonaReader
         public AbstractFrame f1;
         public AbstractFrame f2;
 
-        public DoubleFrame(Pen _p, List<AbstractFrame> _l)
+        public DoubleFrame(Pen pen, Collection<AbstractFrame> list)
         {
-            f1 = new Frame(_p, _l);
+            f1 = new Frame(pen, list);
             f1.side = 1;
 
-            f2 = new Frame(_p, _l);
+            f2 = new Frame(pen, list);
             f2.side = 2;
         }
 
-        public DoubleFrame(Brush _b, List<AbstractFrame> _l)
+        public DoubleFrame(Brush brush, Collection<AbstractFrame> list)
         {
-            f1 = new Background(_b, _l);
+            f1 = new Background(brush, list);
             f1.side = 1;
 
-            f2 = new Background(_b, _l);
+            f2 = new Background(brush, list);
             f2.side = 2;
         }
 
@@ -90,12 +90,12 @@ namespace AglonaReader
     {
         public Brush brush;
         
-        public Background(Brush _b, List<AbstractFrame> _l) : base(_l)
+        public Background(Brush brush, Collection<AbstractFrame> list) : base(list)
         {
-            brush = _b;
+            this.brush = brush;
         }
 
-        public override void Dispose()
+        public sealed override void Dispose()
         {
             if (brush != null)
                 brush.Dispose();
@@ -103,7 +103,8 @@ namespace AglonaReader
 
         public override void Draw(ParallelTextControl pTC)
         {
-            pTC.DrawBackground(this);
+            if (pTC != null)
+                pTC.DrawBackground(this);
         }
     }
 
@@ -123,10 +124,10 @@ namespace AglonaReader
             return result;
         }
 
-        public Frame(Pen _pen, List<AbstractFrame> list) : base(list)
+        public Frame(Pen pen, Collection<AbstractFrame> list) : base(list)
         {
             visible = false;
-            pen = _pen;
+            this.pen = pen;
             list.Add(this);
         }
 
