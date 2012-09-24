@@ -97,7 +97,7 @@ namespace AglonaReader
         private SortedList<int, List<ScreenWord>> wordsOnScreen;
 
 
-        public Font font = new System.Drawing.Font("times", 18.0F);
+        public Font textFont = new System.Drawing.Font("times", 18.0F);
         private Brush drawBrush = new SolidBrush(Color.Black);
 
         public int vMargin = 2;
@@ -112,6 +112,12 @@ namespace AglonaReader
         /// Index of current Pair
         /// </summary>
         public int currentPair;
+
+
+        public TextPair this[int pairIndex]
+        {
+            get { return pText[pairIndex]; }
+        }
 
 
         /// <summary>
@@ -269,7 +275,7 @@ namespace AglonaReader
         public int spaceLength;
 
         /// <summary>
-        /// Number of lines that fit on screen according to the current font and vertical size of the screen
+        /// Number of lines that fit on screen according to the current textFont and vertical size of the screen
         /// </summary>
         public int NumberOfScreenLines;
 
@@ -317,7 +323,7 @@ namespace AglonaReader
             else
             {
                 // Measure and store in the dictionary
-                result = TextRenderer.MeasureText(graphics, word, font, Size.Empty, TextFormatFlags.NoPadding).Width;
+                result = TextRenderer.MeasureText(graphics, word, textFont, Size.Empty, TextFormatFlags.NoPadding).Width;
                 widthDictionary.Add(word, result);
                 return result;
             }
@@ -332,7 +338,7 @@ namespace AglonaReader
         {
             spaceLength = WordWidth(" ", graphics);
             shortWordWidth = WordWidth("What", graphics);
-            lineHeight = font.Height;
+            lineHeight = textFont.Height;
         }
 
         /// <summary>
@@ -573,7 +579,7 @@ namespace AglonaReader
             Graphics g = primaryBG.Graphics;
 
             if (!string.IsNullOrEmpty(debugString))
-                TextRenderer.DrawText(g, debugString, font, new Point(panelMargin, Height - lineHeight), Color.Red);
+                TextRenderer.DrawText(g, debugString, textFont, new Point(panelMargin, Height - lineHeight), Color.Red);
 
             if (editWhenNipped)
                 g.FillEllipse(Brushes.Red, Width - 13, 2, 10, 10);
@@ -591,7 +597,7 @@ namespace AglonaReader
 
             Graphics g = primaryBG.Graphics;
 
-            TextRenderer.DrawText(g, sw.word, font, new Point(sw.x, vMargin + sw.line * lineHeight),
+            TextRenderer.DrawText(g, sw.word, textFont, new Point(sw.x, vMargin + sw.line * lineHeight),
                 Color.Black, color, TextFormatFlags.NoPadding | TextFormatFlags.SingleLine);
         }
 
@@ -918,10 +924,10 @@ namespace AglonaReader
 
                     // Draw next word
                     if (i == 0 && !(big && HighlightFragments))
-                        TextRenderer.DrawText(g, wrd, font, new Point(x, vMargin + y * lineHeight),
+                        TextRenderer.DrawText(g, wrd, textFont, new Point(x, vMargin + y * lineHeight),
                             Color.Black, big ? grayColor : colorTable[pairIndex % NumberofColors], TextFormatFlags.NoPadding | TextFormatFlags.SingleLine);
                     else
-                        TextRenderer.DrawText(g, wrd, font, new Point(x, vMargin + y * lineHeight),
+                        TextRenderer.DrawText(g, wrd, textFont, new Point(x, vMargin + y * lineHeight),
                             Color.Black, TextFormatFlags.NoPadding | TextFormatFlags.SingleLine);
 
                     s.pair = p;
@@ -1238,6 +1244,26 @@ namespace AglonaReader
 
         }
 
+        private bool PosIsOnOrAfterLastScreenWord(TextPair p, int pos1, int pos2)
+        {
+            int lastPos1 = -1;
+            int lastPos2 = -1;
+
+            foreach (KeyValuePair<int, List<ScreenWord>> kv in wordsOnScreen)
+                foreach (ScreenWord sw in kv.Value)
+                    if (sw.pair == p)
+                    {
+                        if (sw.side == 1)
+                            lastPos1 = sw.pos;
+                        else
+                            lastPos2 = sw.pos;
+                    }
+
+            return (pos1 >= lastPos1 || pos2 >= lastPos2);
+
+        }
+
+
         public void SetNippingFrameByScreenWord(byte side, ScreenWord sw)
         {
             Frame f = (Frame) nippingFrame.Frame(side);
@@ -1295,12 +1321,12 @@ namespace AglonaReader
 
         }
 
-        internal void NipHighlightedPair()
+        internal bool NipHighlightedPair()
         {
             if (naturalDividerPosition1_w == null
                     || naturalDividerPosition2_w == null)
 
-                return;
+                return false;
 
             TextPair np = new TextPair();
 
@@ -1357,7 +1383,7 @@ namespace AglonaReader
             while (j < pText.Number() - 1)
             {
                 j++;
-                _q = pText.textPairs[j];
+                _q = pText[j];
                 if (_q.startParagraph1 && _q.startParagraph2)
                     break;
                 _q.ClearComputedWords();
@@ -1368,6 +1394,14 @@ namespace AglonaReader
 
             FindNaturalDividers(0);
 
+            if (currentPair != HighlightedPair
+                && PosIsOnOrAfterLastScreenWord(pText[HighlightedPair], NaturalDividerPosition1, NaturalDividerPosition2))
+            {
+                currentPair = HighlightedPair;
+                PrepareScreen();
+                RenderPairs();
+            }
+
             FindNaturalDividersScreen(0);
             Render();
 
@@ -1375,6 +1409,8 @@ namespace AglonaReader
             Side2Set = false;
 
             Modified = true;
+
+            return true;
 
         }
 
@@ -1723,6 +1759,7 @@ namespace AglonaReader
         }
 
         public int Number { get { return pText.Number(); } }
+        
     }
 
     public class ScreenWord

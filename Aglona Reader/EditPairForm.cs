@@ -66,7 +66,7 @@ namespace AglonaReader
 
         private void EditPairForm_Shown(object sender, EventArgs e)
         {
-            TextPair = ParallelTextControl.pText.textPairs[PairIndex];
+            TextPair = ParallelTextControl[PairIndex];
 
             if (ParallelTextControl.reversed)
             {

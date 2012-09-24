@@ -76,7 +76,8 @@ namespace AglonaReader
                         Recompute();
                     }
                 }
-                pTC.SetSplitterPositionByRatio(0.5F);
+                else
+                    pTC.SetSplitterPositionByRatio(0.5F);
 
             }
             else
@@ -144,7 +145,7 @@ namespace AglonaReader
                     
 
                     if (found_word == null
-                        || pTC.HighlightedPair != -1 && found_word.pair != pTC.pText.textPairs[pTC.HighlightedPair])
+                        || pTC.HighlightedPair != -1 && found_word.pair != pTC[pTC.HighlightedPair])
                     {
                         pTC.mouse_text_currentword = null;
                     }
@@ -282,7 +283,7 @@ namespace AglonaReader
 
             else if (e.KeyData == (Keys.Control | Keys.End))
             {
-                int n = pTC.pText.Number();
+                int n = pTC.Number;
                 if (n == 0)
                     return;
                 if (pTC.HighlightedPair != n - 1)
@@ -300,7 +301,7 @@ namespace AglonaReader
 
             else if (e.KeyData == (Keys.Control | Keys.Home))
             {
-                int n = pTC.pText.Number();
+                int n = pTC.Number;
                 if (n == 0)
                     return;
                 
@@ -341,13 +342,13 @@ namespace AglonaReader
             if (pTC.HighlightedPair == 0)
                 return;
 
-            TextPair prev_p = pTC.pText.textPairs[pTC.HighlightedPair];
+            TextPair prev_p = pTC[pTC.HighlightedPair];
 
             pTC.HighlightedPair--;
 
             pTC.FindNaturalDividers(0);
 
-            TextPair p = pTC.pText.textPairs[pTC.HighlightedPair];
+            TextPair p = pTC[pTC.HighlightedPair];
 
             if (prev_p.renderedInfo1.line1 == 0 && (prev_p.renderedInfo1.x1 == 0 || p.height > 0)
                 || prev_p.renderedInfo2.line1 == 0 && (prev_p.renderedInfo2.x1 == 0 || p.height > 0))
@@ -363,7 +364,7 @@ namespace AglonaReader
 
         private void ProcessKeyDown()
         {
-            if (pTC.HighlightedPair == pTC.pText.Number() - 1)
+            if (pTC.HighlightedPair == pTC.Number - 1)
             {
                 if (pTC.currentPair != pTC.HighlightedPair)
                 {
@@ -380,12 +381,13 @@ namespace AglonaReader
 
             pTC.FindNaturalDividers(0);
 
-            TextPair p = pTC.pText.textPairs[pTC.HighlightedPair];
+            TextPair p = pTC[pTC.HighlightedPair];
 
-            if (p.renderedInfo1.line2 == -1
+            if ((p.renderedInfo1.line2 == -1
                 || p.renderedInfo1.line2 >= pTC.NumberOfScreenLines - 1
                 || p.renderedInfo2.line2 == -1
                 || p.renderedInfo2.line2 >= pTC.NumberOfScreenLines - 1)
+                && !pTC[pTC.HighlightedPair].IsBig())
             {
                 pTC.currentPair = pTC.HighlightedPair;
                 pTC.PrepareScreen();
@@ -399,7 +401,7 @@ namespace AglonaReader
 
         private void ChangeNatural(byte screen_side, bool inc)
         {
-            TextPair p = pTC.pText.textPairs[pTC.HighlightedPair];
+            TextPair p = pTC[pTC.HighlightedPair];
 
             byte side;
 
@@ -562,8 +564,10 @@ namespace AglonaReader
         {
             if (e.KeyChar == ' ')
             {
-                pTC.NipHighlightedPair();
-                pTC.mouse_text_currentword = null;
+                if (pTC.NipHighlightedPair())
+                    pTC.mouse_text_currentword = null;
+                else
+                    ProcessKeyDown();
 
             }
         }

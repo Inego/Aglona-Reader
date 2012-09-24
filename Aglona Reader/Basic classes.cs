@@ -73,6 +73,11 @@ namespace AglonaReader
                 return recommended_natural2;
         }
 
+        public bool IsBig()
+        {
+            return sb1 != null || sb2 != null;
+        }
+
         public byte structureLevel;
 
         public string text1;
@@ -422,6 +427,11 @@ namespace AglonaReader
         {
             textPairs = new List<TextPair>();
             computedPairs = new List<TextPair>();
+        }
+
+        public TextPair this[int pairIndex]
+        {
+            get { return textPairs[pairIndex]; }
         }
 
         public void AddPair(string text1, string text2, bool startParagraph1, bool startParagraph2)
