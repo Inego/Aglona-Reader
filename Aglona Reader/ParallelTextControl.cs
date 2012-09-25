@@ -28,7 +28,8 @@ namespace AglonaReader
         List<double> colorTableH;
         List<SolidBrush> brushTable;
         List<Pen> penTable;
-        List<Color> colorTable;
+        List<Color> darkColorTable;
+        List<Color> lightColorTable;
         Color grayColor; // Changes with Brightness
 
         private double brightness;
@@ -58,20 +59,26 @@ namespace AglonaReader
 
                 penTable.Clear();
 
-                colorTable.Clear();
+                darkColorTable.Clear();
+                lightColorTable.Clear();
 
             }
 
-            Color c;
+            Color lightColor;
+            Color darkColor;
 
             for (byte i = 0; i < NumberofColors; i++)
             {
-                brushTable.Add(new SolidBrush(ColorRGB.HSL2RGB(colorTableH[i], 1, brightness)));
 
-                c = ColorRGB.HSL2RGB(colorTableH[i], 1, brightness - 0.1);
+                lightColor = ColorRGB.HSL2RGB(colorTableH[i], 1, brightness);
+                lightColorTable.Add(lightColor);
 
-                penTable.Add(new Pen(c));
-                colorTable.Add(c);
+                brushTable.Add(new SolidBrush(lightColor));
+
+                darkColor = ColorRGB.HSL2RGB(colorTableH[i], 1, brightness - 0.1);
+
+                penTable.Add(new Pen(darkColor));
+                darkColorTable.Add(darkColor);
 
             }
 
@@ -454,7 +461,7 @@ namespace AglonaReader
             colorTableH.Add(0.68);
             colorTableH.Add(0.83);
             colorTableH.Add(0);
-            colorTableH.Add(0.11);
+            //colorTableH.Add(0.11); // Orange? Too close to yellow. Disable for now
 
             
 
@@ -468,7 +475,8 @@ namespace AglonaReader
 
             brushTable = new List<SolidBrush>();
             penTable = new List<Pen>();
-            colorTable = new List<Color>();
+            darkColorTable = new List<Color>();
+            lightColorTable = new List<Color>();
             
         }
 
@@ -877,6 +885,10 @@ namespace AglonaReader
                 DrawBackground(side, renderedInfo.line1, renderedInfo.x1, renderedInfo.line2, renderedInfo.x2b, secondaryBG.Graphics,
                     brushTable[pairIndex % NumberofColors]);
 
+            //if (!big && HighlightFragments)
+            //    DrawGradientBackground(side, renderedInfo.line1, renderedInfo.x1, renderedInfo.line2, renderedInfo.x2b, secondaryBG.Graphics,
+            //        pairIndex % NumberofColors);
+
             if (list != null)
                 for (int i = 0; i < list.Count; i++)
                 {
@@ -926,12 +938,30 @@ namespace AglonaReader
                     string wrd = r.word;
 
                     // Draw next word
+                    
+                    //if (HighlightFirstWords && i == 0 && !(big && HighlightFragments))
+                    //    TextRenderer.DrawText(g, wrd, textFont, new Point(x, vMargin + y * lineHeight),
+                    //        Color.Black, big ? grayColor : darkColorTable[pairIndex % NumberofColors], TextFormatFlags.NoPadding | TextFormatFlags.SingleLine);
+                    //else
+                    //    TextRenderer.DrawText(g, wrd, textFont, new Point(x, vMargin + y * lineHeight),
+                    //        Color.Black, TextFormatFlags.NoPadding | TextFormatFlags.SingleLine);
+
                     if (HighlightFirstWords && i == 0 && !(big && HighlightFragments))
-                        TextRenderer.DrawText(g, wrd, textFont, new Point(x, vMargin + y * lineHeight),
-                            Color.Black, big ? grayColor : colorTable[pairIndex % NumberofColors], TextFormatFlags.NoPadding | TextFormatFlags.SingleLine);
-                    else
-                        TextRenderer.DrawText(g, wrd, textFont, new Point(x, vMargin + y * lineHeight),
-                            Color.Black, TextFormatFlags.NoPadding | TextFormatFlags.SingleLine);
+                    {
+                        Rectangle wordRect = new Rectangle(x, vMargin + y * lineHeight, r.x2 - r.x + 1, lineHeight);
+                        LinearGradientBrush brush = new LinearGradientBrush(
+                            wordRect,
+                            big ? grayColor : darkColorTable[pairIndex % NumberofColors],
+                            HighlightFragments && !big ? lightColorTable[pairIndex % NumberofColors] : Color.White,
+                            LinearGradientMode.Horizontal);
+                        //TextRenderer.DrawText(g, wrd, textFont, new Point(x, vMargin + y * lineHeight),
+                        //    Color.Black, big ? grayColor : darkColorTable[pairIndex % NumberofColors], TextFormatFlags.NoPadding | TextFormatFlags.SingleLine);
+                        g.FillRectangle(brush, wordRect);
+                        brush.Dispose();
+                    }
+                        
+                    TextRenderer.DrawText(g, wrd, textFont, new Point(x, vMargin + y * lineHeight),
+                         Color.Black, TextFormatFlags.NoPadding | TextFormatFlags.SingleLine);
 
                     s.pair = p;
                     s.pos = r.pos;
@@ -1607,6 +1637,127 @@ namespace AglonaReader
                     new Point(textend, vMargin + (line2) * lineHeight)
                 });
         }
+
+
+        void DrawGradientBackground(byte side, int line1, int x1, int line2, int x2, Graphics g, int colorNumber)
+        {
+            int textstart;
+            int textend;
+            int width;
+
+            
+
+            if (side == 1 && !reversed || side == 2 && reversed)
+            {
+                textstart = panelMargin;
+                textend = leftWidth - panelMargin;
+                width = leftWidth - 2 * panelMargin;
+            }
+            else
+            {
+                textstart = splitterPosition + splitterWidth + panelMargin;
+                textend = Width - panelMargin;
+                width = rightWidth - 2 * panelMargin;
+            }
+
+            // Define starting points of linear gradient brush
+
+            Rectangle gradientRect = new Rectangle();
+
+            //gradientRect.X = line1 == -1 ? textstart : textstart + x1;
+            //gradientRect.Y = line1 == -1 ? 0 : vMargin + line1 * lineHeight;
+            //gradientRect.Width = (line2 == -1 ? textend : textstart + x2) - gradientRect.X;
+            //gradientRect.Height = (line2 == -1 ? Height : vMargin + (line2 + 1) * lineHeight) - gradientRect.Y;
+
+            if (line1 == line2 && line1 != -1)
+            {
+                gradientRect.X = textstart + x1;
+                gradientRect.Y = vMargin + line1 * lineHeight;
+                gradientRect.Width = x2 - x1;
+                gradientRect.Height = lineHeight;
+            }
+            else
+            {
+                gradientRect.X = textstart;
+                gradientRect.Y = line1 == -1 ? 0 : vMargin + line1 * lineHeight;
+                gradientRect.Width = width;
+                gradientRect.Height =
+                    (line2 == -1 ? Height : vMargin + (line2 + 1) * lineHeight) - gradientRect.Y;
+            }
+
+            //LinearGradientBrush brush = new LinearGradientBrush(gradientRect, darkColorTable[colorNumber], lightColorTable[colorNumber], 0.0F);
+            LinearGradientBrush brush = new LinearGradientBrush(gradientRect, darkColorTable[colorNumber], Color.White, LinearGradientMode.Vertical);
+
+            if (line1 == line2)
+                if (line1 == -1)
+                {
+                    // The frame begins and ends beyond the screen
+                    // We draw two parallel, unconnected lines on both sides
+                    g.FillRectangle(brush, textstart, 0, width, Height);
+                }
+                else
+                    // A piece of text
+                    g.FillRectangle(brush, textstart + x1, vMargin + line1 * lineHeight,
+                    x2 - x1, lineHeight);
+
+            else if (line1 == -1)
+                g.FillPolygon(brush, new Point[]
+                {
+                    new Point(textstart, 0),
+                    new Point(textstart, vMargin + (line2 + 1) * lineHeight),
+                    new Point(textstart + x2, vMargin + (line2 + 1) * lineHeight),
+                    new Point(textstart + x2, vMargin + line2 * lineHeight),
+                    new Point(textend, vMargin + line2 * lineHeight),
+                    new Point(textend, 0)
+                });
+
+            else if (line2 == -1)
+                if (x1 == 0) // Top starts at cursorX = 0
+                    g.FillPolygon(brush, new Point[]
+                    {
+                        new Point(textstart, Height - 1),
+                        new Point(textstart, vMargin + line1 * lineHeight),
+                        new Point(textend, vMargin + line1 * lineHeight),
+                        new Point(textend, Height - 1)
+                    });
+                else
+                    g.FillPolygon(brush, new Point[]
+                    {
+                        new Point(textstart, Height - 1),
+                        new Point(textstart, vMargin + (line1 + 1) * lineHeight),
+                        new Point(textstart + x1, vMargin + (line1 + 1) * lineHeight),
+                        new Point(textstart + x1, vMargin + line1 * lineHeight),
+                        new Point(textend, vMargin + line1 * lineHeight),
+                        new Point(textend, Height - 1)
+                    });
+
+            else if (x1 == 0)
+                g.FillPolygon(brush, new Point[]
+                {
+                    new Point(textend, vMargin + line1 * lineHeight),   
+                    new Point(textstart, vMargin + line1 * lineHeight),
+                    new Point(textstart, vMargin + (line2 + 1) * lineHeight),
+                    new Point(textstart + x2, vMargin + (line2 + 1) * lineHeight),
+                    new Point(textstart + x2, vMargin + line2 * lineHeight),
+                    new Point(textend, vMargin + line2 * lineHeight)
+                });
+            else
+                g.FillPolygon(brush, new Point[]
+                {
+                    new Point(textend, vMargin + line1 * lineHeight),
+                    new Point(textstart + x1, vMargin + line1 * lineHeight),
+                    new Point(textstart + x1, vMargin + (line1 + 1) * lineHeight),
+                    new Point(textstart, vMargin + (line1 + 1) * lineHeight),
+                    new Point(textstart, vMargin + (line2 + 1) * lineHeight),
+                    new Point(textstart + x2, vMargin + (line2 + 1) * lineHeight),
+                    new Point(textstart + x2, vMargin + (line2) * lineHeight),
+                    new Point(textend, vMargin + (line2) * lineHeight)
+                });
+
+            brush.Dispose();
+        }
+
+
 
         internal void DrawBackground(Background f)
         {
