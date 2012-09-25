@@ -250,6 +250,7 @@ namespace AglonaReader
                     return NaturalDividerPosition(sb2, recommended_natural2);
         }
 
+
         private static int NaturalDividerPosition(StringBuilder text, int recommended_natural)
         {
             int current_iteration = 0;
@@ -269,42 +270,48 @@ namespace AglonaReader
                 switch (c)
                 {
                     case '\n':
-                        if (state == 1)
-                            state = 2;
-                        else if (state == 3)
-                            state = 2;
+                        state = 2;
                         break;
 
+                    case '—':
                     case '.':
+                    case ',':
                     case ':':
                     case ';':
                     case '!':
                     case '?':
                         if (state == 1)
                             state = 3;
+                        else if (state == 2)
+                        {
+                            if (current_iteration == recommended_natural)
+                                goto CorrectAndReturn;
+                            current_iteration++;
+                            state = 3;
+                        }
+
+
                         break;
 
                     case ' ':
                     case '\t':
                     case '\r':
-                        if (state == 3)
-                            state = 2;
-
                         break;
 
                     default:
                         if ((c == '\'' || c == '\"' || c == '«' || c == '»') && state != 2)
                             // do nothing
                             ;
-                        else if (state == 0)
-                            state = 1;
-                        else if (state == 2 || state == 3)
-                        {
-                            if (current_iteration == recommended_natural)
-                                return pos;
-                            current_iteration++;
-                            state = 1;
-                        }
+                        else
+                            if (state == 0)
+                                state = 1;
+                            else if (state == 2 || state == 3)
+                            {
+                                if (current_iteration == recommended_natural)
+                                    goto CorrectAndReturn;
+                                current_iteration++;
+                                state = 1;
+                            }
                         break;
                 }
 
@@ -313,8 +320,30 @@ namespace AglonaReader
             }
 
             return -1;
+
+        CorrectAndReturn:
+
+            char prev;
+
+            if (pos > 0)
+            {
+                prev = text[pos - 1];
+                if (!(prev == ' '
+                    || prev == '\n'
+                    || prev == '\t'
+                    || prev == '\r'))
+                {
+                    pos--;
+                    goto CorrectAndReturn;
+                }
+            }
+
+            return pos;
+
+
         }
 
+        
 
         private static int NaturalDividerPosition(string text, int recommended_natural)
         {
@@ -335,42 +364,48 @@ namespace AglonaReader
                 switch (c)
                 {
                     case '\n':
-                        if (state == 1)
-                            state = 2;
-                        else if (state == 3)
-                            state = 2;
+                        state = 2;
                         break;
 
+                    case '—':
                     case '.':
+                    case ',':
                     case ':':
                     case ';':
                     case '!':
                     case '?':
                         if (state == 1)
                             state = 3;
+                        else if (state == 2)
+                        {
+                            if (current_iteration == recommended_natural)
+                                goto CorrectAndReturn;
+                            current_iteration++;
+                            state = 3;
+                        }
+                       
+
                         break;
 
                     case ' ':
                     case '\t':
                     case '\r':
-                        if (state == 3)
-                            state = 2;
-
                         break;
 
                     default:
                         if ((c == '\'' || c == '\"' || c == '«' || c == '»') && state != 2)
                             // do nothing
                             ;
-                        else if (state == 0)
-                            state = 1;
-                        else if (state == 2 || state == 3)
-                        {
-                            if (current_iteration == recommended_natural)
-                                return pos;
-                            current_iteration++;
-                            state = 1;
-                        }
+                        else
+                            if (state == 0)
+                                state = 1;
+                            else if (state == 2 || state == 3)
+                            {
+                                if (current_iteration == recommended_natural)
+                                    goto CorrectAndReturn;
+                                current_iteration++;
+                                state = 1;
+                            }
                         break;
                 }
 
@@ -379,6 +414,27 @@ namespace AglonaReader
             }
 
             return -1;
+
+        CorrectAndReturn:
+
+            char prev;
+
+            if (pos > 0)
+            {
+                prev = text[pos - 1];
+                if (!(prev == ' '
+                    || prev == '\n'
+                    || prev == '\t'
+                    || prev == '\r'))
+                {
+                    pos--;
+                    goto CorrectAndReturn;
+                }
+            }
+
+            return pos;
+
+            
         }
 
 

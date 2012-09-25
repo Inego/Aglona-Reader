@@ -12,6 +12,8 @@ namespace AglonaReader
     public partial class MainForm : Form
     {
 
+        bool newBook;
+
         AppSettings appSettings;
 
         byte opState;
@@ -43,47 +45,52 @@ namespace AglonaReader
             if (appSettings == null)
                 appSettings = new AppSettings();
 
-            if (appSettings != null)
+
+            pTC.HighlightFragments = appSettings.HighlightFragments;
+            pTC.HighlightFirstWords = appSettings.HighlightFirstWords;
+            pTC.Brightness = appSettings.Brightness;
+
+            if (appSettings.FileUsages.Count > 0)
             {
-
-                pTC.HighlightFragments = appSettings.HighlightFragments;
-                pTC.Brightness = appSettings.Brightness;
-
-                if (appSettings.FileUsages.Count > 0)
-                {
-
-                    FileUsageInfo f = appSettings.FileUsages[0];
-                    pTC.reversed = f.Reversed;
-                    reverseToolStripMenuItem.Checked = pTC.reversed;
-                    pTC.SetSplitterPositionByRatio(f.SplitterRatio);
-
-                    pTC.pText.Load(f.FileName);
-                    pTC.Modified = false;
-
-                    if (pTC.Number > 0)
-                    {
-                        if (f.Pair >= pTC.Number)
-                            pTC.HighlightedPair = pTC.Number - 1;
-                        else
-                            pTC.HighlightedPair = f.Pair;
-
-                        if (f.TopPair >= pTC.Number)
-                            pTC.currentPair = pTC.Number - 1;
-                        else
-                            pTC.currentPair = f.TopPair;
-
-                        pTC.FindNaturalDividers(0);
-                        Recompute();
-                    }
-                }
-                else
-                    pTC.SetSplitterPositionByRatio(0.5F);
-
+                LoadSettingsFromFileUsageInfo(appSettings.FileUsages[0], true);
+                newBook = false;
             }
             else
+            {
                 pTC.SetSplitterPositionByRatio(0.5F);
+                newBook = true;                
+            }
 
             highlightFramgentsToolStripMenuItem.Checked = appSettings.HighlightFragments;
+            highlightFirstWordsToolStripMenuItem.Checked = appSettings.HighlightFirstWords;
+        }
+
+        private void LoadSettingsFromFileUsageInfo(FileUsageInfo f, bool load)
+        {
+            
+            pTC.reversed = f.Reversed;
+            reverseToolStripMenuItem.Checked = pTC.reversed;
+            pTC.SetSplitterPositionByRatio(f.SplitterRatio);
+
+            if (load)
+                pTC.pText.Load(f.FileName);
+            pTC.Modified = false;
+
+            if (pTC.Number > 0)
+            {
+                if (f.Pair >= pTC.Number)
+                    pTC.HighlightedPair = pTC.Number - 1;
+                else
+                    pTC.HighlightedPair = f.Pair;
+
+                if (f.TopPair >= pTC.Number)
+                    pTC.currentPair = pTC.Number - 1;
+                else
+                    pTC.currentPair = f.TopPair;
+
+                pTC.FindNaturalDividers(0);
+                Recompute();
+            }
         }
 
         private bool XonSplitter(int x)
@@ -476,7 +483,7 @@ namespace AglonaReader
         {
             string fileName;
 
-            if (string.IsNullOrEmpty(pTC.pText.fileName) || askForFileName)
+            if (newBook || askForFileName)
             {
                 // Ask for the file name
                 using (SaveFileDialog d = new SaveFileDialog())
@@ -490,8 +497,13 @@ namespace AglonaReader
                         d.Dispose();
                         return;
                     }
-                    
+
                     fileName = d.FileName;
+
+                    RetrieveToTheTop(fileName);
+
+                    newBook = false;
+
                     d.Dispose();
                 }
             }
@@ -500,6 +512,34 @@ namespace AglonaReader
 
             pTC.pText.Save(fileName);
             pTC.Modified = false;
+        }
+
+        private bool RetrieveToTheTop(string fileName)
+        {
+            // Let's check whether there exists this file in the list
+
+            for (int index = 0; index < appSettings.FileUsages.Count; index++)
+            {
+                if (appSettings.FileUsages[index].FileName == fileName)
+                {
+                    if (index != 0)
+                    {
+                        FileUsageInfo toMove = appSettings.FileUsages[index];
+                        appSettings.FileUsages.Remove(toMove);
+                        appSettings.FileUsages.Insert(0, toMove);
+                    }
+                    return true;
+                }
+            }
+
+            FileUsageInfo fileUsageInfo = new FileUsageInfo();
+
+            fileUsageInfo.FileName = fileName;
+
+            appSettings.FileUsages.Insert(0, fileUsageInfo);
+
+            return false;
+
         }
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
@@ -522,19 +562,24 @@ namespace AglonaReader
                     fileName = openFileDialog.FileName;
                     pTC.pText = new ParallelText();
                     mouse_text_line = -1;
-                    pTC.currentPair = 0;
-                    pTC.HighlightedPair = 0;
+                    
                     pTC.pText.Load(fileName);
+
+                    if (RetrieveToTheTop(fileName))
+                        LoadSettingsFromFileUsageInfo(appSettings.FileUsages[0], false);
+                    else
+                    {
+                        pTC.currentPair = 0;
+                        pTC.HighlightedPair = 0;
+                    }
+
+                    newBook = false;
+
                     pTC.Modified = false;
+                    
                     pTC.FindNaturalDividers(0);
+                    
                     Recompute();
-
-                    // Add a new FileUsage
-
-                    FileUsageInfo f = new FileUsageInfo();
-                    f.FileName = fileName;
-
-                    appSettings.FileUsages.Insert(0, f);
 
                 }
 
@@ -544,9 +589,10 @@ namespace AglonaReader
 
         private void SaveAppSettings()
         {
-            if (appSettings.FileUsages.Count > 0)
+            if (appSettings.FileUsages.Count > 0 && !newBook)
             {
                 FileUsageInfo f = appSettings.FileUsages[0];
+
                 f.Pair = pTC.HighlightedPair;
                 f.TopPair = pTC.currentPair;
                 f.Reversed = pTC.reversed;
@@ -554,6 +600,8 @@ namespace AglonaReader
             }
 
             appSettings.HighlightFragments = pTC.HighlightFragments;
+            appSettings.HighlightFirstWords = pTC.HighlightFirstWords;
+            
             appSettings.Brightness = pTC.Brightness;
 
             Properties.Settings.Default.AppSettings = appSettings;
@@ -608,7 +656,10 @@ namespace AglonaReader
                     "Save modified book?", "The book was modified", MessageBoxButtons.YesNoCancel);
 
             if (r == System.Windows.Forms.DialogResult.Yes)
+            {
                 saveToolStripMenuItem_Click(sender, EventArgs.Empty);
+                SaveAppSettings();
+            }
 
             return r;
 
@@ -618,6 +669,29 @@ namespace AglonaReader
         private void highlightFramgentsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             pTC.HighlightFragments = highlightFramgentsToolStripMenuItem.Checked;
+            pTC.RenderPairs();
+            pTC.Render();
+        }
+
+        private void newToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (pTC.Modified)
+                if (AskToSaveModified(sender) == System.Windows.Forms.DialogResult.Cancel)
+                    return;
+
+            pTC.CreateNewParallelBook();
+
+            pTC.highlightedFrame.SetInvisible();
+            pTC.nippingFrame.SetInvisible();
+
+            pTC.ProcessLayoutChange();
+
+            newBook = true;
+        }
+
+        private void highlightFirstWordsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            pTC.HighlightFirstWords= highlightFirstWordsToolStripMenuItem.Checked;
             pTC.RenderPairs();
             pTC.Render();
         }
@@ -651,6 +725,7 @@ namespace AglonaReader
     public class AppSettings
     {
         public bool HighlightFragments { get; set; }
+        public bool HighlightFirstWords { get; set; }
         public double Brightness { get; set; }
 
         public Collection<FileUsageInfo> FileUsages { get; set; }
@@ -661,6 +736,7 @@ namespace AglonaReader
             Brightness = 0.96;
             FileUsages = new Collection<FileUsageInfo>();
         }
+
     }
 
     

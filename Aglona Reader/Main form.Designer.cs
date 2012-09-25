@@ -47,6 +47,7 @@
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pTC = new AglonaReader.ParallelTextControl();
+            this.highlightFirstWordsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mainMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -81,6 +82,7 @@
             this.newToolStripMenuItem.Name = "newToolStripMenuItem";
             this.newToolStripMenuItem.Size = new System.Drawing.Size(146, 22);
             this.newToolStripMenuItem.Text = "New";
+            this.newToolStripMenuItem.Click += new System.EventHandler(this.newToolStripMenuItem_Click);
             // 
             // openToolStripMenuItem
             // 
@@ -165,7 +167,8 @@
             // visualsToolStripMenuItem
             // 
             this.visualsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.highlightFramgentsToolStripMenuItem});
+            this.highlightFramgentsToolStripMenuItem,
+            this.highlightFirstWordsToolStripMenuItem});
             this.visualsToolStripMenuItem.Name = "visualsToolStripMenuItem";
             this.visualsToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.OemOpenBrackets)));
             this.visualsToolStripMenuItem.Size = new System.Drawing.Size(55, 20);
@@ -174,8 +177,8 @@
             // highlightFramgentsToolStripMenuItem
             // 
             this.highlightFramgentsToolStripMenuItem.CheckOnClick = true;
-            this.highlightFramgentsToolStripMenuItem.Name = "highlightFragmentsToolStripMenuItem";
-            this.highlightFramgentsToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.highlightFramgentsToolStripMenuItem.Name = "highlightFramgentsToolStripMenuItem";
+            this.highlightFramgentsToolStripMenuItem.Size = new System.Drawing.Size(182, 22);
             this.highlightFramgentsToolStripMenuItem.Text = "Highlight fragments";
             this.highlightFramgentsToolStripMenuItem.Click += new System.EventHandler(this.highlightFramgentsToolStripMenuItem_Click);
             // 
@@ -190,17 +193,18 @@
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
             this.aboutToolStripMenuItem.Text = "About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
-            // parallelTextControl
+            // pTC
             // 
             this.pTC.BackColor = System.Drawing.SystemColors.Info;
             this.pTC.Brightness = 0.97D;
             this.pTC.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pTC.HighlightFragments = false;
             this.pTC.Location = new System.Drawing.Point(0, 24);
+            this.pTC.Modified = false;
             this.pTC.Name = "pTC";
             this.pTC.NaturalDividerPosition1 = 0;
             this.pTC.NaturalDividerPosition2 = 0;
@@ -216,6 +220,14 @@
             this.pTC.MouseLeave += new System.EventHandler(this.parallelTextControl_MouseLeave);
             this.pTC.MouseMove += new System.Windows.Forms.MouseEventHandler(this.parallelTextControl_MouseMove);
             this.pTC.MouseUp += new System.Windows.Forms.MouseEventHandler(this.parallelTextControl_MouseUp);
+            // 
+            // highlightFirstWordsToolStripMenuItem
+            // 
+            this.highlightFirstWordsToolStripMenuItem.CheckOnClick = true;
+            this.highlightFirstWordsToolStripMenuItem.Name = "highlightFirstWordsToolStripMenuItem";
+            this.highlightFirstWordsToolStripMenuItem.Size = new System.Drawing.Size(182, 22);
+            this.highlightFirstWordsToolStripMenuItem.Text = "Highlight first words";
+            this.highlightFirstWordsToolStripMenuItem.Click += new System.EventHandler(this.highlightFirstWordsToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -259,6 +271,7 @@
         private System.Windows.Forms.ToolStripMenuItem saveAsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem visualsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem highlightFramgentsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem highlightFirstWordsToolStripMenuItem;
 
     }
 }

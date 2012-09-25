@@ -16,6 +16,7 @@ namespace AglonaReader
 
         public bool Modified { get; set; }
 
+        public bool HighlightFirstWords { get; set; }
         public bool HighlightFragments { get; set; }
 
         // Length of a string to be considered a "big block"
@@ -363,14 +364,9 @@ namespace AglonaReader
         {
             InitializeComponent();
 
-            pText = new ParallelText();
-
+            CreateNewParallelBook();
+            
             wordsOnScreen = new SortedList<int, List<ScreenWord>>();
-
-            currentPair = 0;
-            HighlightedPair = 0;
-
-            reversed = false;
 
             vMargin = 3;
 
@@ -401,10 +397,23 @@ namespace AglonaReader
             editWhenNipped = false;
 
             InitializeColors();
-
             
             Brightness = 0.97;
+
+            HighlightFirstWords = true;
+            HighlightFragments = true;
+
             
+        }
+
+        public void CreateNewParallelBook()
+        {
+            pText = new ParallelText();
+
+            currentPair = 0;
+            HighlightedPair = 0;
+
+            reversed = false;
         }
 
 
@@ -865,14 +874,8 @@ namespace AglonaReader
             // Before drawing text we must draw colored background
                 // Colored 
             if (!big && HighlightFragments)
-            {
                 DrawBackground(side, renderedInfo.line1, renderedInfo.x1, renderedInfo.line2, renderedInfo.x2b, secondaryBG.Graphics,
                     brushTable[pairIndex % NumberofColors]);
-
-
-                //DrawBackground2(newSide, renderedInfo.Line1, renderedInfo.X1, renderedInfo.Line2, renderedInfo.x2b, secondaryBG.Graphics, penTable[PairIndex % NumberofColors]);
-            }
-            
 
             if (list != null)
                 for (int i = 0; i < list.Count; i++)
@@ -923,7 +926,7 @@ namespace AglonaReader
                     string wrd = r.word;
 
                     // Draw next word
-                    if (i == 0 && !(big && HighlightFragments))
+                    if (HighlightFirstWords && i == 0 && !(big && HighlightFragments))
                         TextRenderer.DrawText(g, wrd, textFont, new Point(x, vMargin + y * lineHeight),
                             Color.Black, big ? grayColor : colorTable[pairIndex % NumberofColors], TextFormatFlags.NoPadding | TextFormatFlags.SingleLine);
                     else

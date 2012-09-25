@@ -55,7 +55,7 @@ namespace AglonaReader
 
     }
 
-    public class DoubleFrame : IDisposable
+    public class DoubleFrame
     {
         public AbstractFrame F1 { get; set; }
         public AbstractFrame F2 { get; set; }
@@ -83,10 +83,12 @@ namespace AglonaReader
             return side == 1 ? F1 : F2;
         }
 
-        public void Dispose()
+        public void SetInvisible()
         {
-            
+            this.F1.Visible = false;
+            this.F2.Visible = false;
         }
+
     }
 
 
