@@ -34,7 +34,7 @@ namespace AglonaReader
         public void FillByRenderInfo(RenderedTextInfo renderedTextInfo, byte newSide)
         {
             if (renderedTextInfo == null
-                || !renderedTextInfo.valid)
+                || !renderedTextInfo.Valid)
             {
                 this.Visible = false;
                 return;
@@ -44,11 +44,11 @@ namespace AglonaReader
 
             this.Side = newSide;
 
-            this.Line1 = renderedTextInfo.line1;
-            this.Line2 = renderedTextInfo.line2;
+            this.Line1 = renderedTextInfo.Line1;
+            this.Line2 = renderedTextInfo.Line2;
 
-            this.X1 = renderedTextInfo.x1;
-            this.X2 = renderedTextInfo.x2;
+            this.X1 = renderedTextInfo.X1;
+            this.X2 = renderedTextInfo.X2;
         }
 
         public abstract void Draw(ParallelTextControl parallelTextControl);
@@ -119,7 +119,7 @@ namespace AglonaReader
     public class Frame : AbstractFrame, IDisposable
     {
 
-        public Pen pen;
+        public Pen FramePen { get; set; }
 
         public static Pen CreatePen(Color color, DashStyle dashStyle, float width)
         {
@@ -134,7 +134,7 @@ namespace AglonaReader
         {
             Visible = false;
             if (pen != null)
-                this.pen = pen;
+                this.FramePen = pen;
             if (list != null)
                 list.Add(this);
         }
@@ -161,18 +161,19 @@ namespace AglonaReader
             if (disposing)
             {
                 // free managed resources
-                if (pen != null)
+                if (FramePen != null)
                 {
-                    pen.Dispose();
-                    pen = null;
+                    FramePen.Dispose();
+                    FramePen = null;
                 }
             }
 
         }
 
-        public override void Draw(ParallelTextControl pTC)
+        public override void Draw(ParallelTextControl parallelTextControl)
         {
-            pTC.DrawFrame(this);
+            if (parallelTextControl != null)
+                parallelTextControl.DrawFrame(this);
         }
 
         

@@ -20,11 +20,23 @@ namespace AglonaReader
         
         private int mouse_text_line = -1;
         private int mouse_text_x = -1;
-        
+
+
+        private void pTC_MouseWheel(object sender, System.Windows.Forms.MouseEventArgs e)
+        {
+            if (e.Delta > 0)
+                ProcessKeyUp();
+            else if (e.Delta < 0)
+                ProcessKeyDown();
+        }
+
 
         public MainForm()
         {
             InitializeComponent();
+
+            this.pTC.MouseWheel += new MouseEventHandler(this.pTC_MouseWheel);
+
             opState = 0;
             this.WindowState = FormWindowState.Maximized;
 
@@ -68,12 +80,12 @@ namespace AglonaReader
         private void LoadSettingsFromFileUsageInfo(FileUsageInfo f, bool load)
         {
             
-            pTC.reversed = f.Reversed;
-            reverseToolStripMenuItem.Checked = pTC.reversed;
+            pTC.Reversed = f.Reversed;
+            reverseToolStripMenuItem.Checked = pTC.Reversed;
             pTC.SetSplitterPositionByRatio(f.SplitterRatio);
 
             if (load)
-                pTC.pText.Load(f.FileName);
+                pTC.PText.Load(f.FileName);
             pTC.Modified = false;
 
             if (pTC.Number > 0)
@@ -84,9 +96,9 @@ namespace AglonaReader
                     pTC.HighlightedPair = f.Pair;
 
                 if (f.TopPair >= pTC.Number)
-                    pTC.currentPair = pTC.Number - 1;
+                    pTC.CurrentPair = pTC.Number - 1;
                 else
-                    pTC.currentPair = f.TopPair;
+                    pTC.CurrentPair = f.TopPair;
 
                 pTC.FindNaturalDividers(0);
                 Recompute();
@@ -100,11 +112,14 @@ namespace AglonaReader
 
         private void parallelTextControl_MouseMove(object sender, MouseEventArgs e)
         {
-            if (e.X == pTC.lastMouseX && e.Y == pTC.lastMouseY)
+            
+
+
+            if (e.X == pTC.LastMouseX && e.Y == pTC.LastMouseY)
                 return;
 
-            pTC.lastMouseX = e.X;
-            pTC.lastMouseY = e.Y;
+            pTC.LastMouseX = e.X;
+            pTC.LastMouseY = e.Y;
 
             if (XonSplitter(e.X) || opState == 1)
                 Cursor = Cursors.VSplit;
@@ -115,7 +130,7 @@ namespace AglonaReader
             {
                 // Move splitter
 
-                int newSplitterPosition = e.X - pTC.splitterMoveOffset;
+                int newSplitterPosition = e.X - pTC.SplitterMoveOffset;
 
                 if (newSplitterPosition != pTC.SplitterPosition)
                 {
@@ -129,13 +144,13 @@ namespace AglonaReader
 
             else if (opState == 0)
             {
-                // Let'word check whether the cursor points to a word
+                // Let'Word check whether the cursor points to a Word
                 
-                // Compute current line
+                // Compute current Line
 
-                int line = (e.Y - pTC.vMargin) / pTC.lineHeight;
+                int line = (e.Y - pTC.VMargin) / pTC.LineHeight;
 
-                // Let'word see what we've got on this line
+                // Let'Word see what we've got on this Line
 
                 int word_x = -1;
 
@@ -143,7 +158,7 @@ namespace AglonaReader
 
                 if (found_word != null)
                 {
-                    word_x = found_word.x;
+                    word_x = found_word.X1;
                 }
 
                 if (mouse_text_line != line || mouse_text_x != word_x)
@@ -152,14 +167,14 @@ namespace AglonaReader
                     
 
                     if (found_word == null
-                        || pTC.HighlightedPair != -1 && found_word.pair != pTC[pTC.HighlightedPair])
+                        || pTC.HighlightedPair != -1 && found_word.Pair != pTC[pTC.HighlightedPair])
                     {
-                        pTC.mouse_text_currentword = null;
+                        pTC.MouseCurrentWord = null;
                     }
                     else
                     {
 
-                        pTC.mouse_text_currentword = found_word;
+                        pTC.MouseCurrentWord = found_word;
                     }
 
                     pTC.Render();
@@ -171,14 +186,16 @@ namespace AglonaReader
 
             }
 
+            
+
         }
 
         private void parallelTextControl_MouseLeave(object sender, EventArgs e)
         {
             Cursor = Cursors.Default;
-            if (pTC.mouse_text_currentword != null)
+            if (pTC.MouseCurrentWord != null)
             {
-                pTC.mouse_text_currentword = null;
+                pTC.MouseCurrentWord = null;
                 pTC.Render();
             }
         }
@@ -190,7 +207,7 @@ namespace AglonaReader
                 if (XonSplitter(e.X))
                 {
                     opState = 1;
-                    pTC.splitterMoveOffset = e.X - pTC.SplitterPosition;
+                    pTC.SplitterMoveOffset = e.X - pTC.SplitterPosition;
                 }
 
             }
@@ -202,23 +219,23 @@ namespace AglonaReader
                 opState = 0;
             else
             {
-                if (pTC.mouse_text_currentword != null && pTC.mouse_text_currentword.next != null)
+                if (pTC.MouseCurrentWord != null && pTC.MouseCurrentWord.Next != null)
                 {
 
-                    if (pTC.mouse_text_currentword.side == 1)
+                    if (pTC.MouseCurrentWord.Side == 1)
                     {
-                        pTC.naturalDividerPosition1_w = pTC.mouse_text_currentword.next;
-                        pTC.NaturalDividerPosition1 = pTC.naturalDividerPosition1_w.pos;
+                        pTC.naturalDividerPosition1_w = pTC.MouseCurrentWord.Next;
+                        pTC.NaturalDividerPosition1 = pTC.naturalDividerPosition1_w.Pos;
                         pTC.SetNippingFrameByScreenWord(1, pTC.naturalDividerPosition1_w);
-                        (pTC.nippingFrame.F1 as Frame).pen = pTC.correctedPen;
+                        (pTC.NippingFrame.F1 as Frame).FramePen = pTC.CorrectedPen;
                         pTC.Side1Set = true;
                     }
                     else
                     {
-                        pTC.naturalDividerPosition2_w = pTC.mouse_text_currentword.next;
-                        pTC.NaturalDividerPosition2 = pTC.naturalDividerPosition2_w.pos;
+                        pTC.naturalDividerPosition2_w = pTC.MouseCurrentWord.Next;
+                        pTC.NaturalDividerPosition2 = pTC.naturalDividerPosition2_w.Pos;
                         pTC.SetNippingFrameByScreenWord(2, pTC.naturalDividerPosition2_w);
-                        (pTC.nippingFrame.F2 as Frame).pen = pTC.correctedPen;
+                        (pTC.NippingFrame.F2 as Frame).FramePen = pTC.CorrectedPen;
                         pTC.Side2Set = true;
                     }
 
@@ -227,7 +244,7 @@ namespace AglonaReader
                     else
                     {
                         pTC.Render();
-                        pTC.HighlightWord(pTC.mouse_text_currentword, Color.LightSkyBlue);
+                        pTC.HighlightWord(pTC.MouseCurrentWord, Color.LightSkyBlue);
                     }
 
                 }
@@ -237,7 +254,7 @@ namespace AglonaReader
 
         private void reverseToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            pTC.reversed = reverseToolStripMenuItem.Checked;
+            pTC.Reversed = reverseToolStripMenuItem.Checked;
             pTC.ComputeSideCoordinates();
             Recompute();
         }
@@ -245,7 +262,7 @@ namespace AglonaReader
         private void Recompute()
         {
             mouse_text_line = -1;
-            pTC.mouse_text_currentword = null;
+            pTC.MouseCurrentWord = null;
             pTC.ProcessLayoutChange();
         }
 
@@ -261,8 +278,8 @@ namespace AglonaReader
             {
                 if (pTC.HighlightedPair > 0)
                 {
-                    if (pTC.currentPair == pTC.HighlightedPair)
-                        pTC.currentPair--;
+                    if (pTC.CurrentPair == pTC.HighlightedPair)
+                        pTC.CurrentPair--;
 
                     pTC.MergePairs(pTC.HighlightedPair - 1);
                     pTC.HighlightedPair--;
@@ -296,7 +313,7 @@ namespace AglonaReader
                 if (pTC.HighlightedPair != n - 1)
                 {
                     pTC.HighlightedPair = n - 1;
-                    pTC.currentPair = pTC.HighlightedPair;
+                    pTC.CurrentPair = pTC.HighlightedPair;
                     pTC.PrepareScreen();
                     pTC.RenderPairs();
                     pTC.FindNaturalDividers(0);
@@ -313,7 +330,7 @@ namespace AglonaReader
                     return;
                 
                     pTC.HighlightedPair = 0;
-                    pTC.currentPair = 0;
+                    pTC.CurrentPair = 0;
                     pTC.PrepareScreen();
                     pTC.RenderPairs();
                     pTC.FindNaturalDividers(0);
@@ -341,6 +358,11 @@ namespace AglonaReader
                     pTC.Render();
                 }
             }
+
+            else if (e.KeyData == Keys.PageUp)
+            {
+                int a = 1;
+            }
             
         }
 
@@ -357,10 +379,10 @@ namespace AglonaReader
 
             TextPair p = pTC[pTC.HighlightedPair];
 
-            if (prev_p.renderedInfo1.line1 == 0 && (prev_p.renderedInfo1.x1 == 0 || p.height > 0)
-                || prev_p.renderedInfo2.line1 == 0 && (prev_p.renderedInfo2.x1 == 0 || p.height > 0))
+            if (prev_p.RenderedInfo1.Line1 == 0 && (prev_p.RenderedInfo1.X1 == 0 || p.Height > 0)
+                || prev_p.RenderedInfo2.Line1 == 0 && (prev_p.RenderedInfo2.X1 == 0 || p.Height > 0))
             {
-                pTC.currentPair = pTC.HighlightedPair;
+                pTC.CurrentPair = pTC.HighlightedPair;
                 pTC.PrepareScreen();
                 pTC.RenderPairs();
             }
@@ -373,9 +395,9 @@ namespace AglonaReader
         {
             if (pTC.HighlightedPair == pTC.Number - 1)
             {
-                if (pTC.currentPair != pTC.HighlightedPair)
+                if (pTC.CurrentPair != pTC.HighlightedPair)
                 {
-                    pTC.currentPair = pTC.HighlightedPair;
+                    pTC.CurrentPair = pTC.HighlightedPair;
                     pTC.PrepareScreen();
                     pTC.RenderPairs();
                     pTC.FindNaturalDividersScreen(0);
@@ -390,13 +412,13 @@ namespace AglonaReader
 
             TextPair p = pTC[pTC.HighlightedPair];
 
-            if ((p.renderedInfo1.line2 == -1
-                || p.renderedInfo1.line2 >= pTC.NumberOfScreenLines - 1
-                || p.renderedInfo2.line2 == -1
-                || p.renderedInfo2.line2 >= pTC.NumberOfScreenLines - 1)
+            if ((p.RenderedInfo1.Line2 == -1
+                || p.RenderedInfo1.Line2 >= pTC.NumberOfScreenLines - 1
+                || p.RenderedInfo2.Line2 == -1
+                || p.RenderedInfo2.Line2 >= pTC.NumberOfScreenLines - 1)
                 && !pTC[pTC.HighlightedPair].IsBig())
             {
-                pTC.currentPair = pTC.HighlightedPair;
+                pTC.CurrentPair = pTC.HighlightedPair;
                 pTC.PrepareScreen();
                 pTC.RenderPairs();
             }
@@ -414,7 +436,7 @@ namespace AglonaReader
 
             if (screen_side == 0)
                 side = 0;
-            else if (pTC.reversed)
+            else if (pTC.Reversed)
                 side = (byte) (3 - screen_side);
             else
                 side = screen_side;
@@ -454,9 +476,8 @@ namespace AglonaReader
         {
             using (ImportTextForm importTextForm = new ImportTextForm())
             {
-                importTextForm.pText = pTC.pText;
+                importTextForm.PText = pTC.PText;
                 importTextForm.ShowDialog();
-                importTextForm.Dispose();
             }
 
             pTC.FindNaturalDividers(0);
@@ -470,7 +491,6 @@ namespace AglonaReader
             {
                 f.ParallelTC = pTC;
                 f.ShowDialog();
-                f.Dispose();
             }
         }
 
@@ -493,24 +513,19 @@ namespace AglonaReader
                     DialogResult dialogResult = d.ShowDialog();
 
                     if (dialogResult != DialogResult.OK)
-                    {
-                        d.Dispose();
                         return;
-                    }
 
                     fileName = d.FileName;
 
                     RetrieveToTheTop(fileName);
 
                     newBook = false;
-
-                    d.Dispose();
                 }
             }
             else
-                fileName = pTC.pText.fileName;
+                fileName = pTC.PText.FileName;
 
-            pTC.pText.Save(fileName);
+            pTC.PText.Save(fileName);
             pTC.Modified = false;
         }
 
@@ -560,16 +575,16 @@ namespace AglonaReader
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     fileName = openFileDialog.FileName;
-                    pTC.pText = new ParallelText();
+                    pTC.PText = new ParallelText();
                     mouse_text_line = -1;
                     
-                    pTC.pText.Load(fileName);
+                    pTC.PText.Load(fileName);
 
                     if (RetrieveToTheTop(fileName))
                         LoadSettingsFromFileUsageInfo(appSettings.FileUsages[0], false);
                     else
                     {
-                        pTC.currentPair = 0;
+                        pTC.CurrentPair = 0;
                         pTC.HighlightedPair = 0;
                     }
 
@@ -582,8 +597,6 @@ namespace AglonaReader
                     Recompute();
 
                 }
-
-                openFileDialog.Dispose();
             }
         }
 
@@ -594,8 +607,8 @@ namespace AglonaReader
                 FileUsageInfo f = appSettings.FileUsages[0];
 
                 f.Pair = pTC.HighlightedPair;
-                f.TopPair = pTC.currentPair;
-                f.Reversed = pTC.reversed;
+                f.TopPair = pTC.CurrentPair;
+                f.Reversed = pTC.Reversed;
                 f.SplitterRatio = pTC.SplitterRatio;
             }
 
@@ -613,7 +626,7 @@ namespace AglonaReader
             if (e.KeyChar == ' ')
             {
                 if (pTC.NipHighlightedPair())
-                    pTC.mouse_text_currentword = null;
+                    pTC.MouseCurrentWord = null;
                 else
                     ProcessKeyDown();
 
@@ -681,8 +694,8 @@ namespace AglonaReader
 
             pTC.CreateNewParallelBook();
 
-            pTC.highlightedFrame.SetInvisible();
-            pTC.nippingFrame.SetInvisible();
+            pTC.HighlightedFrame.SetInvisible();
+            pTC.NippingFrame.SetInvisible();
 
             pTC.ProcessLayoutChange();
 

@@ -197,7 +197,7 @@
             this.aboutToolStripMenuItem.Text = "About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
-            // pTC
+            // parallelTextControl
             // 
             this.pTC.BackColor = System.Drawing.SystemColors.Info;
             this.pTC.Brightness = 0.97D;

@@ -20,32 +20,30 @@ namespace AglonaReader
             InitializeComponent();
         }
 
-        public ParallelText pText;
+        public ParallelText PText { get; set; }
 
         private void selectFile1Button_Click(object sender, EventArgs e)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-
-            openFileDialog.Filter = "Text files (*.txt)|*.txt";
-            openFileDialog.RestoreDirectory = true;
-
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
-                fileName1.Text = openFileDialog.FileName;
+                openFileDialog.Filter = "Text files (*.txt)|*.txt";
+                openFileDialog.RestoreDirectory = true;
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                    fileName1.Text = openFileDialog.FileName;
             }
         }
 
         private void selectFile2Button_Click(object sender, EventArgs e)
         {
 
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-
-            openFileDialog.Filter = "Text files (*.txt)|*.txt";
-            openFileDialog.RestoreDirectory = true;
-
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
-                fileName2.Text = openFileDialog.FileName;
+                openFileDialog.Filter = "Text files (*.txt)|*.txt";
+                openFileDialog.RestoreDirectory = true;
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                    fileName2.Text = openFileDialog.FileName;
             }
 
         }
@@ -55,7 +53,7 @@ namespace AglonaReader
             string t1 = File.ReadAllText(fileName1.Text);
             string t2 = File.ReadAllText(fileName2.Text);
 
-            pText.AddPair(t1, t2);
+            PText.AddPair(t1, t2);
 
             Close();
         }

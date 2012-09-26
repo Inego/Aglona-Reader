@@ -20,8 +20,8 @@ namespace AglonaReader
 
         public int PairIndex { get; set; }
 
-        //private string text1;
-        //private string text2;
+        //private string Text1;
+        //private string Text2;
         //private byte level;
 
         public EditPairForm()
@@ -33,28 +33,28 @@ namespace AglonaReader
         {
             Result = true;
 
-            if (ParallelTextControl.reversed)
+            if (ParallelTextControl.Reversed)
             {
-                TextPair.text1 = textBox2.Text;
-                TextPair.text2 = textBox1.Text;
+                TextPair.Text1 = textBox2.Text;
+                TextPair.Text2 = textBox1.Text;
             }
             else
             {
-                TextPair.text1 = textBox1.Text;
-                TextPair.text2 = textBox2.Text;
+                TextPair.Text1 = textBox1.Text;
+                TextPair.Text2 = textBox2.Text;
             }
 
-            TextPair.sb1 = null;
-            TextPair.sb2 = null;
+            TextPair.SB1 = null;
+            TextPair.SB2 = null;
 
             if (level0.Checked)
-                TextPair.structureLevel = 0;
+                TextPair.StructureLevel = 0;
             else if (level1.Checked)
-                TextPair.structureLevel = 1;
+                TextPair.StructureLevel = 1;
             else if (level2.Checked)
-                TextPair.structureLevel = 2;
+                TextPair.StructureLevel = 2;
             else if (level3.Checked)
-                TextPair.structureLevel = 3;
+                TextPair.StructureLevel = 3;
 
             Close();
         }
@@ -68,18 +68,18 @@ namespace AglonaReader
         {
             TextPair = ParallelTextControl[PairIndex];
 
-            if (ParallelTextControl.reversed)
+            if (ParallelTextControl.Reversed)
             {
-                textBox1.Text = TextPair.sb2 == null ? TextPair.text2 : TextPair.sb2.ToString();
-                textBox2.Text = TextPair.sb1 == null ? TextPair.text1 : TextPair.sb1.ToString();
+                textBox1.Text = TextPair.SB2 == null ? TextPair.Text2 : TextPair.SB2.ToString();
+                textBox2.Text = TextPair.SB1 == null ? TextPair.Text1 : TextPair.SB1.ToString();
             }
             else
             {
-                textBox1.Text = TextPair.sb1 == null ? TextPair.text1 : TextPair.sb1.ToString();
-                textBox2.Text = TextPair.sb2 == null ? TextPair.text2 : TextPair.sb2.ToString();
+                textBox1.Text = TextPair.SB1 == null ? TextPair.Text1 : TextPair.SB1.ToString();
+                textBox2.Text = TextPair.SB2 == null ? TextPair.Text2 : TextPair.SB2.ToString();
             }
 
-            switch (TextPair.structureLevel)
+            switch (TextPair.StructureLevel)
             {
                 case 0:
                     level0.Checked = true;

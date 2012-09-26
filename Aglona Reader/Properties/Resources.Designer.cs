@@ -47,7 +47,7 @@ namespace AglonaReader.Properties {
         }
         
         /// <summary>
-        ///   Overrides the current thread'word CurrentUICulture property for all
+        ///   Overrides the current thread'Word CurrentUICulture property for all
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]

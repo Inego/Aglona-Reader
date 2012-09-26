@@ -10,32 +10,31 @@ namespace AglonaReader
 
     public class WordInfo
     {
-        public string word;
-        public int line;
-        public int x;
-        public int x2;
-        public int pos;
+        public string Word { get; set; }
+        public int Line { get; set; }
+        public int X1 { get; set; }
+        public int X2 { get; set; }
+        public int Pos { get; set; }
 
         public WordInfo(string word, int line, int wordX, int wordX2, int pos)
         {
-            this.word = word;
-            this.line = line;
-            this.x = wordX;
-            this.x2 = wordX2;
-            this.pos = pos;
+            this.Word = word;
+            this.Line = line;
+            this.X1 = wordX;
+            this.X2 = wordX2;
+            this.Pos = pos;
         }
 
     }
     
     public class RenderedTextInfo
     {
-        public bool valid;
-        public int line1;
-        public int line2;
-        public int x1;
-        public int x2;
-        public int x2b;
-        //public int x2b;
+        public bool Valid { get; set; }
+        public int Line1 { get; set; }
+        public int Line2 { get; set; }
+        public int X1 { get; set; }
+        public int X2 { get; set; }
+        public int X2B { get; set; }
     }
 
     public class TextPair
@@ -43,7 +42,7 @@ namespace AglonaReader
 
         public RenderedTextInfo RenderedInfo(byte side)
         {
-            return side == 1 ? renderedInfo1 : renderedInfo2;
+            return side == 1 ? RenderedInfo1 : RenderedInfo2;
         }
 
         private int recommended_natural1;
@@ -75,76 +74,76 @@ namespace AglonaReader
 
         public bool IsBig()
         {
-            return sb1 != null || sb2 != null;
+            return SB1 != null || SB2 != null;
         }
 
-        public byte structureLevel;
+        public byte StructureLevel { get; set; }
 
-        public string text1;
-        public string text2;
+        public string Text1 { get; set; }
+        public string Text2 { get; set; }
 
         
 
         // Used if texts are large (typically in aligning mode for the "big block")
-        public StringBuilder sb1;
-        public StringBuilder sb2;
+        public StringBuilder SB1 { get; set; }
+        public StringBuilder SB2 { get; set; }
 
         /// <summary>
-        /// Indicates that text1 begins a paragraph
+        /// Indicates that Text1 begins a paragraph
         /// </summary>
-        public bool startParagraph1;
+        public bool StartParagraph1 { get; set; }
         /// <summary>
-        /// Indicates that text2 begins a paragraph
+        /// Indicates that Text2 begins a paragraph
         /// </summary>
-        public bool startParagraph2;
+        public bool StartParagraph2 { get; set; }
 
         /// <summary>
         /// Current position for processing in text 1
         /// </summary>
-        public int currentPos1;
+        public int CurrentPos1 { get; set; }
 
         /// <summary>
         /// Current position for processing in text 2
         /// </summary>
-        public int currentPos2;
+        public int CurrentPos2 { get; set; }
 
         /// <summary>
         /// Indicates that all lines of text 1 have already been computed
         /// </summary>
-        public bool allLinesComputed1;
+        public bool AllLinesComputed1 { get; set; }
 
         /// <summary>
         /// Indicates that all lines of text 2 have already been computed
         /// </summary>
-        public bool allLinesComputed2;
+        public bool AllLinesComputed2 { get; set; }
 
         
         /// <summary>
-        /// How many lines are required to be added in order to compute the start line of the next text Pair.
-        /// Zero means that the next Pair begins at the same line.
+        /// How many lines are required to be added in order to compute the start Line of the Next text Pair.
+        /// Zero means that the Next Pair begins at the same Line.
         /// </summary>
-        public int height;
+        public int Height { get; set; }
 
         public bool ComputedWordsExist() { return (computedWords1 != null); }
 
-        public RenderedTextInfo renderedInfo1;
-        public RenderedTextInfo renderedInfo2;
+        public RenderedTextInfo RenderedInfo1 { get; set; }
+        public RenderedTextInfo RenderedInfo2 { get; set; }
 
         private Collection<WordInfo> computedWords1;
-        public Collection<WordInfo> computedWords2;
+        private Collection<WordInfo> computedWords2;
 
         public char GetChar(byte side, int charIndex)
         {
             if (side == 1)
-                if (sb1 == null)
-                    return text1[charIndex];
+                if (SB1 == null)
+                    return Text1[charIndex];
                 else
-                    return sb1[charIndex];
+                    return SB1[charIndex];
             else
-                if (sb2 == null)
-                    return text2[charIndex];
+                if (SB2 == null)
+                    return Text2[charIndex];
                 else
-                    return sb2[charIndex];
+                    return SB2[charIndex];
         }
 
         public Collection<WordInfo> ComputedWords(byte side, bool createNew)
@@ -168,16 +167,16 @@ namespace AglonaReader
 
         public TextPair()
         {
-            height = -1;
+            Height = -1;
 
-            currentPos1 = 0;
-            currentPos2 = 0;
+            CurrentPos1 = 0;
+            CurrentPos2 = 0;
 
-            allLinesComputed1 = false;
-            allLinesComputed2 = false;
+            AllLinesComputed1 = false;
+            AllLinesComputed2 = false;
 
-            renderedInfo1 = new RenderedTextInfo();
-            renderedInfo2 = new RenderedTextInfo();
+            RenderedInfo1 = new RenderedTextInfo();
+            RenderedInfo2 = new RenderedTextInfo();
 
         }
 
@@ -185,18 +184,18 @@ namespace AglonaReader
         {
             if (text1 != null)
                 if (text1.Length >= ParallelTextControl.BigTextSize)
-                    this.sb1 = new StringBuilder(text1);
+                    this.SB1 = new StringBuilder(text1);
                 else
-                    this.text1 = text1;
+                    this.Text1 = text1;
 
             if (text2 != null)
                 if (text2.Length >= ParallelTextControl.BigTextSize)
-                    this.sb2 = new StringBuilder(text2);
+                    this.SB2 = new StringBuilder(text2);
                 else
-                    this.text2 = text2;
+                    this.Text2 = text2;
 
-            this.startParagraph1 = startParagraph1;
-            this.startParagraph2 = startParagraph2;
+            this.StartParagraph1 = startParagraph1;
+            this.StartParagraph2 = startParagraph2;
 
         }
 
@@ -207,47 +206,47 @@ namespace AglonaReader
             if (computedWords2 != null)
                 computedWords2.Clear();
 
-            height = -1;
+            Height = -1;
                 
-            allLinesComputed1 = false;
-            allLinesComputed2 = false;
+            AllLinesComputed1 = false;
+            AllLinesComputed2 = false;
 
         }
 
         internal int GetLength(byte side)
         {
             if (side == 1)
-                if (sb1 == null)
-                    return text1.Length;
+                if (SB1 == null)
+                    return Text1.Length;
                 else
-                    return sb1.Length;
+                    return SB1.Length;
             else
-                if (sb2 == null)
-                    return text2.Length;
+                if (SB2 == null)
+                    return Text2.Length;
                 else
-                    return sb2.Length;
+                    return SB2.Length;
         }
 
         internal void SetStructureLevel(byte p)
         {
-            structureLevel = p;
-            startParagraph1 = true;
-            startParagraph2 = true;
+            StructureLevel = p;
+            StartParagraph1 = true;
+            StartParagraph2 = true;
         }
 
 
         internal int NaturalDividerPosition(byte side)
         {
             if (side == 1)
-                if (sb1 == null)
-                    return NaturalDividerPosition(text1, recommended_natural1);
+                if (SB1 == null)
+                    return NaturalDividerPosition(Text1, recommended_natural1);
                 else
-                    return NaturalDividerPosition(sb1, recommended_natural1);
+                    return NaturalDividerPosition(SB1, recommended_natural1);
             else
-                if (sb2 == null)
-                    return NaturalDividerPosition(text2, recommended_natural2);
+                if (SB2 == null)
+                    return NaturalDividerPosition(Text2, recommended_natural2);
                 else
-                    return NaturalDividerPosition(sb2, recommended_natural2);
+                    return NaturalDividerPosition(SB2, recommended_natural2);
         }
 
 
@@ -453,50 +452,50 @@ namespace AglonaReader
 
     public class ParallelText
     {
-        public string author1 = "";
-        public string title1 = "";
-        public string info1 = "";
-        public string lang1 = "";
+        public string Author1 { get; set; }
+        public string Title1 { get; set; }
+        public string Info1 { get; set; }
+        public string Lang1 { get; set; }
 
-        public string author2 = "";
-        public string title2 = "";
-        public string info2 = "";
-        public string lang2 = "";
+        public string Author2 { get; set; }
+        public string Title2 { get; set; }
+        public string Info2 { get; set; }
+        public string Lang2 { get; set; }
 
-        public string info = "";
+        public string Info { get; set; }
 
-        public string fileName = "";
+        public string FileName { get; set; }
 
 
-        public List<TextPair> textPairs;
+        public List<TextPair> TextPairs { get; set; }
 
         /// <summary>
         /// Contains a list of pairs which are at least partially computed.
         /// It is used for speedy truncating.
         /// </summary>
-        public List<TextPair> computedPairs;
+        public List<TextPair> ComputedPairs { get; set; }
 
         public int Number()
-        { return textPairs.Count(); }
+        { return TextPairs.Count(); }
 
         public ParallelText()
         {
-            textPairs = new List<TextPair>();
-            computedPairs = new List<TextPair>();
+            TextPairs = new List<TextPair>();
+            ComputedPairs = new List<TextPair>();
         }
 
         public TextPair this[int pairIndex]
         {
-            get { return textPairs[pairIndex]; }
+            get { return TextPairs[pairIndex]; }
         }
 
         public void AddPair(string text1, string text2, bool startParagraph1, bool startParagraph2)
         {
-            TextPair newPair = textPairs.Count == 0 ?
+            TextPair newPair = TextPairs.Count == 0 ?
                 new TextPair(text1, text2, true, true) :
                 new TextPair(text1, text2, startParagraph1, startParagraph2);
 
-            textPairs.Add(newPair);
+            TextPairs.Add(newPair);
             
         }
 
@@ -507,9 +506,9 @@ namespace AglonaReader
 
         public void Truncate()
         {
-            foreach (TextPair p in computedPairs)
+            foreach (TextPair p in ComputedPairs)
                 p.ClearComputedWords();
-            computedPairs.Clear();
+            ComputedPairs.Clear();
         }
 
         public static void InsertWords(Collection<CommonWordInfo> list, int spaceLeft, byte side)
@@ -541,7 +540,7 @@ namespace AglonaReader
                     l = prev_p.ComputedWords(side, true);
                 }
 
-                l.Add(new WordInfo(r.word, r.line, r.x + bias, r.x2 + bias, r.pos));
+                l.Add(new WordInfo(r.Word, r.Line, r.X1 + bias, r.X2 + bias, r.Pos));
 
                 counter++;
             }
@@ -560,35 +559,35 @@ namespace AglonaReader
                 
                 writer.WriteStartElement("ParallelBook");
 
-                writer.WriteAttributeString("lang1", lang1);
-                writer.WriteAttributeString("author1", author1);
-                writer.WriteAttributeString("title1", title1);
-                writer.WriteAttributeString("info1", info1);
+                writer.WriteAttributeString("lang1", Lang1);
+                writer.WriteAttributeString("author1", Author1);
+                writer.WriteAttributeString("title1", Title1);
+                writer.WriteAttributeString("info1", Info1);
 
-                writer.WriteAttributeString("lang2", lang2);
-                writer.WriteAttributeString("author2", author2);
-                writer.WriteAttributeString("title2", title2);
-                writer.WriteAttributeString("info2", info2);
+                writer.WriteAttributeString("lang2", Lang2);
+                writer.WriteAttributeString("author2", Author2);
+                writer.WriteAttributeString("title2", Title2);
+                writer.WriteAttributeString("info2", Info2);
 
-                writer.WriteAttributeString("info", info);
+                writer.WriteAttributeString("info", Info);
                 
-                foreach (TextPair p in textPairs)
+                foreach (TextPair p in TextPairs)
                 {
                     writer.WriteStartElement("p");
 
                     level = 0;
 
-                    if (p.structureLevel == 1)
+                    if (p.StructureLevel == 1)
                         level = 4;
-                    else if (p.structureLevel == 2)
+                    else if (p.StructureLevel == 2)
                         level = 5;
-                    else if (p.structureLevel == 3)
+                    else if (p.StructureLevel == 3)
                         level = 6;
                     else
                     {
-                        if (p.startParagraph1)
+                        if (p.StartParagraph1)
                             level = 1;
-                        if (p.startParagraph2)
+                        if (p.StartParagraph2)
                             level += 2;
                     }
 
@@ -599,15 +598,15 @@ namespace AglonaReader
                         writer.WriteEndAttribute();
                     }
 
-                    if (p.sb1 == null)
-                        writer.WriteAttributeString("s", p.text1);
+                    if (p.SB1 == null)
+                        writer.WriteAttributeString("s", p.Text1);
                     else
-                        writer.WriteAttributeString("s", p.sb1.ToString());
+                        writer.WriteAttributeString("s", p.SB1.ToString());
 
-                    if (p.sb2 == null)
-                        writer.WriteAttributeString("t", p.text2);
+                    if (p.SB2 == null)
+                        writer.WriteAttributeString("t", p.Text2);
                     else
-                        writer.WriteAttributeString("t", p.sb2.ToString());
+                        writer.WriteAttributeString("t", p.SB2.ToString());
                     
                     writer.WriteEndElement();
                 }
@@ -616,7 +615,7 @@ namespace AglonaReader
                 writer.Flush();
             }
 
-            this.fileName = newFileName;
+            this.FileName = newFileName;
         }
 
 
@@ -638,7 +637,7 @@ namespace AglonaReader
                 if (reader.Name != "lang1")
                     return false;
 
-                lang1 = reader.Value;
+                Lang1 = reader.Value;
 
                 if (!reader.MoveToNextAttribute())
                     return false;
@@ -646,7 +645,7 @@ namespace AglonaReader
                 if (reader.Name != "author1")
                     return false;
 
-                author1 = reader.Value;
+                Author1 = reader.Value;
 
                 if (!reader.MoveToNextAttribute())
                     return false;
@@ -654,7 +653,7 @@ namespace AglonaReader
                 if (reader.Name != "title1")
                     return false;
 
-                title1 = reader.Value;
+                Title1 = reader.Value;
 
                 if (!reader.MoveToNextAttribute())
                     return false;
@@ -662,7 +661,7 @@ namespace AglonaReader
                 if (reader.Name != "info1")
                     return false;
 
-                info1 = reader.Value;
+                Info1 = reader.Value;
 
                 if (!reader.MoveToNextAttribute())
                     return false;
@@ -670,7 +669,7 @@ namespace AglonaReader
                 if (reader.Name != "lang2")
                     return false;
 
-                lang2 = reader.Value;
+                Lang2 = reader.Value;
 
                 if (!reader.MoveToNextAttribute())
                     return false;
@@ -678,7 +677,7 @@ namespace AglonaReader
                 if (reader.Name != "author2")
                     return false;
 
-                author2 = reader.Value;
+                Author2 = reader.Value;
 
                 if (!reader.MoveToNextAttribute())
                     return false;
@@ -686,7 +685,7 @@ namespace AglonaReader
                 if (reader.Name != "title2")
                     return false;
 
-                title2 = reader.Value;
+                Title2 = reader.Value;
 
                 if (!reader.MoveToNextAttribute())
                     return false;
@@ -694,7 +693,7 @@ namespace AglonaReader
                 if (reader.Name != "info2")
                     return false;
 
-                info2 = reader.Value;
+                Info2 = reader.Value;
 
             NextPair:
 
@@ -712,13 +711,13 @@ namespace AglonaReader
                     {
                         if (reader.Value == "3")
                         {
-                            p.startParagraph1 = true;
-                            p.startParagraph2 = true;
+                            p.StartParagraph1 = true;
+                            p.StartParagraph2 = true;
                         }
                         else if (reader.Value == "1")
-                            p.startParagraph1 = true;
+                            p.StartParagraph1 = true;
                         else if (reader.Value == "2")
-                            p.startParagraph2 = true;
+                            p.StartParagraph2 = true;
                         else if (reader.Value == "4")
                             p.SetStructureLevel(1);
                         else if (reader.Value == "5")
@@ -735,9 +734,9 @@ namespace AglonaReader
                         return false;
 
                     if (reader.Value.Length >= ParallelTextControl.BigTextSize)
-                        p.sb1 = new StringBuilder(reader.Value);
+                        p.SB1 = new StringBuilder(reader.Value);
                     else
-                        p.text1 = reader.Value;
+                        p.Text1 = reader.Value;
 
                     if (!reader.MoveToNextAttribute())
                         return false;
@@ -746,11 +745,11 @@ namespace AglonaReader
                         return false;
 
                     if (reader.Value.Length >= ParallelTextControl.BigTextSize)
-                        p.sb2 = new StringBuilder(reader.Value);
+                        p.SB2 = new StringBuilder(reader.Value);
                     else
-                        p.text2 = reader.Value;
+                        p.Text2 = reader.Value;
 
-                    textPairs.Add(p);
+                    TextPairs.Add(p);
 
                     goto NextPair;
 
@@ -759,7 +758,7 @@ namespace AglonaReader
 
                 reader.Close();
 
-                fileName = newFileName;
+                FileName = newFileName;
 
                 return true;
 
