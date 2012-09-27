@@ -124,8 +124,6 @@ namespace AglonaReader
         /// </summary>
         public int Height { get; set; }
 
-        public bool ComputedWordsExist() { return (computedWords1 != null); }
-
         public RenderedTextInfo RenderedInfo1 { get; set; }
         public RenderedTextInfo RenderedInfo2 { get; set; }
 

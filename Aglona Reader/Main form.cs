@@ -360,10 +360,67 @@ namespace AglonaReader
             }
 
             else if (e.KeyData == Keys.PageUp)
+                ProcessPageUp();
+            else if (e.KeyData == Keys.PageDown)
+                ProcessPageDown();
+            
+        }
+
+        private void ProcessPageDown()
+        {
+            if (pTC.LastRenderedPair != pTC.CurrentPair)
             {
-                int a = 1;
+                pTC.CurrentPair = pTC.LastRenderedPair;
+                pTC.HighlightedPair = pTC.LastRenderedPair;
+                pTC.PrepareScreen();
+                pTC.RenderPairs();
+                pTC.FindNaturalDividersScreen(0);
+                pTC.Render();
+
             }
             
+        }
+
+        private void ProcessPageUp()
+        {
+
+            int newCurrentPair = pTC.CurrentPair;
+            int accLines = 0; // Accumulated lines
+
+            TextPair processedPair;
+
+            while (newCurrentPair > 0)
+            {
+                newCurrentPair--;
+                processedPair = pTC[newCurrentPair];
+
+                if (!(processedPair.AllLinesComputed1 && processedPair.AllLinesComputed2))
+                    pTC.PrepareScreen(newCurrentPair, -1);
+
+                accLines += processedPair.Height;
+
+                if (accLines >= pTC.NumberOfScreenLines)
+                {
+                    newCurrentPair++;
+                    break;
+                }
+            }
+
+            if (newCurrentPair == pTC.CurrentPair
+                && newCurrentPair > 0)
+                newCurrentPair--;
+
+            if (newCurrentPair != pTC.CurrentPair)
+            {
+                pTC.CurrentPair = newCurrentPair;
+                pTC.HighlightedPair = newCurrentPair;
+                pTC.PrepareScreen();
+                pTC.RenderPairs();
+                pTC.FindNaturalDividersScreen(0);
+                pTC.Render();
+
+            }
+
         }
 
         private void ProcessKeyUp()

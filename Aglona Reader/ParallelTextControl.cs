@@ -651,12 +651,11 @@ namespace AglonaReader
         /// </summary>
         /// <param name="startPair">Index of the start Pair</param>
         /// <param name="limit">Number of lines</param>
-        public void PrepareScreen(int startPair, int requiredLines, bool onlyStartPair)
+        public void PrepareScreen(int startPair, int requiredLines)
         {
 
             if (PText.Number() == 0)
                 return;
-
 
             // Required number of lines that we want to compute for the current Pair.
             // -1 means we want to compute ALL lines
@@ -702,7 +701,7 @@ namespace AglonaReader
 
         NextPair:
 
-            if (cPair < startPair)
+            if (cPair < startPair || requiredLines == -1)
                 requiredHeight = -1;
             else
             {
@@ -748,7 +747,8 @@ namespace AglonaReader
                     occLength2 = 0;
                 }
 
-                if (p.AllLinesComputed1 && p.AllLinesComputed2 && (p.StructureLevel > 0
+                if (p.AllLinesComputed1 && p.AllLinesComputed2
+                    && (p.StructureLevel > 0
                     || cPair + 1 < PText.Number() && PText.TextPairs[cPair + 1].StructureLevel > 0))
                     height++;
 
@@ -802,13 +802,16 @@ namespace AglonaReader
                 occLength2 = 0;
             }
 
+            if (requiredLines == -1 && cPair > startPair && prev_pair.Height > 0)
+                return;
+
             goto NextPair;
 
         }
 
         public void PrepareScreen()
         {
-            PrepareScreen(CurrentPair, NumberOfScreenLines, false);
+            PrepareScreen(CurrentPair, NumberOfScreenLines);
         }
 
 
@@ -884,10 +887,6 @@ namespace AglonaReader
                 DrawBackground(side, renderedInfo.Line1, renderedInfo.X1, renderedInfo.Line2, renderedInfo.X2B, SecondaryBG.Graphics,
                     brushTable[pairIndex % NumberofColors]);
 
-            //if (!big && HighlightFragments)
-            //    DrawGradientBackground(Side, renderedInfo.Line1, renderedInfo.X1, renderedInfo.Line2, renderedInfo.X2B, SecondaryBG.Graphics,
-            //        pairIndex % NumberofColors);
-
             if (list != null)
                 for (int i = 0; i < list.Count; i++)
                 {
@@ -931,19 +930,12 @@ namespace AglonaReader
                         if (FirstRenderedPair == -1)
                             FirstRenderedPair = pairIndex;
 
-                        LastRenderedPair = pairIndex;
+                        if (pairIndex > LastRenderedPair)
+                            LastRenderedPair = pairIndex;
+
                     }
 
                     string wrd = r.Word;
-
-                    // Draw Next Word
-                    
-                    //if (HighlightFirstWords && i == 0 && !(big && HighlightFragments))
-                    //    TextRenderer.DrawText(g, wrd, TextFont, new Point(X1, VMargin + y * LineHeight),
-                    //        Color.Black, big ? grayColor : darkColorTable[pairIndex % NumberofColors], TextFormatFlags.NoPadding | TextFormatFlags.SingleLine);
-                    //else
-                    //    TextRenderer.DrawText(g, wrd, TextFont, new Point(X1, VMargin + y * LineHeight),
-                    //        Color.Black, TextFormatFlags.NoPadding | TextFormatFlags.SingleLine);
 
                     if (HighlightFirstWords && i == 0 && !(big && HighlightFragments))
                     {
@@ -973,7 +965,6 @@ namespace AglonaReader
                     l.Add(s);
 
                 }
-            
         }
 
 
@@ -1146,9 +1137,7 @@ namespace AglonaReader
                 height = 0;
             }
             else
-            {
                 pos = (side == 1) ? p.CurrentPos1 : p.CurrentPos2;
-            }
 
             wordPos = -1;
 
@@ -1250,7 +1239,7 @@ namespace AglonaReader
 
             ComputeNumberOfScreenLines();
 
-            PrepareScreen(CurrentPair, NumberOfScreenLines, false);
+            PrepareScreen(CurrentPair, NumberOfScreenLines);
 
             ResizeBufferedGraphic();
             RenderPairs();
