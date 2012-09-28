@@ -224,17 +224,17 @@ namespace AglonaReader
 
                     if (pTC.MouseCurrentWord.Side == 1)
                     {
-                        pTC.naturalDividerPosition1_w = pTC.MouseCurrentWord.Next;
-                        pTC.NaturalDividerPosition1 = pTC.naturalDividerPosition1_w.Pos;
-                        pTC.SetNippingFrameByScreenWord(1, pTC.naturalDividerPosition1_w);
+                        pTC.NaturalDividerPosition1W = pTC.MouseCurrentWord.Next;
+                        pTC.NaturalDividerPosition1 = pTC.NaturalDividerPosition1W.Pos;
+                        pTC.SetNippingFrameByScreenWord(1, pTC.NaturalDividerPosition1W);
                         (pTC.NippingFrame.F1 as Frame).FramePen = pTC.CorrectedPen;
                         pTC.Side1Set = true;
                     }
                     else
                     {
-                        pTC.naturalDividerPosition2_w = pTC.MouseCurrentWord.Next;
-                        pTC.NaturalDividerPosition2 = pTC.naturalDividerPosition2_w.Pos;
-                        pTC.SetNippingFrameByScreenWord(2, pTC.naturalDividerPosition2_w);
+                        pTC.NaturalDividerPosition2W = pTC.MouseCurrentWord.Next;
+                        pTC.NaturalDividerPosition2 = pTC.NaturalDividerPosition2W.Pos;
+                        pTC.SetNippingFrameByScreenWord(2, pTC.NaturalDividerPosition2W);
                         (pTC.NippingFrame.F2 as Frame).FramePen = pTC.CorrectedPen;
                         pTC.Side2Set = true;
                     }
@@ -255,6 +255,7 @@ namespace AglonaReader
         private void reverseToolStripMenuItem_Click(object sender, EventArgs e)
         {
             pTC.Reversed = reverseToolStripMenuItem.Checked;
+            pTC.SetSplitterPositionByRatio(1 - pTC.SplitterRatio);
             pTC.ComputeSideCoordinates();
             Recompute();
         }
@@ -399,7 +400,7 @@ namespace AglonaReader
 
                 accLines += processedPair.Height;
 
-                if (accLines >= pTC.NumberOfScreenLines)
+                if (accLines > pTC.LastFullScreenLine)
                 {
                     newCurrentPair++;
                     break;
@@ -470,9 +471,9 @@ namespace AglonaReader
             TextPair p = pTC[pTC.HighlightedPair];
 
             if ((p.RenderedInfo1.Line2 == -1
-                || p.RenderedInfo1.Line2 >= pTC.NumberOfScreenLines - 1
+                || p.RenderedInfo1.Line2 >= pTC.LastFullScreenLine
                 || p.RenderedInfo2.Line2 == -1
-                || p.RenderedInfo2.Line2 >= pTC.NumberOfScreenLines - 1)
+                || p.RenderedInfo2.Line2 >= pTC.LastFullScreenLine)
                 && !pTC[pTC.HighlightedPair].IsBig())
             {
                 pTC.CurrentPair = pTC.HighlightedPair;
