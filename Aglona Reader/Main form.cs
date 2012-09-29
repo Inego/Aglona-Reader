@@ -767,6 +767,11 @@ namespace AglonaReader
             pTC.Render();
         }
 
+        private void structureleftToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
     }
 
     public class CommonWordInfo : WordInfo

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Xml;
+using System.ComponentModel;
 
 
 namespace AglonaReader
@@ -464,13 +465,19 @@ namespace AglonaReader
 
         public string FileName { get; set; }
 
-
+        [Browsable(false)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public List<TextPair> TextPairs { get; set; }
 
         /// <summary>
         /// Contains a list of pairs which are at least partially computed.
         /// It is used for speedy truncating.
         /// </summary>
+        /// 
+        [Browsable(false)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public List<TextPair> ComputedPairs { get; set; }
 
         public int Number()

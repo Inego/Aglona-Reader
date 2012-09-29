@@ -28,6 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.Drawing.StringFormat stringFormat1 = new System.Drawing.StringFormat();
+            AglonaReader.ParallelText parallelText1 = new AglonaReader.ParallelText();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.mainMenu = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -39,15 +41,16 @@
             this.bookToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.informationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.reverseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.structureleftToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pairToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.importToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.visualsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.highlightFramgentsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.highlightFirstWordsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pTC = new AglonaReader.ParallelTextControl();
-            this.highlightFirstWordsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mainMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -117,7 +120,8 @@
             // 
             this.bookToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.informationToolStripMenuItem,
-            this.reverseToolStripMenuItem});
+            this.reverseToolStripMenuItem,
+            this.structureleftToolStripMenuItem});
             this.bookToolStripMenuItem.Name = "bookToolStripMenuItem";
             this.bookToolStripMenuItem.Size = new System.Drawing.Size(46, 20);
             this.bookToolStripMenuItem.Text = "Book";
@@ -138,6 +142,13 @@
             this.reverseToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
             this.reverseToolStripMenuItem.Text = "Reverse";
             this.reverseToolStripMenuItem.Click += new System.EventHandler(this.reverseToolStripMenuItem_Click);
+            // 
+            // structureleftToolStripMenuItem
+            // 
+            this.structureleftToolStripMenuItem.Name = "structureleftToolStripMenuItem";
+            this.structureleftToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
+            this.structureleftToolStripMenuItem.Text = "Structure (left)";
+            this.structureleftToolStripMenuItem.Click += new System.EventHandler(this.structureleftToolStripMenuItem_Click);
             // 
             // pairToolStripMenuItem
             // 
@@ -182,6 +193,14 @@
             this.highlightFramgentsToolStripMenuItem.Text = "Highlight fragments";
             this.highlightFramgentsToolStripMenuItem.Click += new System.EventHandler(this.highlightFramgentsToolStripMenuItem_Click);
             // 
+            // highlightFirstWordsToolStripMenuItem
+            // 
+            this.highlightFirstWordsToolStripMenuItem.CheckOnClick = true;
+            this.highlightFirstWordsToolStripMenuItem.Name = "highlightFirstWordsToolStripMenuItem";
+            this.highlightFirstWordsToolStripMenuItem.Size = new System.Drawing.Size(182, 22);
+            this.highlightFirstWordsToolStripMenuItem.Text = "Highlight first words";
+            this.highlightFirstWordsToolStripMenuItem.Click += new System.EventHandler(this.highlightFirstWordsToolStripMenuItem_Click);
+            // 
             // helpToolStripMenuItem
             // 
             this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -197,37 +216,73 @@
             this.aboutToolStripMenuItem.Text = "About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
-            // parallelTextControl
+            // pTC
             // 
             this.pTC.BackColor = System.Drawing.SystemColors.Info;
             this.pTC.Brightness = 0.97D;
+            this.pTC.CurrentPair = 0;
+            this.pTC.DebugString = null;
             this.pTC.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pTC.EditWhenNipped = false;
+            this.pTC.FirstRenderedPair = 0;
+            stringFormat1.Alignment = System.Drawing.StringAlignment.Near;
+            stringFormat1.FormatFlags = ((System.Drawing.StringFormatFlags)(((System.Drawing.StringFormatFlags.FitBlackBox | System.Drawing.StringFormatFlags.LineLimit) 
+            | System.Drawing.StringFormatFlags.NoClip)));
+            stringFormat1.HotkeyPrefix = System.Drawing.Text.HotkeyPrefix.None;
+            stringFormat1.LineAlignment = System.Drawing.StringAlignment.Near;
+            stringFormat1.Trimming = System.Drawing.StringTrimming.None;
+            this.pTC.GT = stringFormat1;
+            this.pTC.HighlightedPair = 0;
+            this.pTC.HighlightFirstWords = true;
             this.pTC.HighlightFragments = false;
+            this.pTC.LastFullScreenLine = 0;
+            this.pTC.LastMouseX = -1;
+            this.pTC.LastMouseY = -1;
+            this.pTC.LastRenderedPair = 0;
+            this.pTC.LineHeight = 28;
             this.pTC.Location = new System.Drawing.Point(0, 24);
             this.pTC.Modified = false;
+            this.pTC.MouseCurrentWord = null;
+            this.pTC.MouseStatus = ((byte)(0));
             this.pTC.Name = "pTC";
             this.pTC.NaturalDividerPosition1 = 0;
+            this.pTC.NaturalDividerPosition1W = null;
             this.pTC.NaturalDividerPosition2 = 0;
+            this.pTC.NaturalDividerPosition2W = null;
+            this.pTC.NumberOfScreenLines = 0;
+            this.pTC.PanelMargin = 10;
+            this.pTC.PrimaryBG = null;
+            parallelText1.Author1 = null;
+            parallelText1.Author2 = null;
+            parallelText1.FileName = null;
+            parallelText1.Info = null;
+            parallelText1.Info1 = null;
+            parallelText1.Info2 = null;
+            parallelText1.Lang1 = null;
+            parallelText1.Lang2 = null;
+            parallelText1.Title1 = null;
+            parallelText1.Title2 = null;
+            this.pTC.PText = parallelText1;
+            this.pTC.Reversed = false;
+            this.pTC.RightPosition = 445;
+            this.pTC.SecondaryBG = null;
             this.pTC.Side1Set = false;
             this.pTC.Side2Set = false;
             this.pTC.Size = new System.Drawing.Size(688, 240);
+            this.pTC.SpaceLength = 6;
+            this.pTC.SplitterMoveOffset = 0;
             this.pTC.SplitterPosition = 445;
+            this.pTC.SplitterRatio = 0F;
             this.pTC.SplitterWidth = 4;
             this.pTC.TabIndex = 3;
+            this.pTC.TextFont = new System.Drawing.Font("Times New Roman", 18F);
+            this.pTC.VMargin = 3;
             this.pTC.KeyDown += new System.Windows.Forms.KeyEventHandler(this.pTC_KeyDown);
             this.pTC.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.pTC_KeyPress);
             this.pTC.MouseDown += new System.Windows.Forms.MouseEventHandler(this.parallelTextControl_MouseDown);
             this.pTC.MouseLeave += new System.EventHandler(this.parallelTextControl_MouseLeave);
             this.pTC.MouseMove += new System.Windows.Forms.MouseEventHandler(this.parallelTextControl_MouseMove);
             this.pTC.MouseUp += new System.Windows.Forms.MouseEventHandler(this.parallelTextControl_MouseUp);
-            // 
-            // highlightFirstWordsToolStripMenuItem
-            // 
-            this.highlightFirstWordsToolStripMenuItem.CheckOnClick = true;
-            this.highlightFirstWordsToolStripMenuItem.Name = "highlightFirstWordsToolStripMenuItem";
-            this.highlightFirstWordsToolStripMenuItem.Size = new System.Drawing.Size(182, 22);
-            this.highlightFirstWordsToolStripMenuItem.Text = "Highlight first words";
-            this.highlightFirstWordsToolStripMenuItem.Click += new System.EventHandler(this.highlightFirstWordsToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -272,6 +327,7 @@
         private System.Windows.Forms.ToolStripMenuItem visualsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem highlightFramgentsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem highlightFirstWordsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem structureleftToolStripMenuItem;
 
     }
 }
