@@ -1381,22 +1381,20 @@ namespace AglonaReader
             }
 
             // Truncate all preceding pairs until true-true
-
-            if (!(np.StartParagraph1 && np.StartParagraph2))
-            {
                 
-                TextPair _p;
-                int i = HighlightedPair;
+            TextPair _p;
+            int i = HighlightedPair;
 
-                do
-                {
-                    i--;
-                    _p = PText.TextPairs[i];
-                    _p.ClearComputedWords();
-                }
-
-                while (!_p.StartParagraph1 || !_p.StartParagraph2);
+            do
+            {
+                i--;
+                if (i < 0)
+                    break;
+                _p = PText.TextPairs[i];
+                _p.ClearComputedWords();
             }
+
+            while (!_p.StartParagraph1 || !_p.StartParagraph2);
 
             hp.ClearComputedWords();
             

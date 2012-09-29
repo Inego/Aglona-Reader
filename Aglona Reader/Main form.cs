@@ -312,15 +312,7 @@ namespace AglonaReader
                 if (n == 0)
                     return;
                 if (pTC.HighlightedPair != n - 1)
-                {
-                    pTC.HighlightedPair = n - 1;
-                    pTC.CurrentPair = pTC.HighlightedPair;
-                    pTC.PrepareScreen();
-                    pTC.RenderPairs();
-                    pTC.FindNaturalDividers(0);
-                    pTC.FindNaturalDividersScreen(0);
-                    pTC.Render();
-                }
+                    GotoPair(n - 1);
 
             }
 
@@ -329,15 +321,8 @@ namespace AglonaReader
                 int n = pTC.Number;
                 if (n == 0)
                     return;
-                
-                    pTC.HighlightedPair = 0;
-                    pTC.CurrentPair = 0;
-                    pTC.PrepareScreen();
-                    pTC.RenderPairs();
-                    pTC.FindNaturalDividers(0);
-                    pTC.FindNaturalDividersScreen(0);
-                    pTC.Render();
 
+                GotoPair(0);
             }
 
             else if (e.KeyData == (Keys.Control | Keys.OemOpenBrackets))
