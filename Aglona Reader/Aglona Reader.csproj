@@ -106,6 +106,12 @@
     <Compile Include="BookInfoForm.Designer.cs">
       <DependentUpon>BookInfoForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="BookStructureForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="BookStructureForm.Designer.cs">
+      <DependentUpon>BookStructureForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="ColorTableForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -143,6 +149,9 @@
     <Compile Include="Settings.cs" />
     <EmbeddedResource Include="BookInfoForm.resx">
       <DependentUpon>BookInfoForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="BookStructureForm.resx">
+      <DependentUpon>BookStructureForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ColorTableForm.resx">
       <DependentUpon>ColorTableForm.cs</DependentUpon>

@@ -1669,7 +1669,7 @@ namespace AglonaReader
             do
             {
                 i--;
-                if (i == 0)
+                if (i < 0)
                     break;
                 _p = PText.TextPairs[i];
                 _p.ClearComputedWords();

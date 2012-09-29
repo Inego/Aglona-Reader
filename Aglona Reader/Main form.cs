@@ -412,16 +412,18 @@ namespace AglonaReader
                 newCurrentPair--;
 
             if (newCurrentPair != pTC.CurrentPair)
-            {
-                pTC.CurrentPair = newCurrentPair;
-                pTC.HighlightedPair = newCurrentPair;
-                pTC.PrepareScreen();
-                pTC.RenderPairs();
-                pTC.FindNaturalDividersScreen(0);
-                pTC.Render();
+                GotoPair(newCurrentPair);
 
-            }
+        }
 
+        private void GotoPair(int newCurrentPair)
+        {
+            pTC.CurrentPair = newCurrentPair;
+            pTC.HighlightedPair = newCurrentPair;
+            pTC.PrepareScreen();
+            pTC.RenderPairs();
+            pTC.FindNaturalDividersScreen(0);
+            pTC.Render();
         }
 
         private void ProcessKeyUp()
@@ -769,7 +771,30 @@ namespace AglonaReader
 
         private void structureleftToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            BrowseBookStructure(1);
+        }
 
+        private void BrowseBookStructure(byte screenSide)
+        {
+            using (BookStructureForm f = new BookStructureForm())
+            {
+                f.parallelTextControl = pTC;
+                f.screenSide = screenSide;
+                f.ShowDialog();
+
+                if (f.pairIndex != -1)
+                    GotoPair(f.pairIndex);
+            }
+        }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+
+        private void structurerightToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            BrowseBookStructure(2);
         }
 
     }

@@ -132,6 +132,7 @@
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "ImportTextForm";
+            this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Import text from source files";
             this.Shown += new System.EventHandler(this.ImportTextForm_Shown);

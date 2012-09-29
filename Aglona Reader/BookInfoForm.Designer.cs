@@ -60,7 +60,7 @@
             this.label1.TabIndex = 0;
             this.label1.Text = "Author:";
             // 
-            // Author1
+            // author1
             // 
             this.author1.Location = new System.Drawing.Point(15, 26);
             this.author1.Name = "author1";
@@ -76,7 +76,7 @@
             this.label2.TabIndex = 2;
             this.label2.Text = "Title:";
             // 
-            // Title1
+            // title1
             // 
             this.title1.Location = new System.Drawing.Point(15, 71);
             this.title1.Multiline = true;
@@ -110,7 +110,7 @@
             this.label4.TabIndex = 6;
             this.label4.Text = "Language:";
             // 
-            // Lang1
+            // lang1
             // 
             this.lang1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.lang1.Location = new System.Drawing.Point(75, 276);
@@ -119,7 +119,7 @@
             this.lang1.Size = new System.Drawing.Size(37, 20);
             this.lang1.TabIndex = 7;
             // 
-            // Lang2
+            // lang2
             // 
             this.lang2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.lang2.Location = new System.Drawing.Point(370, 276);
@@ -154,7 +154,7 @@
             this.label6.TabIndex = 12;
             this.label6.Text = "Information:";
             // 
-            // Title2
+            // title2
             // 
             this.title2.Location = new System.Drawing.Point(310, 71);
             this.title2.Multiline = true;
@@ -171,7 +171,7 @@
             this.label7.TabIndex = 10;
             this.label7.Text = "Title:";
             // 
-            // Author2
+            // author2
             // 
             this.author2.Location = new System.Drawing.Point(310, 26);
             this.author2.Name = "author2";
@@ -257,6 +257,7 @@
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "BookInfoForm";
+            this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Book information";
             this.Load += new System.EventHandler(this.BookInfoForm_Load);
