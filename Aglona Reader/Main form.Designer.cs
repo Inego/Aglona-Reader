@@ -42,6 +42,7 @@
             this.informationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.reverseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.structureleftToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.structurerightToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pairToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.importToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -51,7 +52,10 @@
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pTC = new AglonaReader.ParallelTextControl();
-            this.structurerightToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.editModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mainMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -122,9 +126,13 @@
             // 
             this.bookToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.informationToolStripMenuItem,
+            this.toolStripSeparator1,
             this.reverseToolStripMenuItem,
+            this.toolStripSeparator2,
             this.structureleftToolStripMenuItem,
-            this.structurerightToolStripMenuItem});
+            this.structurerightToolStripMenuItem,
+            this.toolStripSeparator3,
+            this.editModeToolStripMenuItem});
             this.bookToolStripMenuItem.Name = "bookToolStripMenuItem";
             this.bookToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F2)));
             this.bookToolStripMenuItem.Size = new System.Drawing.Size(46, 20);
@@ -154,6 +162,14 @@
             this.structureleftToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
             this.structureleftToolStripMenuItem.Text = "Structure (left)";
             this.structureleftToolStripMenuItem.Click += new System.EventHandler(this.structureleftToolStripMenuItem_Click);
+            // 
+            // structurerightToolStripMenuItem
+            // 
+            this.structurerightToolStripMenuItem.Name = "structurerightToolStripMenuItem";
+            this.structurerightToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F2)));
+            this.structurerightToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
+            this.structurerightToolStripMenuItem.Text = "Structure (right)";
+            this.structurerightToolStripMenuItem.Click += new System.EventHandler(this.structurerightToolStripMenuItem_Click);
             // 
             // pairToolStripMenuItem
             // 
@@ -217,7 +233,7 @@
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.aboutToolStripMenuItem.Text = "About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
@@ -239,7 +255,7 @@
             this.pTC.GT = stringFormat1;
             this.pTC.HighlightedPair = 0;
             this.pTC.HighlightFirstWords = true;
-            this.pTC.HighlightFragments = false;
+            this.pTC.HighlightFragments = true;
             this.pTC.LastFullScreenLine = 0;
             this.pTC.LastMouseX = -1;
             this.pTC.LastMouseY = -1;
@@ -248,6 +264,7 @@
             this.pTC.Location = new System.Drawing.Point(0, 24);
             this.pTC.Modified = false;
             this.pTC.MouseCurrentWord = null;
+            this.pTC.MousePressed = false;
             this.pTC.MouseStatus = ((byte)(0));
             this.pTC.Name = "pTC";
             this.pTC.NaturalDividerPosition1 = 0;
@@ -289,13 +306,28 @@
             this.pTC.MouseMove += new System.Windows.Forms.MouseEventHandler(this.parallelTextControl_MouseMove);
             this.pTC.MouseUp += new System.Windows.Forms.MouseEventHandler(this.parallelTextControl_MouseUp);
             // 
-            // structurerightToolStripMenuItem
+            // toolStripSeparator1
             // 
-            this.structurerightToolStripMenuItem.Name = "structurerightToolStripMenuItem";
-            this.structurerightToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F2)));
-            this.structurerightToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
-            this.structurerightToolStripMenuItem.Text = "Structure (right)";
-            this.structurerightToolStripMenuItem.Click += new System.EventHandler(this.structurerightToolStripMenuItem_Click);
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(197, 6);
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(197, 6);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(197, 6);
+            // 
+            // editModeToolStripMenuItem
+            // 
+            this.editModeToolStripMenuItem.CheckOnClick = true;
+            this.editModeToolStripMenuItem.Name = "editModeToolStripMenuItem";
+            this.editModeToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.E)));
+            this.editModeToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
+            this.editModeToolStripMenuItem.Text = "Edit mode";
             // 
             // MainForm
             // 
@@ -342,6 +374,10 @@
         private System.Windows.Forms.ToolStripMenuItem highlightFirstWordsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem structureleftToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem structurerightToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private System.Windows.Forms.ToolStripMenuItem editModeToolStripMenuItem;
 
     }
 }

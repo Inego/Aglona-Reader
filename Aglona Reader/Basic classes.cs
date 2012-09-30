@@ -447,6 +447,17 @@ namespace AglonaReader
             recommended_natural1 = 0;
             recommended_natural2 = 0;
         }
+
+        internal bool NotFitOnScreen(int lastFullScreenLine)
+        {
+            return (RenderedInfo1.Line2 == -1
+                        || RenderedInfo1.Line2 > lastFullScreenLine
+                        || RenderedInfo2.Line2 == -1
+                        || RenderedInfo2.Line2 > lastFullScreenLine)
+                        && !IsBig()
+                        || RenderedInfo1.Line1 == -1
+                        || RenderedInfo2.Line1 == -1;
+        }
     }
 
     public class ParallelText

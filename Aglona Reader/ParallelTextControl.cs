@@ -1075,7 +1075,7 @@ namespace AglonaReader
 
         public void FindNaturalDividersScreen(byte side)
         {
-            if (PText.Number() > 0)
+            if (EditMode && PText.Number() > 0)
             {
                 TextPair h = PText.TextPairs[HighlightedPair];
 
@@ -1240,14 +1240,10 @@ namespace AglonaReader
 
         public void ProcessLayoutChange()
         {
-
             // erase both tables
             PText.Truncate();
-
             ComputeNumberOfScreenLines();
-
             UpdateScreen();
-
         }
 
         private ScreenWord FindScreenWordByPosition(int pairIndex, int pos, byte side)
@@ -1331,7 +1327,7 @@ namespace AglonaReader
         internal void FindNaturalDividers(byte side)
         {
 
-            if (PText.Number() == 0)
+            if (!EditMode || PText.Number() == 0)
                 return;
 
             // Look for natural dividers in the current (highlighted) Pair
@@ -1720,13 +1716,16 @@ namespace AglonaReader
 
             if (forced || mouse_text_line != line || mouse_text_x != word_x)
             {
-                if (found_word == null
-                    || HighlightedPair != -1 && found_word.PairIndex != HighlightedPair)
-                    MouseCurrentWord = null;
-                else
-                    MouseCurrentWord = found_word;
+                if (EditMode)
+                {
+                    if (found_word == null
+                        || HighlightedPair != -1 && found_word.PairIndex != HighlightedPair)
+                        MouseCurrentWord = null;
+                    else
+                        MouseCurrentWord = found_word;
 
-                Render();
+                    Render();
+                }
 
                 mouse_text_word = found_word;
                 mouse_text_line = line;
@@ -1831,6 +1830,8 @@ namespace AglonaReader
         public int Number { get { return PText.Number(); } }
 
         public bool MousePressed { get; set; }
+
+        public bool EditMode { get; set; }
     }
 
     public class ScreenWord
