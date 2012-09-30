@@ -35,17 +35,20 @@ namespace AglonaReader
         {
 
             TreeNode selected = null;
+            TreeNode previousNode = null;
 
             byte side = (byte) (parallelTextControl.Reversed ? 3 - screenSide : screenSide);
 
             TextPair p;
             TreeNode t = null;
+            TreeNode newNode = null;
+
             for (int i = 0; i < parallelTextControl.Number; i++)
             {
                 p = parallelTextControl[i];
                 if (p.StructureLevel > 0)
                 {
-                    TreeNode newNode = new TreeNode();
+                    newNode = new TreeNode();
 
                     if (side == 1)
                         if (p.SB1 == null)
@@ -59,15 +62,18 @@ namespace AglonaReader
                             newNode.Text = p.SB2.ToString();
 
                     newNode.Tag = i;
-                    if (selected == null && i >= parallelTextControl.HighlightedPair)
-                        selected = newNode;
+                    
+                    
+
+                    previousNode = newNode;
 
                     AddToParentRecursively(newNode, t, p.StructureLevel);
 
                     t = newNode;
                 }
 
-                
+                if (selected == null && i >= parallelTextControl.HighlightedPair)
+                    selected = i == parallelTextControl.HighlightedPair ? newNode : previousNode;
 
             }
 

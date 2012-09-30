@@ -14,6 +14,10 @@ namespace AglonaReader
     public partial class ParallelTextControl : UserControl
     {
 
+        public int mouse_text_line = -1;
+        private int mouse_text_x = -1;
+        public ScreenWord mouse_text_word = null;
+
         public bool Modified { get; set; }
 
         public bool HighlightFirstWords { get; set; }
@@ -956,7 +960,7 @@ namespace AglonaReader
                     TextRenderer.DrawText(g, wrd, TextFont, new Point(x, VMargin + y * LineHeight),
                          Color.Black, TextFormatFlags.NoPadding | TextFormatFlags.SingleLine);
 
-                    s.Pair = p;
+                    s.PairIndex = pairIndex;
                     s.Pos = r.Pos;
                     s.Side = side;
                     s.X1 = x;
@@ -1082,13 +1086,13 @@ namespace AglonaReader
 
                 if (side == 0 || side == 1)
                 {
-                    NaturalDividerPosition1W = FindScreenWordByPosition(h, NaturalDividerPosition1, 1);
+                    NaturalDividerPosition1W = FindScreenWordByPosition(HighlightedPair, NaturalDividerPosition1, 1);
                     SetNippingFrameByScreenWord(1, NaturalDividerPosition1W);
                 }
 
                 if (side == 0 || side == 2)
                 {
-                    NaturalDividerPosition2W = FindScreenWordByPosition(h, NaturalDividerPosition2, 2);
+                    NaturalDividerPosition2W = FindScreenWordByPosition(HighlightedPair, NaturalDividerPosition2, 2);
                     SetNippingFrameByScreenWord(2, NaturalDividerPosition2W);
                 }
                 MouseCurrentWord = null;
@@ -1242,37 +1246,30 @@ namespace AglonaReader
 
             ComputeNumberOfScreenLines();
 
-            PrepareScreen(CurrentPair, NumberOfScreenLines);
-
-            ResizeBufferedGraphic();
-            RenderPairs();
-            FindNaturalDividersScreen(0);
-            Render();
+            UpdateScreen();
 
         }
 
-        private ScreenWord FindScreenWordByPosition(TextPair p, int pos, byte side)
+        private ScreenWord FindScreenWordByPosition(int pairIndex, int pos, byte side)
         {
             if (pos != -1)
                 foreach (KeyValuePair<int, List<ScreenWord>> kv in wordsOnScreen)
                     foreach (ScreenWord sw in kv.Value)
-                        if (sw.Pair == p && sw.Pos == pos && sw.Side == side)
-                        {
+                        if (sw.PairIndex == pairIndex && sw.Pos == pos && sw.Side == side)
                             return sw;
-                        }
             
             return null;
 
         }
 
-        private bool PosIsOnOrAfterLastScreenWord(TextPair p, int pos1, int pos2)
+        private bool PosIsOnOrAfterLastScreenWord(int pairIndex, int pos1, int pos2)
         {
             int lastPos1 = -1;
             int lastPos2 = -1;
 
             foreach (KeyValuePair<int, List<ScreenWord>> kv in wordsOnScreen)
                 foreach (ScreenWord sw in kv.Value)
-                    if (sw.Pair == p)
+                    if (sw.PairIndex == pairIndex)
                     {
                         if (sw.Side == 1)
                         {
@@ -1313,16 +1310,14 @@ namespace AglonaReader
 
         public ScreenWord WordAfterCursor(int line, int cursorX)
         {
-
             List<ScreenWord> listOfWords;
 
             if (wordsOnScreen.TryGetValue(line, out listOfWords))
             {
-                // let'Word see...
+                // let's see...
 
                 foreach (ScreenWord s in listOfWords)
                 {
-                    //if (e.X1 < Word.cursorX || e.X1 > Word.X2) continue;
                     if (cursorX > s.X2) continue;
                     return s;
                 }
@@ -1422,7 +1417,7 @@ namespace AglonaReader
             FindNaturalDividers(0);
 
             if (CurrentPair != HighlightedPair
-                && PosIsOnOrAfterLastScreenWord(PText[HighlightedPair], NaturalDividerPosition1, NaturalDividerPosition2))
+                && PosIsOnOrAfterLastScreenWord(HighlightedPair, NaturalDividerPosition1, NaturalDividerPosition2))
             {
                 CurrentPair = HighlightedPair;
                 PrepareScreen();
@@ -1430,6 +1425,7 @@ namespace AglonaReader
             }
 
             FindNaturalDividersScreen(0);
+            ProcessMousePosition(true);
             Render();
 
             Side1Set = false;
@@ -1659,7 +1655,6 @@ namespace AglonaReader
             p.ClearComputedWords();
 
             // Truncate all preceding pairs until true-true
-
             
             TextPair _p;
             int i = pairIndex;
@@ -1692,12 +1687,53 @@ namespace AglonaReader
                 _q.ClearComputedWords();
             }
 
+            UpdateScreen();
+        }
+
+        public void UpdateScreen()
+        {
             PrepareScreen();
             RenderPairs();
             FindNaturalDividers(0);
             FindNaturalDividersScreen(0);
+            ProcessMousePosition(true);
             Render();
         }
+
+        public void ProcessMousePosition(bool forced)
+        {
+            // Let's check whether the cursor points to a Word
+
+            // Compute current Line
+
+            int line = (LastMouseY - VMargin) / LineHeight;
+
+            // Let's see what we've got on this Line
+
+            int word_x = -1;
+
+            ScreenWord found_word = WordAfterCursor(line, LastMouseX);
+
+            if (found_word != null)
+                word_x = found_word.X1;
+
+            if (forced || mouse_text_line != line || mouse_text_x != word_x)
+            {
+                if (found_word == null
+                    || HighlightedPair != -1 && found_word.PairIndex != HighlightedPair)
+                    MouseCurrentWord = null;
+                else
+                    MouseCurrentWord = found_word;
+
+                Render();
+
+                mouse_text_word = found_word;
+                mouse_text_line = line;
+                mouse_text_x = word_x;
+
+            }
+        }
+
 
         private void EditPair(int pairIndex)
         {
@@ -1785,7 +1821,8 @@ namespace AglonaReader
         public float SplitterRatio { get; set; }
 
         public int Number { get { return PText.Number(); } }
-        
+
+        public bool MousePressed { get; set; }
     }
 
     public class ScreenWord
@@ -1794,7 +1831,7 @@ namespace AglonaReader
         public string Word { get; set; }
         public int X1 { get; set; } // start of the Word -- real point on screen
         public int X2 { get; set; } // end of the Word
-        public TextPair Pair { get; set; } // index of Pair
+        public int PairIndex { get; set; } // index of Pair
         public byte Side { get; set; } // 1 or 2 -- the second or first text
         public int Pos { get; set; } // position of the Word in the Pair
         public int FX1 { get; set; }
