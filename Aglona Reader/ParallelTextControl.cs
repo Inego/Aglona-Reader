@@ -1648,7 +1648,7 @@ namespace AglonaReader
         }
 
 
-        public void PairChanged(int pairIndex)
+        public void PairChanged(int pairIndex, bool forceUpdate)
         {
             TextPair p = PText.TextPairs[pairIndex];
 
@@ -1687,7 +1687,8 @@ namespace AglonaReader
                 _q.ClearComputedWords();
             }
 
-            UpdateScreen();
+            if (forceUpdate)
+                UpdateScreen();
         }
 
         public void UpdateScreen()
@@ -1742,7 +1743,6 @@ namespace AglonaReader
             if (p.GetLength(1) > BigTextSize || p.GetLength(2) > BigTextSize)
             {
                 EditWhenNipped = !EditWhenNipped;
-                //MessageBox.Show("The text is too long. Use Edit command on shorter pairs.");
                 Render();
                 return;
             }
@@ -1753,7 +1753,15 @@ namespace AglonaReader
 
             if (editPairForm.Result)
             {
-                PairChanged(pairIndex);
+                if (PText[pairIndex].StructureLevel > 0
+                    && pairIndex < PText.Number() - 1
+                    && !(PText[pairIndex + 1].StartParagraph1 && PText[pairIndex + 1].StartParagraph2))
+                {
+                    PText[pairIndex + 1].StartParagraph1 = true;
+                    PText[pairIndex + 1].StartParagraph2 = true;
+                    PairChanged(pairIndex + 1, false);
+                }
+                PairChanged(pairIndex, true);
                 Modified = true;
             }
         }

@@ -275,7 +275,7 @@ namespace AglonaReader
 
                     pTC.MergePairs(pTC.HighlightedPair - 1);
                     pTC.HighlightedPair--;
-                    pTC.PairChanged(pTC.HighlightedPair);
+                    pTC.PairChanged(pTC.HighlightedPair, true);
                 }
             }
 
