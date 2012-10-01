@@ -1304,9 +1304,11 @@ namespace AglonaReader
             }
         }
 
-        public ScreenWord WordAfterCursor(int line, int cursorX)
+        public ScreenWord WordAfterCursor(int line, int cursorX, byte side)
         {
             List<ScreenWord> listOfWords;
+
+            ScreenWord lastWord = null;
 
             if (wordsOnScreen.TryGetValue(line, out listOfWords))
             {
@@ -1314,12 +1316,16 @@ namespace AglonaReader
 
                 foreach (ScreenWord s in listOfWords)
                 {
-                    if (cursorX > s.X2) continue;
-                    return s;
+                    if (s.Side != side)
+                        continue;
+                    if (cursorX > s.X2)
+                        lastWord = s;
+                    else
+                        return s;
                 }
             }
 
-            return null;
+            return lastWord;
         }
 
 
@@ -1703,13 +1709,19 @@ namespace AglonaReader
 
             // Compute current Line
 
+            byte side = (byte) (LastMouseX < splitterPosition ? 1 : 2);
+
+            if (Reversed)
+                side = (byte) (3 - side);
+
+
             int line = (LastMouseY - VMargin) / LineHeight;
 
             // Let's see what we've got on this Line
 
             int word_x = -1;
 
-            ScreenWord found_word = WordAfterCursor(line, LastMouseX);
+            ScreenWord found_word = WordAfterCursor(line, LastMouseX, side);
 
             if (found_word != null)
                 word_x = found_word.X1;
