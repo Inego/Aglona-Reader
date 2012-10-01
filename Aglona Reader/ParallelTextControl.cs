@@ -1636,7 +1636,7 @@ namespace AglonaReader
 
         public void EditCurrentPair()
         {
-            if (PText.Number() == 0)
+            if (!EditMode || PText.Number() == 0)
                 return;
 
             EditPair(HighlightedPair);

@@ -268,7 +268,7 @@ namespace AglonaReader
 
             else if (e.KeyData == (Keys.Control | Keys.Up))
             {
-                if (pTC.HighlightedPair > 0)
+                if (pTC.EditMode && pTC.HighlightedPair > 0)
                 {
                     if (pTC.CurrentPair == pTC.HighlightedPair)
                         pTC.CurrentPair--;
@@ -338,6 +338,7 @@ namespace AglonaReader
 
             else if (e.KeyData == Keys.PageUp)
                 ProcessPageUp();
+
             else if (e.KeyData == Keys.PageDown)
                 ProcessPageDown();
             
@@ -510,6 +511,10 @@ namespace AglonaReader
 
         private void ChangeNatural(byte screen_side, bool inc)
         {
+
+            if (!pTC.EditMode)
+                return;
+
             TextPair p = pTC[pTC.HighlightedPair];
 
             byte side;
@@ -547,13 +552,11 @@ namespace AglonaReader
 
         }
 
-        private void EditCurrentPair()
-        {
-            pTC.EditCurrentPair();
-        }
-
         private void importToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (!pTC.EditMode)
+                return;
+
             using (ImportTextForm importTextForm = new ImportTextForm())
             {
                 importTextForm.PText = pTC.PText;
@@ -690,6 +693,7 @@ namespace AglonaReader
                 f.TopPair = pTC.CurrentPair;
                 f.Reversed = pTC.Reversed;
                 f.SplitterRatio = pTC.SplitterRatio;
+                f.EditMode = pTC.EditMode;
             }
 
             appSettings.HighlightFragments = pTC.HighlightFragments;
@@ -715,7 +719,7 @@ namespace AglonaReader
 
         private void editToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            EditCurrentPair();
+            pTC.EditCurrentPair();
         }
 
         private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -736,8 +740,6 @@ namespace AglonaReader
                 e.Cancel = true;
                 return;
             }
-
-            SaveAppSettings();
         }
 
         DialogResult AskToSaveModified(Object sender)
@@ -816,6 +818,18 @@ namespace AglonaReader
         private void structurerightToolStripMenuItem_Click(object sender, EventArgs e)
         {
             BrowseBookStructure(2);
+        }
+
+        private void editModeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            pTC.EditMode = editModeToolStripMenuItem.Checked;
+            if (!pTC.EditMode)
+            {
+                pTC.HighlightedFrame.SetInvisible();
+                pTC.NippingFrame.SetInvisible();
+                pTC.MouseCurrentWord = null;
+            }
+            pTC.UpdateScreen();
         }
 
     }
