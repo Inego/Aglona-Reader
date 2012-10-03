@@ -13,6 +13,13 @@ namespace AglonaReader
 
     public partial class ParallelTextControl : UserControl
     {
+        public byte SelectionSide { get; set; }
+        public int Selection1Pair { get; set; }
+        public int Selection1Position { get; set; }
+        public int Selection2Pair { get; set; }
+        public int Selection2Position { get; set; }
+        public Frame SelectionFrame { get; set; }
+        public bool SelectionFinished { get; set; }
 
         public int mouse_text_line = -1;
         private int mouse_text_x = -1;
@@ -366,7 +373,7 @@ namespace AglonaReader
             PrimaryBG = BufferedGraphicsManager.Current.Allocate(CreateGraphics(), ClientRectangle);
             SecondaryBG = BufferedGraphicsManager.Current.Allocate(PrimaryBG.Graphics, ClientRectangle);
 
-            PrimaryBG.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+            //PrimaryBG.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
         }
 
         public ParallelTextControl()
@@ -374,6 +381,8 @@ namespace AglonaReader
             InitializeComponent();
 
             CreateNewParallelBook();
+
+            SelectionFinished = true;
             
             wordsOnScreen = new SortedList<int, List<ScreenWord>>();
 
@@ -393,6 +402,10 @@ namespace AglonaReader
             CorrectedPen = Frame.CreatePen(Color.Peru, DashStyle.Solid, 2.0F);
 
             NippingFrame = new DoubleFrame(SuggestedPen, frames);
+
+            Pen selectionPen = Frame.CreatePen(Color.Black, DashStyle.Solid, 2.0F);
+
+            SelectionFrame = new Frame(selectionPen, frames);
 
             GT = (StringFormat)StringFormat.GenericTypographic.Clone();
 
@@ -958,7 +971,11 @@ namespace AglonaReader
                     }
                         
                     TextRenderer.DrawText(g, wrd, TextFont, new Point(x, VMargin + y * LineHeight),
-                         Color.Black, TextFormatFlags.NoPadding | TextFormatFlags.SingleLine);
+                        // In view mode, show text in gray if it is not complete
+                        !EditMode && (renderedInfo.Line1 == -1 || renderedInfo.Line2 == -1 || renderedInfo.Line2 > LastFullScreenLine) ?
+                        Color.Gray :
+                        Color.Black, 
+                         TextFormatFlags.NoPadding | TextFormatFlags.SingleLine);
 
                     s.PairIndex = pairIndex;
                     s.Pos = r.Pos;
@@ -1075,14 +1092,15 @@ namespace AglonaReader
 
         public void FindNaturalDividersScreen(byte side)
         {
-            if (EditMode && PText.Number() > 0)
+            if (PText.Number() == 0)
+                return;
+
+            if (EditMode)
             {
                 TextPair h = PText.TextPairs[HighlightedPair];
 
                 if (side == 0)
-                {
                     SetFramesByPair(h, HighlightedFrame);
-                }
 
                 if (side == 0 || side == 1)
                 {
@@ -1095,8 +1113,13 @@ namespace AglonaReader
                     NaturalDividerPosition2W = FindScreenWordByPosition(HighlightedPair, NaturalDividerPosition2, 2);
                     SetNippingFrameByScreenWord(2, NaturalDividerPosition2W);
                 }
+
                 MouseCurrentWord = null;
             }
+
+            else
+                UpdateSelectionFrame();
+
         }
 
         private void ProcessCurrentWord(StringBuilder word, ref int occLength, Collection<CommonWordInfo> words, ref int Height, TextPair p, byte side, ref int MaxWidth, ref int wordPosition)
@@ -1709,10 +1732,18 @@ namespace AglonaReader
 
             // Compute current Line
 
-            byte side = (byte) (LastMouseX < splitterPosition ? 1 : 2);
+            byte side;
 
-            if (Reversed)
-                side = (byte) (3 - side);
+
+            if (!EditMode && !SelectionFinished)
+                // When selection started in one side, look always for words on that side
+                side = SelectionSide;
+            else
+            {
+                side = (byte)(LastMouseX < splitterPosition ? 1 : 2);
+                if (Reversed)
+                    side = (byte)(3 - side);
+            }
 
 
             int line = (LastMouseY - VMargin) / LineHeight;
@@ -1728,6 +1759,11 @@ namespace AglonaReader
 
             if (forced || mouse_text_line != line || mouse_text_x != word_x)
             {
+
+                mouse_text_word = found_word;
+                mouse_text_line = line;
+                mouse_text_x = word_x;
+
                 if (EditMode)
                 {
                     if (found_word == null
@@ -1738,10 +1774,19 @@ namespace AglonaReader
 
                     Render();
                 }
+                else if (!SelectionFinished && mouse_text_word != null)
+                {
+                    // Update second part of the selection
+                    if (Selection2Pair != mouse_text_word.PairIndex
+                        || Selection2Position != mouse_text_word.Pos)
+                    {
+                        Selection2Pair = mouse_text_word.PairIndex;
+                        Selection2Position = mouse_text_word.Pos;
 
-                mouse_text_word = found_word;
-                mouse_text_line = line;
-                mouse_text_x = word_x;
+                        UpdateSelectionFrame();
+                        Render();
+                    }
+                }
 
             }
         }
@@ -1844,6 +1889,73 @@ namespace AglonaReader
         public bool MousePressed { get; set; }
 
         public bool EditMode { get; set; }
+
+
+        internal void UpdateSelectionFrame()
+        {
+
+            if (SelectionFrame.Side == 0)
+                return;
+
+            ScreenWord word1 = FindScreenWordByPosition(Selection1Pair, Selection1Position, SelectionSide);
+            ScreenWord word2 = FindScreenWordByPosition(Selection2Pair, Selection2Position, SelectionSide);
+
+            SelectionFrame.Visible = true;
+
+            if (Selection1Pair < Selection2Pair || Selection1Pair == Selection2Pair && Selection1Position <= Selection2Position)
+            {
+                // Normal order (selection start before end)
+                
+                if (word1 == null)
+                    if (Selection1Pair >= LastRenderedPair)
+                        SelectionFrame.Visible = false;
+                    else
+                        SelectionFrame.Line1 = -1;
+                else
+                {
+                    SelectionFrame.Line1 = word1.Line;
+                    SelectionFrame.X1 = word1.FX1;
+                }
+
+                if (word2 == null)
+                    if (Selection2Pair >= LastRenderedPair)
+                        SelectionFrame.Line2 = -1;
+                    else
+                        SelectionFrame.Visible = false;
+                else
+                {
+                    SelectionFrame.Line2 = word2.Line;
+                    SelectionFrame.X2 = word2.FX2;
+                }
+                
+            }
+            else
+            {
+                // Reversed
+
+                if (word2 == null)
+                    if (Selection2Pair >= LastRenderedPair)
+                        SelectionFrame.Visible = false;
+                    else
+                        SelectionFrame.Line1 = -1;
+                else
+                {
+                    SelectionFrame.Line1 = word2.Line;
+                    SelectionFrame.X1 = word2.FX1;
+                }
+
+                if (word1 == null)
+                    if (Selection1Pair >= LastRenderedPair)
+                        SelectionFrame.Line2 = -1;
+                    else
+                        SelectionFrame.Visible = false;
+                else
+                {
+                    SelectionFrame.Line2 = word1.Line;
+                    SelectionFrame.X2 = word1.FX2;
+                }
+            }
+        }
     }
 
     public class ScreenWord

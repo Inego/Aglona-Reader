@@ -150,7 +150,12 @@ namespace AglonaReader
             }
 
             else if (opState == 0)
+            {
                 pTC.ProcessMousePosition(false);
+
+                
+
+            }
 
         }
 
@@ -169,7 +174,6 @@ namespace AglonaReader
         {
             pTC.MousePressed = true;
 
-
             if (opState == 0)
             {
                 if (XonSplitter(e.X))
@@ -178,7 +182,35 @@ namespace AglonaReader
                     pTC.SplitterMoveOffset = e.X - pTC.SplitterPosition;
                 }
 
+                else if (!pTC.EditMode)
+                {
+                    // In view mode mouse down begins selection
+
+                    if (pTC.mouse_text_word == null)
+                        return;
+
+                    if (pTC.SelectionFinished)
+                    {
+                        pTC.SelectionFinished = false;
+                        pTC.SelectionSide = pTC.mouse_text_word.Side;
+                        pTC.Selection1Pair = pTC.mouse_text_word.PairIndex;
+                        pTC.Selection2Pair = pTC.mouse_text_word.PairIndex;
+                        pTC.Selection1Position = pTC.mouse_text_word.Pos;
+                        pTC.Selection2Position = pTC.mouse_text_word.Pos;
+                        pTC.SelectionFrame.Visible = true;
+                        pTC.SelectionFrame.Side = pTC.mouse_text_word.Side;
+                        pTC.SelectionFrame.Line1 = pTC.mouse_text_word.Line;
+                        pTC.SelectionFrame.Line2 = pTC.mouse_text_word.Line;
+                        pTC.SelectionFrame.X1 = pTC.mouse_text_word.FX1;
+                        pTC.SelectionFrame.X2 = pTC.mouse_text_word.FX2;
+                        pTC.Render();
+                    }
+
+                }
+
             }
+
+            
         }
 
         private void parallelTextControl_MouseUp(object sender, MouseEventArgs e)
@@ -193,50 +225,61 @@ namespace AglonaReader
                 opState = 0;
             else
             {
-                if (pTC.MouseCurrentWord != null && pTC.MouseCurrentWord.Next != null)
+                if (pTC.EditMode)
                 {
 
-                    if (pTC.MouseCurrentWord.Side == 1)
+                    if (pTC.MouseCurrentWord != null && pTC.MouseCurrentWord.Next != null)
                     {
-                        pTC.NaturalDividerPosition1W = pTC.MouseCurrentWord.Next;
-                        pTC.NaturalDividerPosition1 = pTC.NaturalDividerPosition1W.Pos;
-                        pTC.SetNippingFrameByScreenWord(1, pTC.NaturalDividerPosition1W);
-                        (pTC.NippingFrame.F1 as Frame).FramePen = pTC.CorrectedPen;
-                        pTC.Side1Set = true;
-                    }
-                    else
-                    {
-                        pTC.NaturalDividerPosition2W = pTC.MouseCurrentWord.Next;
-                        pTC.NaturalDividerPosition2 = pTC.NaturalDividerPosition2W.Pos;
-                        pTC.SetNippingFrameByScreenWord(2, pTC.NaturalDividerPosition2W);
-                        (pTC.NippingFrame.F2 as Frame).FramePen = pTC.CorrectedPen;
-                        pTC.Side2Set = true;
-                    }
 
-                    if (pTC.Side1Set && pTC.Side2Set)
-                        pTC.NipHighlightedPair();
-                    else
+                        if (pTC.MouseCurrentWord.Side == 1)
+                        {
+                            pTC.NaturalDividerPosition1W = pTC.MouseCurrentWord.Next;
+                            pTC.NaturalDividerPosition1 = pTC.NaturalDividerPosition1W.Pos;
+                            pTC.SetNippingFrameByScreenWord(1, pTC.NaturalDividerPosition1W);
+                            (pTC.NippingFrame.F1 as Frame).FramePen = pTC.CorrectedPen;
+                            pTC.Side1Set = true;
+                        }
+                        else
+                        {
+                            pTC.NaturalDividerPosition2W = pTC.MouseCurrentWord.Next;
+                            pTC.NaturalDividerPosition2 = pTC.NaturalDividerPosition2W.Pos;
+                            pTC.SetNippingFrameByScreenWord(2, pTC.NaturalDividerPosition2W);
+                            (pTC.NippingFrame.F2 as Frame).FramePen = pTC.CorrectedPen;
+                            pTC.Side2Set = true;
+                        }
+
+                        if (pTC.Side1Set && pTC.Side2Set)
+                            pTC.NipHighlightedPair();
+                        else
+                            pTC.Render();
+
+                    }
+                    else if (pTC.mouse_text_word != null)
+                    {
+                        // Set focus to this pair
+                        pTC.HighlightedPair = pTC.mouse_text_word.PairIndex;
+
+                        TextPair p = pTC[pTC.HighlightedPair];
+
+                        if (p.NotFitOnScreen(pTC.LastFullScreenLine))
+                        {
+                            pTC.CurrentPair = pTC.HighlightedPair;
+                            pTC.PrepareScreen();
+                            pTC.RenderPairs();
+                        }
+
+                        pTC.FindNaturalDividers(0);
+                        pTC.FindNaturalDividersScreen(0);
+                        pTC.ProcessMousePosition(true);
                         pTC.Render();
+                    }
 
                 }
-                else if (pTC.mouse_text_word != null)
+
+                else
                 {
-                    // Set focus to this pair
-                    pTC.HighlightedPair = pTC.mouse_text_word.PairIndex;
+                    pTC.SelectionFinished = true;
 
-                    TextPair p = pTC[pTC.HighlightedPair];
-
-                    if (p.NotFitOnScreen(pTC.LastFullScreenLine))
-                    {
-                        pTC.CurrentPair = pTC.HighlightedPair;
-                        pTC.PrepareScreen();
-                        pTC.RenderPairs();
-                    }
-
-                    pTC.FindNaturalDividers(0);
-                    pTC.FindNaturalDividersScreen(0);
-                    pTC.ProcessMousePosition(true);
-                    pTC.Render();
                 }
 
 
@@ -341,6 +384,16 @@ namespace AglonaReader
 
             else if (e.KeyData == Keys.PageDown)
                 ProcessPageDown();
+
+            else if (e.KeyData == Keys.Escape)
+            {
+                if (!pTC.EditMode && pTC.SelectionSide != 0)
+                {
+                    pTC.SelectionSide = 0;
+                    pTC.UpdateSelectionFrame();
+                    pTC.Render();
+                }
+            }
             
         }
 
