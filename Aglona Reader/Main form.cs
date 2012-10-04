@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
+using System.Text;
 
 
 [assembly: CLSCompliant(true)]
@@ -17,7 +18,9 @@ namespace AglonaReader
         AppSettings appSettings;
 
         byte opState;
-        
+
+
+		       
         
 
 
@@ -27,6 +30,7 @@ namespace AglonaReader
                 ProcessKeyUp();
             else if (e.Delta < 0)
                 ProcessKeyDown();
+            
         }
 
 
@@ -150,13 +154,7 @@ namespace AglonaReader
             }
 
             else if (opState == 0)
-            {
                 pTC.ProcessMousePosition(false);
-
-                
-
-            }
-
         }
 
         
@@ -328,10 +326,10 @@ namespace AglonaReader
             else if (e.KeyData == (Keys.Control | Keys.Left))
                 ChangeNatural(1, false);
 
-            else if (e.KeyData == (Keys.Alt| Keys.Right))
+            else if (e.KeyData == (Keys.Alt | Keys.Right))
                 ChangeNatural(2, true);
 
-            else if (e.KeyData == (Keys.Alt| Keys.Left))
+            else if (e.KeyData == (Keys.Alt | Keys.Left))
                 ChangeNatural(2, false);
 
             else if (e.KeyData == Keys.Right)
@@ -394,7 +392,78 @@ namespace AglonaReader
                     pTC.Render();
                 }
             }
+
+            else if (!pTC.EditMode && e.KeyData == (Keys.Control | Keys.C))
+                CopyToClipboard();
             
+        }
+
+        private void CopyToClipboard()
+        {
+            if (pTC.SelectionSide != 0 && pTC.SelectionFinished)
+            {
+                //System.Windows.Forms.Clipboard.SetText("abc");
+
+                StringBuilder selectedText = new StringBuilder();
+
+                int Y1;
+                int Y2;
+                int X1;
+                int X2;
+
+                pTC.AssignProperSelectionOrder(out Y1, out Y2, out X1, out X2);
+
+
+                if (Y1 == Y2)
+                {
+                    // The simplest case - text selected inside one pair
+
+                    // If there is more than one word...
+                    if (X1 < X2)
+                        selectedText.Append(pTC[Y1].Substring(pTC.SelectionSide, X1, X2 - X1));
+                    
+                }
+                else
+                {
+                    // The text spans across several pairs
+
+                    int currentPair = Y1;
+
+                    while (true)
+                    {
+                        if (currentPair > Y1)
+                            // Insert space or linebreak, depending on Startparagraph
+                            if (pTC[currentPair].StartParagraph(pTC.SelectionSide))
+                                selectedText.Append("\r\n");
+                            else
+                                selectedText.Append(' ');
+
+                        if (currentPair == Y1)
+                            selectedText.Append(pTC[currentPair].Substring(pTC.SelectionSide, X1));
+                        else if (currentPair == Y2)
+                            selectedText.Append(pTC[currentPair].Substring(pTC.SelectionSide, 0, X2));
+                        else
+                            selectedText.Append(pTC[currentPair].GetText(pTC.SelectionSide));
+
+                        currentPair++;
+
+                        if (currentPair > Y2)
+                            break;
+
+                    }
+
+                    
+
+                }
+
+                // Append the last word starting in Y2 from X2 
+                selectedText.Append(ParallelTextControl.GetWord(pTC[Y2], pTC.SelectionSide, X2));
+
+
+                Clipboard.SetText(selectedText.ToString());
+                
+                
+            }
         }
 
         private void ProcessPageDown()
@@ -875,14 +944,23 @@ namespace AglonaReader
 
         private void editModeToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            
             pTC.EditMode = editModeToolStripMenuItem.Checked;
-            if (!pTC.EditMode)
+            
+            if (pTC.EditMode)
+            {
+                pTC.SelectionSide = 0;
+                pTC.SelectionFrame.Visible = false;
+            }
+            else
             {
                 pTC.HighlightedFrame.SetInvisible();
                 pTC.NippingFrame.SetInvisible();
                 pTC.MouseCurrentWord = null;
             }
+
             pTC.UpdateScreen();
+
         }
 
     }

@@ -41,6 +41,34 @@ namespace AglonaReader
     public class TextPair
     {
 
+        public string Substring(byte side, int startPosition, int length)
+        {
+            if (side == 1)
+                if (SB1 == null)
+                    return Text1.Substring(startPosition, length);
+                else
+                    return SB1.ToString(startPosition, length);
+            else
+                if (SB2 == null)
+                    return Text2.Substring(startPosition, length);
+                else
+                    return SB2.ToString(startPosition, length);
+        }
+
+        public string Substring(byte side, int startPosition)
+        {
+            if (side == 1)
+                if (SB1 == null)
+                    return Text1.Substring(startPosition);
+                else
+                    return SB1.ToString(startPosition, SB1.Length = startPosition);
+            else
+                if (SB2 == null)
+                    return Text2.Substring(startPosition);
+                else
+                    return SB2.ToString(startPosition, SB2.Length - startPosition);
+        }
+
         public RenderedTextInfo RenderedInfo(byte side)
         {
             return side == 1 ? RenderedInfo1 : RenderedInfo2;
@@ -457,6 +485,25 @@ namespace AglonaReader
                         && !IsBig()
                         || RenderedInfo1.Line1 == -1
                         || RenderedInfo2.Line1 == -1;
+        }
+
+        internal string GetText(byte side)
+        {
+            if (side == 1)
+                if (SB1 == null)
+                    return Text1;
+                else
+                    return SB1.ToString();
+            else
+                if (SB2 == null)
+                    return Text2;
+                else
+                    return SB2.ToString();
+        }
+
+        internal bool StartParagraph(byte side)
+        {
+            return side == 1 ? StartParagraph1 : StartParagraph2;
         }
     }
 

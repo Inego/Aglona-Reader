@@ -645,24 +645,27 @@ namespace AglonaReader
             if (occLength == 0) return false;
             if (startParagraph) return true;
 
-            StringBuilder word = new StringBuilder();
+            return (maxWidth - occLength - sL <= WordWidth(GetWord(p, side, 0), PanelGraphics));
 
+        }
+
+        public static string GetWord(TextPair p, byte side, int pos)
+        {
             char c;
 
-            int pos = 0;
+            StringBuilder word = new StringBuilder();
 
             int length = p.GetLength(side);
 
             while (pos < length)
             {
                 c = p.GetChar(side, pos);
-                if (c == ' ' || c == '\t' || c == '\n') break;
+                if (c == ' ' || c == '\t' || c == '\n' || c == '\r') break;
                 word.Append(c);
                 pos++;
             }
 
-            return (maxWidth - occLength - sL <= WordWidth(word.ToString(), PanelGraphics));
-
+            return word.ToString();
         }
 
         /// <summary>
@@ -1897,63 +1900,58 @@ namespace AglonaReader
             if (SelectionFrame.Side == 0)
                 return;
 
-            ScreenWord word1 = FindScreenWordByPosition(Selection1Pair, Selection1Position, SelectionSide);
-            ScreenWord word2 = FindScreenWordByPosition(Selection2Pair, Selection2Position, SelectionSide);
+            int Y1;
+            int Y2;
+            int X1;
+            int X2;
+
+            AssignProperSelectionOrder(out Y1, out Y2, out X1, out X2);
+
+
+            ScreenWord word1 = FindScreenWordByPosition(Y1, X1, SelectionSide);
+            ScreenWord word2 = FindScreenWordByPosition(Y2, X2, SelectionSide);
 
             SelectionFrame.Visible = true;
 
+            if (word1 == null)
+                if (Y1 >= LastRenderedPair)
+                    SelectionFrame.Visible = false;
+                else
+                    SelectionFrame.Line1 = -1;
+            else
+            {
+                SelectionFrame.Line1 = word1.Line;
+                SelectionFrame.X1 = word1.FX1;
+            }
+
+            if (word2 == null)
+                if (Y2 >= LastRenderedPair)
+                    SelectionFrame.Line2 = -1;
+                else
+                    SelectionFrame.Visible = false;
+            else
+            {
+                SelectionFrame.Line2 = word2.Line;
+                SelectionFrame.X2 = word2.FX2;
+            }
+                
+        }
+
+        public void AssignProperSelectionOrder(out int Y1, out int Y2, out int X1, out int X2)
+        {
             if (Selection1Pair < Selection2Pair || Selection1Pair == Selection2Pair && Selection1Position <= Selection2Position)
             {
-                // Normal order (selection start before end)
-                
-                if (word1 == null)
-                    if (Selection1Pair >= LastRenderedPair)
-                        SelectionFrame.Visible = false;
-                    else
-                        SelectionFrame.Line1 = -1;
-                else
-                {
-                    SelectionFrame.Line1 = word1.Line;
-                    SelectionFrame.X1 = word1.FX1;
-                }
-
-                if (word2 == null)
-                    if (Selection2Pair >= LastRenderedPair)
-                        SelectionFrame.Line2 = -1;
-                    else
-                        SelectionFrame.Visible = false;
-                else
-                {
-                    SelectionFrame.Line2 = word2.Line;
-                    SelectionFrame.X2 = word2.FX2;
-                }
-                
+                Y1 = Selection1Pair;
+                X1 = Selection1Position;
+                Y2 = Selection2Pair;
+                X2 = Selection2Position;
             }
             else
             {
-                // Reversed
-
-                if (word2 == null)
-                    if (Selection2Pair >= LastRenderedPair)
-                        SelectionFrame.Visible = false;
-                    else
-                        SelectionFrame.Line1 = -1;
-                else
-                {
-                    SelectionFrame.Line1 = word2.Line;
-                    SelectionFrame.X1 = word2.FX1;
-                }
-
-                if (word1 == null)
-                    if (Selection1Pair >= LastRenderedPair)
-                        SelectionFrame.Line2 = -1;
-                    else
-                        SelectionFrame.Visible = false;
-                else
-                {
-                    SelectionFrame.Line2 = word1.Line;
-                    SelectionFrame.X2 = word1.FX2;
-                }
+                Y1 = Selection2Pair;
+                X1 = Selection2Position;
+                Y2 = Selection1Pair;
+                X2 = Selection1Position;
             }
         }
     }
