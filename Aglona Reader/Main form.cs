@@ -780,35 +780,38 @@ namespace AglonaReader
             {
                 openFileDialog.Filter = "XML files (*.xml)|*.xml";
                 openFileDialog.RestoreDirectory = true;
-                //openFileDialog.AutoUpgradeEnabled = true;
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
-                {
-                    fileName = openFileDialog.FileName;
-                    pTC.PText = new ParallelText();
-                    pTC.mouse_text_line = -1;
-                    
-                    pTC.PText.Load(fileName);
-
-                    if (RetrieveToTheTop(fileName))
-                        LoadSettingsFromFileUsageInfo(appSettings.FileUsages[0], false);
-                    else
-                    {
-                        pTC.CurrentPair = 0;
-                        pTC.HighlightedPair = 0;
-                        SetEditMode(false);
-                    }
-
-                    newBook = false;
-
-                    pTC.Modified = false;
-                    
-                    pTC.FindNaturalDividers(0);
-                    
-                    Recompute();
-
-                }
+                    fileName = LoadFromFile(openFileDialog.FileName);
             }
+        }
+
+        private string LoadFromFile(string fileName)
+        {
+            pTC.PText = new ParallelText();
+            pTC.mouse_text_line = -1;
+
+            pTC.PText.Load(fileName);
+
+            if (RetrieveToTheTop(fileName))
+                LoadSettingsFromFileUsageInfo(appSettings.FileUsages[0], false);
+            else
+            {
+                pTC.CurrentPair = 0;
+                pTC.HighlightedPair = 0;
+                SetEditMode(false);
+            }
+
+            ProcessEditModeChange();
+
+            newBook = false;
+
+            pTC.Modified = false;
+
+            pTC.FindNaturalDividers(0);
+
+            Recompute();
+            return fileName;
         }
 
         private void SaveAppSettings()
@@ -955,7 +958,15 @@ namespace AglonaReader
         {
             
             pTC.EditMode = editModeToolStripMenuItem.Checked;
-            
+
+            ProcessEditModeChange();
+
+            pTC.UpdateScreen();
+
+        }
+
+        private void ProcessEditModeChange()
+        {
             if (pTC.EditMode)
             {
                 pTC.SelectionSide = 0;
@@ -967,8 +978,18 @@ namespace AglonaReader
                 pTC.NippingFrame.SetInvisible();
                 pTC.MouseCurrentWord = null;
             }
+        }
 
-            pTC.UpdateScreen();
+        private void openRecentToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+            using (OpenRecentForm f = new OpenRecentForm())
+            {
+                f.appSettings = appSettings;
+                f.ShowDialog();
+                if (!string.IsNullOrEmpty(f.result))
+                    LoadFromFile(f.result);
+            }
 
         }
 
