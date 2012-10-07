@@ -19,11 +19,6 @@ namespace AglonaReader
 
         byte opState;
 
-
-		       
-        
-
-
         private void pTC_MouseWheel(object sender, System.Windows.Forms.MouseEventArgs e)
         {
             if (e.Delta > 0)
@@ -32,7 +27,6 @@ namespace AglonaReader
                 ProcessKeyDown();
             
         }
-
 
         public MainForm()
         {
@@ -91,14 +85,26 @@ namespace AglonaReader
         private void LoadSettingsFromFileUsageInfo(FileUsageInfo f, bool load)
         {
             
+            
+
+            if (load)
+                try
+                {
+                    pTC.PText.Load(f.FileName);
+                }
+                catch
+                {
+                    MessageBox.Show("Unable to load " + f.FileName + "!");
+                    return;
+                }
+
             pTC.Reversed = f.Reversed;
             reverseToolStripMenuItem.Checked = pTC.Reversed;
             pTC.SetSplitterPositionByRatio(f.SplitterRatio);
 
             SetEditMode(f.EditMode);
 
-            if (load)
-                pTC.PText.Load(f.FileName);
+                
             pTC.Modified = false;
 
             if (pTC.Number > 0)
@@ -435,7 +441,7 @@ namespace AglonaReader
                             // Insert space or linebreak, depending on Startparagraph
                             if (pTC[currentPair].StartParagraph(pTC.SelectionSide))
                                 selectedText.Append("\r\n");
-                            else
+                            else if (pTC.WesternJoint(currentPair - 1, pTC.SelectionSide))
                                 selectedText.Append(' ');
 
                         if (currentPair == Y1)
@@ -899,6 +905,9 @@ namespace AglonaReader
 
             pTC.CreateNewParallelBook();
 
+            reverseToolStripMenuItem.Checked = false;
+            editModeToolStripMenuItem.Checked = true;
+
             pTC.HighlightedFrame.SetInvisible();
             pTC.NippingFrame.SetInvisible();
 
@@ -969,8 +978,8 @@ namespace AglonaReader
     {
         public TextPair TextPair { get; set; }
 
-        public CommonWordInfo(TextPair textPair, string word, int line, int wordX, int wordX2, int pos)
-            : base(word, line, wordX, wordX2, pos)
+        public CommonWordInfo(TextPair textPair, string word, int line, int wordX, int wordX2, int pos, bool eastern)
+            : base(word, line, wordX, wordX2, pos, eastern)
         {
             this.TextPair = textPair;
 

@@ -88,6 +88,7 @@
             // newToolStripMenuItem
             // 
             this.newToolStripMenuItem.Name = "newToolStripMenuItem";
+            this.newToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
             this.newToolStripMenuItem.Size = new System.Drawing.Size(146, 22);
             this.newToolStripMenuItem.Text = "New";
             this.newToolStripMenuItem.Click += new System.EventHandler(this.newToolStripMenuItem_Click);
@@ -263,7 +264,7 @@
             // 
             // pTC
             // 
-            this.pTC.BackColor = System.Drawing.SystemColors.Info;
+            this.pTC.BackColor = System.Drawing.SystemColors.InactiveBorder;
             this.pTC.Brightness = 0.97D;
             this.pTC.CurrentPair = 0;
             this.pTC.DebugString = null;
@@ -272,8 +273,8 @@
             this.pTC.EditWhenNipped = false;
             this.pTC.FirstRenderedPair = 0;
             stringFormat1.Alignment = System.Drawing.StringAlignment.Near;
-            stringFormat1.FormatFlags = ((System.Drawing.StringFormatFlags)(((System.Drawing.StringFormatFlags.FitBlackBox | System.Drawing.StringFormatFlags.LineLimit)
-                        | System.Drawing.StringFormatFlags.NoClip)));
+            stringFormat1.FormatFlags = ((System.Drawing.StringFormatFlags)(((System.Drawing.StringFormatFlags.FitBlackBox | System.Drawing.StringFormatFlags.LineLimit) 
+            | System.Drawing.StringFormatFlags.NoClip)));
             stringFormat1.HotkeyPrefix = System.Drawing.Text.HotkeyPrefix.None;
             stringFormat1.LineAlignment = System.Drawing.StringAlignment.Near;
             stringFormat1.Trimming = System.Drawing.StringTrimming.None;
@@ -285,7 +286,6 @@
             this.pTC.LastMouseX = -1;
             this.pTC.LastMouseY = -1;
             this.pTC.LastRenderedPair = 0;
-            this.pTC.LineHeight = 28;
             this.pTC.Location = new System.Drawing.Point(0, 24);
             this.pTC.Modified = false;
             this.pTC.MouseCurrentWord = null;
@@ -313,6 +313,12 @@
             this.pTC.Reversed = false;
             this.pTC.RightPosition = 445;
             this.pTC.SecondaryBG = null;
+            this.pTC.Selection1Pair = 0;
+            this.pTC.Selection1Position = 0;
+            this.pTC.Selection2Pair = 0;
+            this.pTC.Selection2Position = 0;
+            this.pTC.SelectionFinished = true;
+            this.pTC.SelectionSide = ((byte)(0));
             this.pTC.Side1Set = false;
             this.pTC.Side2Set = false;
             this.pTC.Size = new System.Drawing.Size(688, 240);
@@ -322,7 +328,6 @@
             this.pTC.SplitterRatio = 0F;
             this.pTC.SplitterWidth = 4;
             this.pTC.TabIndex = 3;
-            this.pTC.TextFont = new System.Drawing.Font("Times New Roman", 18F);
             this.pTC.VMargin = 3;
             this.pTC.KeyDown += new System.Windows.Forms.KeyEventHandler(this.pTC_KeyDown);
             this.pTC.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.pTC_KeyPress);

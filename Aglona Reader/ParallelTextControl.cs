@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Text;
 using System.Windows.Forms;
+using System.ComponentModel;
 
 namespace AglonaReader
 {
@@ -115,8 +116,9 @@ namespace AglonaReader
 
         private SortedList<int, List<ScreenWord>> wordsOnScreen;
 
-
-        public Font TextFont { get; set; }
+        public Font textFont;
+        
+        
         private Brush drawBrush = new SolidBrush(Color.Black);
 
         public int VMargin { get; set; }
@@ -279,7 +281,7 @@ namespace AglonaReader
         private int text2start;
         private int text2end;
 
-        public int LineHeight { get; set; }
+        public int lineHeight;
 
         public StringFormat GT { get; set; } // Generic Typographic
 
@@ -335,7 +337,7 @@ namespace AglonaReader
             else
             {
                 // Measure and store in the dictionary
-                result = TextRenderer.MeasureText(graphics, word, TextFont, Size.Empty, TextFormatFlags.NoPadding).Width;
+                result = TextRenderer.MeasureText(graphics, word, textFont, Size.Empty, TextFormatFlags.NoPadding).Width;
                 widthDictionary.Add(word, result);
                 return result;
             }
@@ -349,7 +351,7 @@ namespace AglonaReader
         public void ComputeSpaceLength(IDeviceContext graphics)
         {
             SpaceLength = WordWidth(" ", graphics);
-            LineHeight = TextFont.Height;
+            lineHeight = textFont.Height;
         }
 
         /// <summary>
@@ -358,11 +360,11 @@ namespace AglonaReader
         /// <param name="vSize">Vertical size of screen in pixels</param>
         public void ComputeNumberOfScreenLines()
         {
-            NumberOfScreenLines = (Height - 2 * VMargin) / LineHeight;
+            NumberOfScreenLines = (Height - 2 * VMargin) / lineHeight;
 
             LastFullScreenLine = NumberOfScreenLines - 1;
 
-            if (LineHeight * NumberOfScreenLines < Height - 2 * VMargin)
+            if (lineHeight * NumberOfScreenLines < Height - 2 * VMargin)
                 NumberOfScreenLines++;
 
         }
@@ -413,7 +415,10 @@ namespace AglonaReader
 
             PanelGraphics = CreateGraphics();
 
-            TextFont = new System.Drawing.Font("times", 18.0F);
+            //textFont = new System.Drawing.Font("Arial Unicode MS", 18.0F);
+            textFont = new System.Drawing.Font("Times New Roman", 18.0F);
+            //textFont = new System.Drawing.Font("SimSun", 18.0F);
+            //textFont = new System.Drawing.Font("Arial", 18.0F);
 
             ComputeSpaceLength(PanelGraphics);
 
@@ -441,6 +446,8 @@ namespace AglonaReader
             HighlightedPair = 0;
 
             Reversed = false;
+            EditMode = true;
+
         }
 
 
@@ -547,17 +554,17 @@ namespace AglonaReader
                 }
                 else
                     // A piece of text
-                    g.DrawRectangle(frame.FramePen, textstart + frame.X1, VMargin + frame.Line1 * LineHeight - frameoffset_y,
-                    frame.X2 - frame.X1 + 2 * frameoffset_x, LineHeight + 2 * frameoffset_y);
+                    g.DrawRectangle(frame.FramePen, textstart + frame.X1, VMargin + frame.Line1 * lineHeight - frameoffset_y,
+                    frame.X2 - frame.X1 + 2 * frameoffset_x, lineHeight + 2 * frameoffset_y);
 
             else if (frame.Line1 == -1)
                 g.DrawLines(frame.FramePen, new Point[]
                 {
                     new Point(textstart, 0),
-                    new Point(textstart, VMargin + (frame.Line2 + 1) * LineHeight + frameoffset_y),
-                    new Point(textstart + frame.X2 + 2 * frameoffset_x, VMargin + (frame.Line2 + 1) * LineHeight + frameoffset_y),
-                    new Point(textstart + frame.X2 + 2 * frameoffset_x, VMargin + frame.Line2 * LineHeight + frameoffset_y),
-                    new Point(textend, VMargin + frame.Line2 * LineHeight + frameoffset_y),
+                    new Point(textstart, VMargin + (frame.Line2 + 1) * lineHeight + frameoffset_y),
+                    new Point(textstart + frame.X2 + 2 * frameoffset_x, VMargin + (frame.Line2 + 1) * lineHeight + frameoffset_y),
+                    new Point(textstart + frame.X2 + 2 * frameoffset_x, VMargin + frame.Line2 * lineHeight + frameoffset_y),
+                    new Point(textend, VMargin + frame.Line2 * lineHeight + frameoffset_y),
                     new Point(textend, 0)
                 });
 
@@ -566,42 +573,42 @@ namespace AglonaReader
                     g.DrawLines(frame.FramePen, new Point[]
                     {
                         new Point(textstart, Height - 1),
-                        new Point(textstart, VMargin + frame.Line1 * LineHeight - frameoffset_y),
-                        new Point(textend, VMargin + frame.Line1 * LineHeight - frameoffset_y),
+                        new Point(textstart, VMargin + frame.Line1 * lineHeight - frameoffset_y),
+                        new Point(textend, VMargin + frame.Line1 * lineHeight - frameoffset_y),
                         new Point(textend, Height - 1)
                     });
                 else
                     g.DrawLines(frame.FramePen, new Point[]
                     {
                         new Point(textstart, Height - 1),
-                        new Point(textstart, VMargin + (frame.Line1 + 1) * LineHeight - frameoffset_y),
-                        new Point(textstart + frame.X1, VMargin + (frame.Line1 + 1) * LineHeight - frameoffset_y),
-                        new Point(textstart + frame.X1, VMargin + frame.Line1 * LineHeight - frameoffset_y),
-                        new Point(textend, VMargin + frame.Line1 * LineHeight - frameoffset_y),
+                        new Point(textstart, VMargin + (frame.Line1 + 1) * lineHeight - frameoffset_y),
+                        new Point(textstart + frame.X1, VMargin + (frame.Line1 + 1) * lineHeight - frameoffset_y),
+                        new Point(textstart + frame.X1, VMargin + frame.Line1 * lineHeight - frameoffset_y),
+                        new Point(textend, VMargin + frame.Line1 * lineHeight - frameoffset_y),
                         new Point(textend, Height - 1)
                     });
 
             else if (frame.X1 == 0)
                 g.DrawPolygon(frame.FramePen, new Point[]
                 {
-                    new Point(textend, VMargin + frame.Line1 * LineHeight - frameoffset_y),   
-                    new Point(textstart, VMargin + frame.Line1 * LineHeight - frameoffset_y),
-                    new Point(textstart, VMargin + (frame.Line2 + 1) * LineHeight + frameoffset_y),
-                    new Point(textstart + frame.X2 + 2 * frameoffset_x, VMargin + (frame.Line2 + 1) * LineHeight + frameoffset_y),
-                    new Point(textstart + frame.X2 + 2 * frameoffset_x, VMargin + frame.Line2 * LineHeight + frameoffset_y),
-                    new Point(textend, VMargin + frame.Line2 * LineHeight + frameoffset_y)
+                    new Point(textend, VMargin + frame.Line1 * lineHeight - frameoffset_y),   
+                    new Point(textstart, VMargin + frame.Line1 * lineHeight - frameoffset_y),
+                    new Point(textstart, VMargin + (frame.Line2 + 1) * lineHeight + frameoffset_y),
+                    new Point(textstart + frame.X2 + 2 * frameoffset_x, VMargin + (frame.Line2 + 1) * lineHeight + frameoffset_y),
+                    new Point(textstart + frame.X2 + 2 * frameoffset_x, VMargin + frame.Line2 * lineHeight + frameoffset_y),
+                    new Point(textend, VMargin + frame.Line2 * lineHeight + frameoffset_y)
                 });
             else
                 g.DrawPolygon(frame.FramePen, new Point[]
                 {
-                    new Point(textend, VMargin + frame.Line1 * LineHeight - frameoffset_y),
-                    new Point(textstart + frame.X1, VMargin + frame.Line1 * LineHeight - frameoffset_y),
-                    new Point(textstart + frame.X1, VMargin + (frame.Line1 + 1) * LineHeight - frameoffset_y),
-                    new Point(textstart, VMargin + (frame.Line1 + 1) * LineHeight - frameoffset_y),
-                    new Point(textstart, VMargin + (frame.Line2 + 1) * LineHeight + frameoffset_y),
-                    new Point(textstart + frame.X2 + 2 * frameoffset_x, VMargin + (frame.Line2 + 1) * LineHeight + frameoffset_y),
-                    new Point(textstart + frame.X2 + 2 * frameoffset_x, VMargin + (frame.Line2) * LineHeight + frameoffset_y),
-                    new Point(textend, VMargin + (frame.Line2) * LineHeight + frameoffset_y)
+                    new Point(textend, VMargin + frame.Line1 * lineHeight - frameoffset_y),
+                    new Point(textstart + frame.X1, VMargin + frame.Line1 * lineHeight - frameoffset_y),
+                    new Point(textstart + frame.X1, VMargin + (frame.Line1 + 1) * lineHeight - frameoffset_y),
+                    new Point(textstart, VMargin + (frame.Line1 + 1) * lineHeight - frameoffset_y),
+                    new Point(textstart, VMargin + (frame.Line2 + 1) * lineHeight + frameoffset_y),
+                    new Point(textstart + frame.X2 + 2 * frameoffset_x, VMargin + (frame.Line2 + 1) * lineHeight + frameoffset_y),
+                    new Point(textstart + frame.X2 + 2 * frameoffset_x, VMargin + (frame.Line2) * lineHeight + frameoffset_y),
+                    new Point(textend, VMargin + (frame.Line2) * lineHeight + frameoffset_y)
                 });
 
         }
@@ -618,7 +625,7 @@ namespace AglonaReader
             Graphics g = PrimaryBG.Graphics;
 
             if (!string.IsNullOrEmpty(DebugString))
-                TextRenderer.DrawText(g, DebugString, TextFont, new Point(PanelMargin, Height - LineHeight), Color.Red);
+                TextRenderer.DrawText(g, DebugString, textFont, new Point(PanelMargin, Height - lineHeight), Color.Red);
 
             if (EditWhenNipped)
                 g.FillEllipse(Brushes.Red, Width - 13, 2, 10, 10);
@@ -636,7 +643,7 @@ namespace AglonaReader
 
             Graphics g = PrimaryBG.Graphics;
 
-            TextRenderer.DrawText(g, sw.Word, TextFont, new Point(sw.X1, VMargin + sw.Line * LineHeight),
+            TextRenderer.DrawText(g, sw.Word, textFont, new Point(sw.X1, VMargin + sw.Line * lineHeight),
                 Color.Black, color, TextFormatFlags.NoPadding | TextFormatFlags.SingleLine);
         }
 
@@ -660,8 +667,23 @@ namespace AglonaReader
             while (pos < length)
             {
                 c = p.GetChar(side, pos);
-                if (c == ' ' || c == '\t' || c == '\n' || c == '\r') break;
+                if (c == ' ' || c == '\t')
+                    if (word.Length == 0)
+                    {
+                        pos++;
+                        continue;
+                    }
+                    else
+                        break;
+
+                if (c == '\n' || c == '\r')
+                    break;
+
+                if (IsEasternCharacter(c))
+                    return c.ToString();
+                
                 word.Append(c);
+
                 pos++;
             }
 
@@ -838,8 +860,7 @@ namespace AglonaReader
         }
 
 
-
-        private void RenderText(Graphics g, int pairIndex, ref int offset, ref int cLine, byte side)
+        private void RenderBackground(Graphics g, int pairIndex, ref int offset, ref int cLine, byte side)
         {
 
             TextPair p = PText.TextPairs[pairIndex];
@@ -849,11 +870,14 @@ namespace AglonaReader
             RenderedTextInfo renderedInfo = p.RenderedInfo(side);
 
             if (cLine >= NumberOfScreenLines
+                || list == null
                 || list.Count == 0)
             {
                 renderedInfo.Valid = false;
                 return;
             }
+
+            WordInfo first = list[0];
 
             WordInfo last = list[list.Count - 1];
 
@@ -869,9 +893,8 @@ namespace AglonaReader
                 renderedInfo.Line1 = -1;
             else
             {
-                renderedInfo.Line1 = cLine + list[0].Line;
-                renderedInfo.X1 = list[0].X1;
-                //renderedInfo.x1b = list[0].cursorX;
+                renderedInfo.Line1 = cLine + first.Line;
+                renderedInfo.X1 = first.X1;
             }
 
             if (cLine + last.Line >= NumberOfScreenLines || !(side == 1 ? p.AllLinesComputed1 : p.AllLinesComputed2))
@@ -893,6 +916,47 @@ namespace AglonaReader
 
             }
 
+            bool big = ((side == 1 ? p.SB1 : p.SB2) != null);
+
+            // Before drawing text we must draw colored background
+            // Colored 
+            if (!big && HighlightFragments)
+                DrawBackground(side, renderedInfo.Line1, renderedInfo.X1, renderedInfo.Line2, renderedInfo.X2B, SecondaryBG.Graphics,
+                    brushTable[pairIndex % NumberofColors]);
+
+            if (HighlightFirstWords
+                && !(big && HighlightFragments)
+                && list != null
+                && list.Count > 0)
+            {
+                Rectangle wordRect = new Rectangle(offset + first.X1, VMargin + (cLine + first.Line) * lineHeight, first.X2 - first.X1 + 1, lineHeight);
+
+                using (LinearGradientBrush brush = new LinearGradientBrush(
+                    wordRect,
+                    big ? grayColor : darkColorTable[pairIndex % NumberofColors],
+                    HighlightFragments && !big ? lightColorTable[pairIndex % NumberofColors] : Color.White,
+                    LinearGradientMode.Horizontal))
+
+                    g.FillRectangle(brush, wordRect);
+                
+            }
+            
+        }
+
+        private void RenderText(Graphics g, int pairIndex, ref int offset, ref int cLine, byte side)
+        {
+
+            TextPair p = PText.TextPairs[pairIndex];
+
+            RenderedTextInfo renderedInfo = p.RenderedInfo(side);
+
+            if (!renderedInfo.Valid)
+                return;
+
+            Collection<WordInfo> list = p.ComputedWords(side);
+
+            WordInfo last = list[list.Count - 1];
+
             int x;
             int y = -1;
 
@@ -903,12 +967,6 @@ namespace AglonaReader
             int prev_y = -1;
 
             bool big = ((side == 1 ? p.SB1 : p.SB2) != null);
-
-            // Before drawing text we must draw colored background
-                // Colored 
-            if (!big && HighlightFragments)
-                DrawBackground(side, renderedInfo.Line1, renderedInfo.X1, renderedInfo.Line2, renderedInfo.X2B, SecondaryBG.Graphics,
-                    brushTable[pairIndex % NumberofColors]);
 
             if (list != null)
                 for (int i = 0; i < list.Count; i++)
@@ -959,21 +1017,8 @@ namespace AglonaReader
                     }
 
                     string wrd = r.Word;
-
-                    if (HighlightFirstWords && i == 0 && !(big && HighlightFragments))
-                    {
-                        Rectangle wordRect = new Rectangle(x, VMargin + y * LineHeight, r.X2 - r.X1 + 1, LineHeight);
-                        
-                        using (LinearGradientBrush brush = new LinearGradientBrush(
-                            wordRect,
-                            big ? grayColor : darkColorTable[pairIndex % NumberofColors],
-                            HighlightFragments && !big ? lightColorTable[pairIndex % NumberofColors] : Color.White,
-                            LinearGradientMode.Horizontal))
-
-                            g.FillRectangle(brush, wordRect);
-                    }
-                        
-                    TextRenderer.DrawText(g, wrd, TextFont, new Point(x, VMargin + y * LineHeight),
+    
+                    TextRenderer.DrawText(g, wrd, textFont, new Point(x, VMargin + y * lineHeight),
                         // In view mode, show text in gray if it is not complete
                         !EditMode && (renderedInfo.Line1 == -1 || renderedInfo.Line2 == -1 || renderedInfo.Line2 > LastFullScreenLine) ?
                         Color.Gray :
@@ -1004,8 +1049,7 @@ namespace AglonaReader
 
             Graphics g = SecondaryBG.Graphics;
 
-            int cPair = startPair;
-            int cLine = -negHeight;
+            
 
             int offset;
             byte textSide;
@@ -1019,22 +1063,54 @@ namespace AglonaReader
                 textSide = 2;
             else
                 textSide = 1;
-            
-        NextPair:
 
-            TextPair p = PText.TextPairs[cPair];
 
-            RenderText(g, cPair, ref offset, ref cLine, textSide);
-            
-            cLine += p.Height;
+            int cPair = startPair;
+            int cLine = -negHeight;
 
-            if (cLine >= NumberOfScreenLines)
-                return;
+            // RenderedInfo and Backgrounds
 
-            if (cPair < PText.Number() - 1)
+            while (true)
             {
-                cPair++;
-                goto NextPair;
+
+                TextPair p = PText.TextPairs[cPair];
+
+                RenderBackground(g, cPair, ref offset, ref cLine, textSide);
+
+                cLine += p.Height;
+
+                if (cLine >= NumberOfScreenLines)
+                    break;
+
+                if (cPair < PText.Number() - 1)
+                    cPair++;
+                else
+                    break;
+
+            }
+
+
+            // Text itself
+            
+            cPair = startPair;
+            cLine = -negHeight;
+
+            while (true)
+            {
+
+                TextPair p = PText.TextPairs[cPair];
+
+                RenderText(g, cPair, ref offset, ref cLine, textSide);
+
+                cLine += p.Height;
+
+                if (cLine >= NumberOfScreenLines)
+                    break;
+
+                if (cPair < PText.Number() - 1)
+                    cPair++;
+                else
+                    break;
             }
 
         }
@@ -1125,15 +1201,16 @@ namespace AglonaReader
 
         }
 
-        private void ProcessCurrentWord(StringBuilder word, ref int occLength, Collection<CommonWordInfo> words, ref int Height, TextPair p, byte side, ref int MaxWidth, ref int wordPosition)
+        private void ProcessCurrentWord(StringBuilder word, ref int occLength, Collection<CommonWordInfo> words, ref int Height, TextPair p, byte side, ref int MaxWidth, ref int wordPosition, bool eastern)
         {
 
             // Current Word complete, let'Word get its length
             int wordLength = WordWidth(word.ToString(), PanelGraphics);
 
-            int newStart = occLength + (occLength == 0 ? 0 : SpaceLength);
 
-            if (newStart + wordLength > MaxWidth)
+            int newStart = occLength + (occLength == 0 || eastern && words.Count > 0 && words[words.Count - 1].Eastern ? 0 : SpaceLength);
+
+            if (newStart + wordLength > MaxWidth && occLength != 0)
             {
                 // Move this Word to the Next Line.
                 // Before that we need to flush words to the DB
@@ -1149,7 +1226,7 @@ namespace AglonaReader
             }
 
             // Add this Word to the current Line
-            words.Add(new CommonWordInfo(p, word.ToString(), Height, newStart, newStart + wordLength - 1, wordPosition));
+            words.Add(new CommonWordInfo(p, word.ToString(), Height, newStart, newStart + wordLength - 1, wordPosition, eastern));
             occLength = newStart + wordLength;
 
             word.Clear();
@@ -1194,10 +1271,11 @@ namespace AglonaReader
                         continue;
                     }
 
-                    ProcessCurrentWord(word, ref occLength, words, ref height, p, side, ref MaxWidth, ref wordPos);
+                    ProcessCurrentWord(word, ref occLength, words, ref height, p, side, ref MaxWidth, ref wordPos, false);
 
                     if (requiredHeight != -1 && requiredHeight == height)
                         goto CommonExit;
+
                     wordPos = -1;
 
                 }
@@ -1205,7 +1283,7 @@ namespace AglonaReader
                 {
                     if (word.Length > 0)
                     {
-                        ProcessCurrentWord(word, ref occLength, words, ref height, p, side, ref MaxWidth, ref wordPos);
+                        ProcessCurrentWord(word, ref occLength, words, ref height, p, side, ref MaxWidth, ref wordPos, false);
                         if (requiredHeight != -1 && requiredHeight == height)
                         {
                             wordPos = pos;
@@ -1227,6 +1305,30 @@ namespace AglonaReader
 
 
                 }
+
+                else if (IsEasternCharacter(c))
+                {
+                    if (word.Length != 0)
+                    {
+                        ProcessCurrentWord(word, ref occLength, words, ref height, p, side, ref MaxWidth, ref wordPos, false);
+                        if (requiredHeight != -1 && requiredHeight == height)
+                            goto CommonExit;
+                    }
+
+                    word.Append(c);
+
+                    ProcessCurrentWord(word, ref occLength, words, ref height, p, side, ref MaxWidth, ref pos, true);
+
+                    if (requiredHeight != -1 && requiredHeight == height)
+                    {
+                        wordPos = pos;
+                        goto CommonExit;
+                    }
+
+                    wordPos = -1;
+
+                }
+
                 else
                 {
                     if (wordPos == -1)
@@ -1242,7 +1344,7 @@ namespace AglonaReader
             // Reached the end, process current Word (if there is any)
             if (word.Length > 0)
             {
-                ProcessCurrentWord(word, ref occLength, words, ref height, p, side, ref MaxWidth, ref wordPos);
+                ProcessCurrentWord(word, ref occLength, words, ref height, p, side, ref MaxWidth, ref wordPos, false);
                 if (requiredHeight != -1 && requiredHeight == height)
                     goto CommonExit;
             }
@@ -1262,6 +1364,12 @@ namespace AglonaReader
             else
                 p.CurrentPos2 = wordPos;
             
+        }
+
+        public static bool IsEasternCharacter(char c)
+        {
+            return (c >= (char)0x2e80
+                && !(c >= (char)0xac00 && c <= (char)0xd7a3)); // Hangul
         }
 
         public void ProcessLayoutChange()
@@ -1598,17 +1706,17 @@ namespace AglonaReader
                 }
                 else
                     // A piece of text
-                    g.FillRectangle(brush, textstart + x1, VMargin + line1 * LineHeight,
-                    x2 - x1, LineHeight);
+                    g.FillRectangle(brush, textstart + x1, VMargin + line1 * lineHeight,
+                    x2 - x1, lineHeight);
 
             else if (line1 == -1)
                 g.FillPolygon(brush, new Point[]
                 {
                     new Point(textstart, 0),
-                    new Point(textstart, VMargin + (line2 + 1) * LineHeight),
-                    new Point(textstart + x2, VMargin + (line2 + 1) * LineHeight),
-                    new Point(textstart + x2, VMargin + line2 * LineHeight),
-                    new Point(textend, VMargin + line2 * LineHeight),
+                    new Point(textstart, VMargin + (line2 + 1) * lineHeight),
+                    new Point(textstart + x2, VMargin + (line2 + 1) * lineHeight),
+                    new Point(textstart + x2, VMargin + line2 * lineHeight),
+                    new Point(textend, VMargin + line2 * lineHeight),
                     new Point(textend, 0)
                 });
 
@@ -1617,42 +1725,42 @@ namespace AglonaReader
                     g.FillPolygon(brush, new Point[]
                     {
                         new Point(textstart, Height - 1),
-                        new Point(textstart, VMargin + line1 * LineHeight),
-                        new Point(textend, VMargin + line1 * LineHeight),
+                        new Point(textstart, VMargin + line1 * lineHeight),
+                        new Point(textend, VMargin + line1 * lineHeight),
                         new Point(textend, Height - 1)
                     });
                 else
                     g.FillPolygon(brush, new Point[]
                     {
                         new Point(textstart, Height - 1),
-                        new Point(textstart, VMargin + (line1 + 1) * LineHeight),
-                        new Point(textstart + x1, VMargin + (line1 + 1) * LineHeight),
-                        new Point(textstart + x1, VMargin + line1 * LineHeight),
-                        new Point(textend, VMargin + line1 * LineHeight),
+                        new Point(textstart, VMargin + (line1 + 1) * lineHeight),
+                        new Point(textstart + x1, VMargin + (line1 + 1) * lineHeight),
+                        new Point(textstart + x1, VMargin + line1 * lineHeight),
+                        new Point(textend, VMargin + line1 * lineHeight),
                         new Point(textend, Height - 1)
                     });
 
             else if (x1 == 0)
                 g.FillPolygon(brush, new Point[]
                 {
-                    new Point(textend, VMargin + line1 * LineHeight),   
-                    new Point(textstart, VMargin + line1 * LineHeight),
-                    new Point(textstart, VMargin + (line2 + 1) * LineHeight),
-                    new Point(textstart + x2, VMargin + (line2 + 1) * LineHeight),
-                    new Point(textstart + x2, VMargin + line2 * LineHeight),
-                    new Point(textend, VMargin + line2 * LineHeight)
+                    new Point(textend, VMargin + line1 * lineHeight),   
+                    new Point(textstart, VMargin + line1 * lineHeight),
+                    new Point(textstart, VMargin + (line2 + 1) * lineHeight),
+                    new Point(textstart + x2, VMargin + (line2 + 1) * lineHeight),
+                    new Point(textstart + x2, VMargin + line2 * lineHeight),
+                    new Point(textend, VMargin + line2 * lineHeight)
                 });
             else
                 g.FillPolygon(brush, new Point[]
                 {
-                    new Point(textend, VMargin + line1 * LineHeight),
-                    new Point(textstart + x1, VMargin + line1 * LineHeight),
-                    new Point(textstart + x1, VMargin + (line1 + 1) * LineHeight),
-                    new Point(textstart, VMargin + (line1 + 1) * LineHeight),
-                    new Point(textstart, VMargin + (line2 + 1) * LineHeight),
-                    new Point(textstart + x2, VMargin + (line2 + 1) * LineHeight),
-                    new Point(textstart + x2, VMargin + (line2) * LineHeight),
-                    new Point(textend, VMargin + (line2) * LineHeight)
+                    new Point(textend, VMargin + line1 * lineHeight),
+                    new Point(textstart + x1, VMargin + line1 * lineHeight),
+                    new Point(textstart + x1, VMargin + (line1 + 1) * lineHeight),
+                    new Point(textstart, VMargin + (line1 + 1) * lineHeight),
+                    new Point(textstart, VMargin + (line2 + 1) * lineHeight),
+                    new Point(textstart + x2, VMargin + (line2 + 1) * lineHeight),
+                    new Point(textstart + x2, VMargin + (line2) * lineHeight),
+                    new Point(textend, VMargin + (line2) * lineHeight)
                 });
         }
 
@@ -1749,7 +1857,7 @@ namespace AglonaReader
             }
 
 
-            int line = (LastMouseY - VMargin) / LineHeight;
+            int line = (LastMouseY - VMargin) / lineHeight;
 
             // Let's see what we've got on this Line
 
@@ -1825,12 +1933,27 @@ namespace AglonaReader
             }
         }
 
+        internal bool WesternJoint(int firstPair, byte side)
+        {
+
+            TextPair first = PText[firstPair];
+            TextPair second = PText[firstPair + 1];
+
+            int firstLength = first.GetLength(side);
+
+            if (firstLength == 0 || second.GetLength(side) == 0)
+                return false; // no space needed between texts since one or both are empty
+
+            return !IsEasternCharacter(first.GetChar(side, firstLength - 1)) && !IsEasternCharacter(second.GetChar(side, 0));
+
+        }
+
 
         internal void MergePairs(int firstPair)
         {
 
-            TextPair first = PText.TextPairs[firstPair];
-            TextPair second = PText.TextPairs[firstPair + 1];
+            TextPair first = PText[firstPair];
+            TextPair second = PText[firstPair + 1];
 
             if (second.SB1 == null)
             {
@@ -1849,7 +1972,7 @@ namespace AglonaReader
                 second.SB1.Insert(0, '\n');
                 second.SB1.Insert(0, '\r');
             }
-            else
+            else if (WesternJoint(firstPair, 1))
                 second.SB1.Insert(0, ' ');
 
             if (second.StartParagraph2)
@@ -1857,7 +1980,7 @@ namespace AglonaReader
                 second.SB2.Insert(0, '\n');
                 second.SB2.Insert(0, '\r');
             }
-            else
+            else if (WesternJoint(firstPair, 2))
                 second.SB2.Insert(0, ' ');
 
             second.SB1.Insert(0, first.SB1 == null ? first.Text1 : first.SB1.ToString());
@@ -1881,7 +2004,6 @@ namespace AglonaReader
             }
 
             Modified = true;
-
 
         }
 

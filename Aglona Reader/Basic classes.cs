@@ -16,14 +16,17 @@ namespace AglonaReader
         public int X1 { get; set; }
         public int X2 { get; set; }
         public int Pos { get; set; }
+        public bool Eastern { get; set; }
 
-        public WordInfo(string word, int line, int wordX, int wordX2, int pos)
+        public WordInfo(string word, int line, int wordX, int wordX2, int pos, bool eastern)
         {
             this.Word = word;
             this.Line = line;
             this.X1 = wordX;
             this.X2 = wordX2;
             this.Pos = pos;
+            this.Eastern = eastern;
+
         }
 
     }
@@ -301,7 +304,9 @@ namespace AglonaReader
 
                     case '—':
                     case '.':
+                    case '。':
                     case ',':
+                    case '，':
                     case ':':
                     case ';':
                     case '!':
@@ -357,7 +362,8 @@ namespace AglonaReader
                 if (!(prev == ' '
                     || prev == '\n'
                     || prev == '\t'
-                    || prev == '\r'))
+                    || prev == '\r'
+                    || ParallelTextControl.IsEasternCharacter(prev)))
                 {
                     pos--;
                     goto CorrectAndReturn;
@@ -394,12 +400,14 @@ namespace AglonaReader
                         break;
 
                     case '—':
-                    case '.':
+                    case '.': 
+                    case '。':
                     case ',':
+                    case '，':
                     case ':':
                     case ';':
                     case '!':
-                    case '?':
+                    case '?': 
                         if (state == 1)
                             state = 3;
                         else if (state == 2)
@@ -451,7 +459,8 @@ namespace AglonaReader
                 if (!(prev == ' '
                     || prev == '\n'
                     || prev == '\t'
-                    || prev == '\r'))
+                    || prev == '\r'
+                    || ParallelTextControl.IsEasternCharacter(prev)))
                 {
                     pos--;
                     goto CorrectAndReturn;
@@ -584,28 +593,47 @@ namespace AglonaReader
             TextPair prev_p = null;
 
             int bias = 0;
-            int counter = 0;
+            
 
+            // Spaces can be only in cases like W E or E W or W W,
+            // where W is a "western" word and E is an eastern character
+            // they can't be between EE
+
+            CommonWordInfo previousWord = null;
+
+            int numberOfSpacesLeft = 0;
+
+            // So before extending spaces we must know their number.
+            foreach (CommonWordInfo r in list)
+            {
+                if (previousWord != null)
+                    if (!(r.Eastern && previousWord.Eastern))
+                        numberOfSpacesLeft++;
+                previousWord = r;
+            }
+
+            previousWord = null;
+            
             foreach (CommonWordInfo r in list)
             {
 
-                if (spaceLeft != 0 && counter > 0)
+                if (spaceLeft != 0 && previousWord != null && !(r.Eastern && previousWord.Eastern))
                 {
-                    int inc = (spaceLeft / (list.Count - counter));
+                    int inc = (spaceLeft / numberOfSpacesLeft);
                     bias += inc;
                     spaceLeft -= inc;
+                    numberOfSpacesLeft--;
                 }
 
                 if (prev_p != r.TextPair)
                 {
                     prev_p = r.TextPair;
-
                     l = prev_p.ComputedWords(side, true);
                 }
 
-                l.Add(new WordInfo(r.Word, r.Line, r.X1 + bias, r.X2 + bias, r.Pos));
+                l.Add(new WordInfo(r.Word, r.Line, r.X1 + bias, r.X2 + bias, r.Pos, r.Eastern));
 
-                counter++;
+                previousWord = r;
             }
 
             list.Clear();

@@ -23,7 +23,7 @@ namespace AglonaReader
             }
             base.Dispose(disposing);
             drawBrush.Dispose();
-            TextFont.Dispose();
+            textFont.Dispose();
         }
 
         protected override void OnPaintBackground(System.Windows.Forms.PaintEventArgs e)
