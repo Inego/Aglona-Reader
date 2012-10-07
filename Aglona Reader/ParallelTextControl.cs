@@ -6,14 +6,16 @@ using System.Drawing.Drawing2D;
 using System.Text;
 using System.Windows.Forms;
 using System.ComponentModel;
+using System.Runtime.InteropServices;
+
 
 namespace AglonaReader
 {
 
-    
-
     public partial class ParallelTextControl : UserControl
     {
+        IntPtr secondaryHDC;
+
         public byte SelectionSide { get; set; }
         public int Selection1Pair { get; set; }
         public int Selection1Position { get; set; }
@@ -326,6 +328,9 @@ namespace AglonaReader
             SetFramesByPair(PText.TextPairs[pairIndex], df);
         }
 
+        [DllImport("gdi32.dll", CharSet = CharSet.Unicode)]
+        static extern bool GetTextExtentPoint32(IntPtr hdc, string lpString, int cbString, out Size lpSize);
+
         public int WordWidth(string word, IDeviceContext graphics)
         {
 
@@ -337,9 +342,15 @@ namespace AglonaReader
             else
             {
                 // Measure and store in the dictionary
-                result = TextRenderer.MeasureText(graphics, word, textFont, Size.Empty, TextFormatFlags.NoPadding).Width;
-                widthDictionary.Add(word, result);
-                return result;
+
+                Size sz;
+                
+                //result = TextRenderer.MeasureText(graphics, word, textFont, Size.Empty, TextFormatFlags.NoPadding).Width;
+
+                GetTextExtentPoint32(secondaryHDC, word, word.Length, out sz);
+
+                widthDictionary.Add(word, sz.Width);
+                return sz.Width;
             }
 
         }
@@ -374,6 +385,8 @@ namespace AglonaReader
         {
             PrimaryBG = BufferedGraphicsManager.Current.Allocate(CreateGraphics(), ClientRectangle);
             SecondaryBG = BufferedGraphicsManager.Current.Allocate(PrimaryBG.Graphics, ClientRectangle);
+
+            
 
             //PrimaryBG.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
         }
@@ -415,9 +428,9 @@ namespace AglonaReader
 
             PanelGraphics = CreateGraphics();
 
+            //textFont = new System.Drawing.Font("Simsun", 18.0F);
             //textFont = new System.Drawing.Font("Arial Unicode MS", 18.0F);
             textFont = new System.Drawing.Font("Times New Roman", 18.0F);
-            //textFont = new System.Drawing.Font("SimSun", 18.0F);
             //textFont = new System.Drawing.Font("Arial", 18.0F);
 
             ComputeSpaceLength(PanelGraphics);
@@ -699,8 +712,14 @@ namespace AglonaReader
         public void PrepareScreen(int startPair, int requiredLines)
         {
 
+            
+
             if (PText.Number() == 0)
                 return;
+
+            secondaryHDC = SecondaryBG.Graphics.GetHdc();
+
+            IntPtr last_font = SelectObject(secondaryHDC, textFont.ToHfont());
 
             // Required number of lines that we want to compute for the current Pair.
             // -1 means we want to compute ALL lines
@@ -753,7 +772,7 @@ namespace AglonaReader
                 
                 if (p.Height != -1 && remainder <= p.Height)
                     // cool
-                    return;
+                    goto CommonExit;
 
                 requiredHeight = remainder;
 
@@ -806,7 +825,7 @@ namespace AglonaReader
                 remainder -= height;
 
                 if (remainder <= 0)
-                    return;
+                    goto CommonExit;
             }
 
             // Are there more text pairs?
@@ -816,7 +835,7 @@ namespace AglonaReader
                 // This was the last Pair, no more coming.
                 ParallelText.InsertWords(words1, 0, 1);
                 ParallelText.InsertWords(words2, 0, 2);
-                return;
+                goto CommonExit;
             }
 
             // ...There are.
@@ -840,7 +859,7 @@ namespace AglonaReader
                     remainder--;
 
                     if (remainder <= 0)
-                        return;
+                        goto CommonExit;
                 }
 
                 occLength1 = 0;
@@ -848,9 +867,14 @@ namespace AglonaReader
             }
 
             if (requiredLines == -1 && cPair > startPair && prev_pair.Height > 0)
-                return;
+                goto CommonExit;
 
             goto NextPair;
+
+        CommonExit:
+
+            DeleteObject(last_font);
+            SecondaryBG.Graphics.ReleaseHdc(secondaryHDC);
 
         }
 
@@ -943,6 +967,11 @@ namespace AglonaReader
             
         }
 
+        [DllImport("gdi32.dll", CharSet = CharSet.Unicode)]
+        static extern bool TextOut(IntPtr hdc, int nXStart, int nYStart,
+            string lpString, int cbString);
+
+
         private void RenderText(Graphics g, int pairIndex, ref int offset, ref int cLine, byte side)
         {
 
@@ -1017,13 +1046,9 @@ namespace AglonaReader
                     }
 
                     string wrd = r.Word;
-    
-                    TextRenderer.DrawText(g, wrd, textFont, new Point(x, VMargin + y * lineHeight),
-                        // In view mode, show text in gray if it is not complete
-                        !EditMode && (renderedInfo.Line1 == -1 || renderedInfo.Line2 == -1 || renderedInfo.Line2 > LastFullScreenLine) ?
-                        Color.Gray :
-                        Color.Black, 
-                         TextFormatFlags.NoPadding | TextFormatFlags.SingleLine);
+
+                    //TextOutW(secondaryHDC, x, VMargin + y * lineHeight, wrd, wrd.Length);
+                    TextOut(secondaryHDC, x, VMargin + y * lineHeight, wrd, wrd.Length);
 
                     s.PairIndex = pairIndex;
                     s.Pos = r.Pos;
@@ -1039,6 +1064,15 @@ namespace AglonaReader
                 }
         }
 
+
+        [DllImport("gdi32.dll")]
+        static extern int SetBkMode(IntPtr hdc, int iBkMode);
+
+        [DllImport("gdi32.dll")]
+        public static extern IntPtr SelectObject(IntPtr hdc, IntPtr hgdiobj);
+
+        [DllImport("gdi32.dll")]
+        public static extern bool DeleteObject(IntPtr objectHandle);
 
         /// <summary>
         /// Renders a newSide
@@ -1089,6 +1123,11 @@ namespace AglonaReader
 
             }
 
+            secondaryHDC = SecondaryBG.Graphics.GetHdc();
+
+            SetBkMode(secondaryHDC, 1);
+
+            IntPtr last_font = SelectObject(secondaryHDC, textFont.ToHfont());
 
             // Text itself
             
@@ -1112,6 +1151,11 @@ namespace AglonaReader
                 else
                     break;
             }
+
+            DeleteObject(last_font);
+            SecondaryBG.Graphics.ReleaseHdc(secondaryHDC);
+
+
 
         }
 

@@ -993,6 +993,18 @@ namespace AglonaReader
 
         }
 
+        private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+            using (SettingsForm settingsForm = new SettingsForm())
+            {
+
+                settingsForm.ShowDialog();
+
+            }
+
+        }
+
     }
 
     public class CommonWordInfo : WordInfo
