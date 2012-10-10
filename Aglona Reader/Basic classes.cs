@@ -712,146 +712,167 @@ namespace AglonaReader
 
         public bool Load(string newFileName)
         {
-            using (XmlTextReader reader = new XmlTextReader(newFileName))
-            {
-                reader.Read();
 
-                if (reader.NodeType != XmlNodeType.Element)
-                    return false;
-
-                if (reader.Name != "ParallelBook")
-                    return false;
-
-                if (!reader.MoveToNextAttribute())
-                    return false;
-
-                if (reader.Name != "lang1")
-                    return false;
-
-                Lang1 = reader.Value;
-
-                if (!reader.MoveToNextAttribute())
-                    return false;
-
-                if (reader.Name != "author1")
-                    return false;
-
-                Author1 = reader.Value;
-
-                if (!reader.MoveToNextAttribute())
-                    return false;
-
-                if (reader.Name != "title1")
-                    return false;
-
-                Title1 = reader.Value;
-
-                if (!reader.MoveToNextAttribute())
-                    return false;
-
-                if (reader.Name != "info1")
-                    return false;
-
-                Info1 = reader.Value;
-
-                if (!reader.MoveToNextAttribute())
-                    return false;
-
-                if (reader.Name != "lang2")
-                    return false;
-
-                Lang2 = reader.Value;
-
-                if (!reader.MoveToNextAttribute())
-                    return false;
-
-                if (reader.Name != "author2")
-                    return false;
-
-                Author2 = reader.Value;
-
-                if (!reader.MoveToNextAttribute())
-                    return false;
-
-                if (reader.Name != "title2")
-                    return false;
-
-                Title2 = reader.Value;
-
-                if (!reader.MoveToNextAttribute())
-                    return false;
-
-                if (reader.Name != "info2")
-                    return false;
-
-                Info2 = reader.Value;
-
-            NextPair:
-
-                if (!reader.Read())
-                    return false;
-
-                if (reader.Name == "p" && reader.NodeType == XmlNodeType.Element)
+            
+                using (XmlTextReader reader = new XmlTextReader(newFileName))
                 {
+                    try
+                    {
+                        reader.Read();
+                    }
+                    catch
+                    {
+                        System.Windows.Forms.MessageBox.Show("File not found or unavailable: " + newFileName);
+                        return false;
+                    }
+
+                    if (reader.NodeType != XmlNodeType.Element)
+                        return false;
+
+                    if (reader.Name != "ParallelBook")
+                        return false;
+
                     if (!reader.MoveToNextAttribute())
                         return false;
 
-                    TextPair p = new TextPair();
+                    if (reader.Name != "lang1")
+                        return false;
 
-                    if (reader.Name == "l")
+                    Lang1 = reader.Value;
+
+                    if (!reader.MoveToNextAttribute())
+                        return false;
+
+                    if (reader.Name != "author1")
+                        return false;
+
+                    Author1 = reader.Value;
+
+                    if (!reader.MoveToNextAttribute())
+                        return false;
+
+                    if (reader.Name != "title1")
+                        return false;
+
+                    Title1 = reader.Value;
+
+                    if (!reader.MoveToNextAttribute())
+                        return false;
+
+                    if (reader.Name != "info1")
+                        return false;
+
+                    Info1 = reader.Value;
+
+                    if (!reader.MoveToNextAttribute())
+                        return false;
+
+                    if (reader.Name != "lang2")
+                        return false;
+
+                    Lang2 = reader.Value;
+
+                    if (!reader.MoveToNextAttribute())
+                        return false;
+
+                    if (reader.Name != "author2")
+                        return false;
+
+                    Author2 = reader.Value;
+
+                    if (!reader.MoveToNextAttribute())
+                        return false;
+
+                    if (reader.Name != "title2")
+                        return false;
+
+                    Title2 = reader.Value;
+
+                    if (!reader.MoveToNextAttribute())
+                        return false;
+
+                    if (reader.Name != "info2")
+                        return false;
+
+                    Info2 = reader.Value;
+
+                    if (!reader.MoveToNextAttribute())
+                        return false;
+
+                    if (reader.Name != "info")
+                        return false;
+
+                    Info = reader.Value;
+
+
+                NextPair:
+
+                    if (!reader.Read())
+                        return false;
+
+                    if (reader.Name == "p" && reader.NodeType == XmlNodeType.Element)
                     {
-                        if (reader.Value == "3")
+                        if (!reader.MoveToNextAttribute())
+                            return false;
+
+                        TextPair p = new TextPair();
+
+                        if (reader.Name == "l")
                         {
-                            p.StartParagraph1 = true;
-                            p.StartParagraph2 = true;
+                            if (reader.Value == "3")
+                            {
+                                p.StartParagraph1 = true;
+                                p.StartParagraph2 = true;
+                            }
+                            else if (reader.Value == "1")
+                                p.StartParagraph1 = true;
+                            else if (reader.Value == "2")
+                                p.StartParagraph2 = true;
+                            else if (reader.Value == "4")
+                                p.SetStructureLevel(1);
+                            else if (reader.Value == "5")
+                                p.SetStructureLevel(2);
+                            else if (reader.Value == "6")
+                                p.SetStructureLevel(3);
+
+                            if (!reader.MoveToNextAttribute())
+                                return false;
+
                         }
-                        else if (reader.Value == "1")
-                            p.StartParagraph1 = true;
-                        else if (reader.Value == "2")
-                            p.StartParagraph2 = true;
-                        else if (reader.Value == "4")
-                            p.SetStructureLevel(1);
-                        else if (reader.Value == "5")
-                            p.SetStructureLevel(2);
-                        else if (reader.Value == "6")
-                            p.SetStructureLevel(3);
+
+                        if (reader.Name != "s")
+                            return false;
+
+                        if (reader.Value.Length >= ParallelTextControl.BigTextSize)
+                            p.SB1 = new StringBuilder(reader.Value);
+                        else
+                            p.Text1 = reader.Value;
 
                         if (!reader.MoveToNextAttribute())
                             return false;
 
+                        if (reader.Name != "t")
+                            return false;
+
+                        if (reader.Value.Length >= ParallelTextControl.BigTextSize)
+                            p.SB2 = new StringBuilder(reader.Value);
+                        else
+                            p.Text2 = reader.Value;
+
+                        TextPairs.Add(p);
+
+                        goto NextPair;
+
                     }
 
-                    if (reader.Name != "s")
-                        return false;
 
-                    if (reader.Value.Length >= ParallelTextControl.BigTextSize)
-                        p.SB1 = new StringBuilder(reader.Value);
-                    else
-                        p.Text1 = reader.Value;
+                    reader.Close();
 
-                    if (!reader.MoveToNextAttribute())
-                        return false;
+                    FileName = newFileName;
 
-                    if (reader.Name != "t")
-                        return false;
+                    return true;
 
-                    if (reader.Value.Length >= ParallelTextControl.BigTextSize)
-                        p.SB2 = new StringBuilder(reader.Value);
-                    else
-                        p.Text2 = reader.Value;
-
-                    TextPairs.Add(p);
-
-                    goto NextPair;
-
-                }
-
-
-                reader.Close();
-
-                FileName = newFileName;
-
-                return true;
+                
 
             }
 

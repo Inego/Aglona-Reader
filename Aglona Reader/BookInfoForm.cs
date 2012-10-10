@@ -52,6 +52,8 @@ namespace AglonaReader
 
             information.Text = pText.Info;
 
+            pairCountLabel.Text = pText.Number().ToString();
+
         }
 
         private void okButton_Click(object sender, EventArgs e)

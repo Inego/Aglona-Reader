@@ -2,6 +2,9 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="AglonaReader.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
+    <Setting Name="UpdateRequired" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
     <Setting Name="AppSettings" Type="AglonaReader.AppSettings" Scope="User">
       <Value Profile="(Default)" />
     </Setting>

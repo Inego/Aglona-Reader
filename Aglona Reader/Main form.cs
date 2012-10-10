@@ -49,16 +49,29 @@ namespace AglonaReader
 
         private void MainForm_Load(object sender, EventArgs e)
         {
+            if (Properties.Settings.Default.UpdateRequired)
+            {
+                Properties.Settings.Default.Upgrade();
+                Properties.Settings.Default.UpdateRequired = false;
+            }
 
             appSettings = Properties.Settings.Default.AppSettings;
 
             if (appSettings == null)
                 appSettings = new AppSettings();
+            else
+            {
+                if (string.IsNullOrEmpty(appSettings.FontName))
+                    appSettings.FontName = "Times New Roman";
+                if (appSettings.FontSize == 0)
+                    appSettings.FontSize = 18.0F;
+            }
 
 
             pTC.HighlightFragments = appSettings.HighlightFragments;
             pTC.HighlightFirstWords = appSettings.HighlightFirstWords;
             pTC.Brightness = appSettings.Brightness;
+            pTC.SetFont(new Font(appSettings.FontName, appSettings.FontSize));
 
             if (appSettings.FileUsages.Count > 0)
             {
@@ -72,8 +85,6 @@ namespace AglonaReader
                 SetEditMode(true);
             }
 
-            highlightFramgentsToolStripMenuItem.Checked = appSettings.HighlightFragments;
-            highlightFirstWordsToolStripMenuItem.Checked = appSettings.HighlightFirstWords;
         }
 
         private void SetEditMode(bool p)
@@ -84,19 +95,12 @@ namespace AglonaReader
 
         private void LoadSettingsFromFileUsageInfo(FileUsageInfo f, bool load)
         {
-            
-            
 
             if (load)
-                try
-                {
-                    pTC.PText.Load(f.FileName);
-                }
-                catch
-                {
-                    MessageBox.Show("Unable to load " + f.FileName + "!");
-                    return;
-                }
+                pTC.PText.Load(f.FileName);
+
+            if (f.SplitterRatio == 0)
+                f.SplitterRatio = 0.5F;
 
             pTC.Reversed = f.Reversed;
             reverseToolStripMenuItem.Checked = pTC.Reversed;
@@ -719,7 +723,7 @@ namespace AglonaReader
                 // Ask for the file name
                 using (SaveFileDialog d = new SaveFileDialog())
                 {
-                    d.Filter = "XML files (*.xml)|*.xml";
+                    d.Filter = "Parallel Books (*.pbo)|*.pbo";
                     d.RestoreDirectory = true;
                     DialogResult dialogResult = d.ShowDialog();
 
@@ -778,7 +782,7 @@ namespace AglonaReader
 
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
-                openFileDialog.Filter = "XML files (*.xml)|*.xml";
+                openFileDialog.Filter = "Parallel Books (*.pbo)|*.pbo";
                 openFileDialog.RestoreDirectory = true;
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
@@ -832,6 +836,9 @@ namespace AglonaReader
             
             appSettings.Brightness = pTC.Brightness;
 
+            appSettings.FontName = pTC.textFont.Name;
+            appSettings.FontSize = pTC.textFont.Size;
+
             Properties.Settings.Default.AppSettings = appSettings;
             Properties.Settings.Default.Save();
         }
@@ -860,7 +867,7 @@ namespace AglonaReader
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (ColorTableForm f = new ColorTableForm())
+            using (AboutForm f = new AboutForm())
                 f.ShowDialog();
         }
 
@@ -884,21 +891,10 @@ namespace AglonaReader
                     "Save modified book?", "The book was modified", MessageBoxButtons.YesNoCancel);
 
             if (r == System.Windows.Forms.DialogResult.Yes)
-            {
                 saveToolStripMenuItem_Click(sender, EventArgs.Empty);
-                
-            }
 
             return r;
 
-        }
-
-
-        private void highlightFramgentsToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            pTC.HighlightFragments = highlightFramgentsToolStripMenuItem.Checked;
-            pTC.RenderPairs();
-            pTC.Render();
         }
 
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
@@ -918,14 +914,7 @@ namespace AglonaReader
 
             newBook = true;
         }
-
-        private void highlightFirstWordsToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            pTC.HighlightFirstWords= highlightFirstWordsToolStripMenuItem.Checked;
-            pTC.RenderPairs();
-            pTC.Render();
-        }
-
+                
         private void structureleftToolStripMenuItem_Click(object sender, EventArgs e)
         {
             BrowseBookStructure(1);
@@ -983,6 +972,9 @@ namespace AglonaReader
         private void openRecentToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
+            if (AskToSaveModified(sender) == System.Windows.Forms.DialogResult.Cancel)
+                return;
+
             using (OpenRecentForm f = new OpenRecentForm())
             {
                 f.appSettings = appSettings;
@@ -998,7 +990,7 @@ namespace AglonaReader
 
             using (SettingsForm settingsForm = new SettingsForm())
             {
-
+                settingsForm.pTC = pTC;
                 settingsForm.ShowDialog();
 
             }
@@ -1036,6 +1028,8 @@ namespace AglonaReader
         public bool HighlightFragments { get; set; }
         public bool HighlightFirstWords { get; set; }
         public double Brightness { get; set; }
+        public string FontName { get; set; }
+        public float FontSize { get; set; }
 
         public Collection<FileUsageInfo> FileUsages { get; set; }
 
@@ -1044,6 +1038,8 @@ namespace AglonaReader
             HighlightFragments = true;
             HighlightFirstWords = true;
             Brightness = 0.96;
+            FontName = "Times New Roman";
+            FontSize = 18.0F;
             FileUsages = new Collection<FileUsageInfo>();
         }
 

@@ -28,9 +28,13 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.formCancelButton = new System.Windows.Forms.Button();
             this.formOKButton = new System.Windows.Forms.Button();
             this.listBox = new System.Windows.Forms.ListBox();
+            this.button1 = new System.Windows.Forms.Button();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.removeAllButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // formCancelButton
@@ -62,6 +66,28 @@
             this.listBox.TabIndex = 0;
             this.listBox.DoubleClick += new System.EventHandler(this.listBox_DoubleClick);
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(13, 402);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(56, 23);
+            this.button1.TabIndex = 3;
+            this.button1.Text = "Remove";
+            this.toolTip1.SetToolTip(this.button1, "Remove the selected file from the list");
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // removeAllButton
+            // 
+            this.removeAllButton.Location = new System.Drawing.Point(76, 402);
+            this.removeAllButton.Name = "removeAllButton";
+            this.removeAllButton.Size = new System.Drawing.Size(75, 23);
+            this.removeAllButton.TabIndex = 4;
+            this.removeAllButton.Text = "Remove All";
+            this.toolTip1.SetToolTip(this.removeAllButton, "Remove all files from the list");
+            this.removeAllButton.UseVisualStyleBackColor = true;
+            this.removeAllButton.Click += new System.EventHandler(this.removeAllButton_Click);
+            // 
             // OpenRecentForm
             // 
             this.AcceptButton = this.formOKButton;
@@ -69,6 +95,8 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.formCancelButton;
             this.ClientSize = new System.Drawing.Size(464, 440);
+            this.Controls.Add(this.removeAllButton);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.listBox);
             this.Controls.Add(this.formOKButton);
             this.Controls.Add(this.formCancelButton);
@@ -90,5 +118,8 @@
         private System.Windows.Forms.Button formCancelButton;
         private System.Windows.Forms.Button formOKButton;
         private System.Windows.Forms.ListBox listBox;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.Button removeAllButton;
     }
 }

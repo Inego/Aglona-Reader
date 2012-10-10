@@ -1,4 +1,6 @@
-﻿namespace AglonaReader
+﻿using System.Windows.Forms;
+
+namespace AglonaReader
 {
     partial class BookInfoForm
     {
@@ -6,6 +8,22 @@
         /// Required designer variable.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
+
+
+        protected override bool ProcessDialogKey(System.Windows.Forms.Keys keyData)
+        {
+            if (keyData == Keys.Enter)
+                return false;
+
+            if (keyData == (Keys.Enter | Keys.Control))
+            {
+                okButton_Click(null, null);
+                return false;
+            }
+
+            return base.ProcessDialogKey(keyData);
+        }
+
 
         /// <summary>
         /// Clean up any resources being used.
@@ -49,6 +67,8 @@
             this.information = new System.Windows.Forms.TextBox();
             this.okButton = new System.Windows.Forms.Button();
             this.cancelButton = new System.Windows.Forms.Button();
+            this.label10 = new System.Windows.Forms.Label();
+            this.pairCountLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // label1
@@ -104,7 +124,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(16, 276);
+            this.label4.Location = new System.Drawing.Point(16, 279);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(58, 13);
             this.label4.TabIndex = 6;
@@ -131,7 +151,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(311, 276);
+            this.label5.Location = new System.Drawing.Point(311, 279);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(58, 13);
             this.label5.TabIndex = 14;
@@ -206,7 +226,7 @@
             // 
             // okButton
             // 
-            this.okButton.Location = new System.Drawing.Point(238, 436);
+            this.okButton.Location = new System.Drawing.Point(461, 434);
             this.okButton.Name = "okButton";
             this.okButton.Size = new System.Drawing.Size(40, 24);
             this.okButton.TabIndex = 18;
@@ -217,13 +237,32 @@
             // cancelButton
             // 
             this.cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.cancelButton.Location = new System.Drawing.Point(289, 436);
+            this.cancelButton.Location = new System.Drawing.Point(512, 434);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(75, 23);
             this.cancelButton.TabIndex = 19;
             this.cancelButton.Text = "Cancel";
             this.cancelButton.UseVisualStyleBackColor = true;
             this.cancelButton.Click += new System.EventHandler(this.cancelButton_Click);
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(16, 439);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(59, 13);
+            this.label10.TabIndex = 20;
+            this.label10.Text = "Pair Count:";
+            // 
+            // pairCountLabel
+            // 
+            this.pairCountLabel.AutoSize = true;
+            this.pairCountLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.pairCountLabel.Location = new System.Drawing.Point(75, 439);
+            this.pairCountLabel.Name = "pairCountLabel";
+            this.pairCountLabel.Size = new System.Drawing.Size(14, 13);
+            this.pairCountLabel.TabIndex = 21;
+            this.pairCountLabel.Text = "0";
             // 
             // BookInfoForm
             // 
@@ -232,6 +271,8 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.cancelButton;
             this.ClientSize = new System.Drawing.Size(603, 469);
+            this.Controls.Add(this.pairCountLabel);
+            this.Controls.Add(this.label10);
             this.Controls.Add(this.cancelButton);
             this.Controls.Add(this.okButton);
             this.Controls.Add(this.information);
@@ -288,5 +329,7 @@
         private System.Windows.Forms.TextBox information;
         private System.Windows.Forms.Button okButton;
         private System.Windows.Forms.Button cancelButton;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.Label pairCountLabel;
     }
 }

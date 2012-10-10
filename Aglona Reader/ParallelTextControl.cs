@@ -14,6 +14,13 @@ namespace AglonaReader
 
     public partial class ParallelTextControl : UserControl
     {
+
+        /// <summary>
+        /// 0 = not set; 1 = black; 2 = gray
+        /// </summary>
+        int currentTextColor;
+
+
         IntPtr secondaryHDC;
 
         public byte SelectionSide { get; set; }
@@ -118,6 +125,7 @@ namespace AglonaReader
 
         private SortedList<int, List<ScreenWord>> wordsOnScreen;
 
+        //public float fontSize = 18.0F;
         public Font textFont;
         
         
@@ -336,7 +344,7 @@ namespace AglonaReader
 
             int result;
 
-            // First, try to use data from the dictionary if it'Word there
+            // First, try to use data from the dictionary if it's there
 
             if (widthDictionary.TryGetValue(word, out result)) return result;
             else
@@ -361,8 +369,19 @@ namespace AglonaReader
         /// <param name="graphics">Graphics on which the text is rendered</param>
         public void ComputeSpaceLength(IDeviceContext graphics)
         {
+            widthDictionary.Clear();
+
+            secondaryHDC = PanelGraphics.GetHdc();
+            IntPtr last_font = SelectObject(secondaryHDC, textFont.ToHfont());
+            
             SpaceLength = WordWidth(" ", graphics);
+
+            DeleteObject(last_font);
+            PanelGraphics.ReleaseHdc(secondaryHDC);
+            
             lineHeight = textFont.Height;
+            
+            ComputeNumberOfScreenLines();
         }
 
         /// <summary>
@@ -383,12 +402,12 @@ namespace AglonaReader
 
         public void ResizeBufferedGraphic()
         {
-            PrimaryBG = BufferedGraphicsManager.Current.Allocate(CreateGraphics(), ClientRectangle);
+            Graphics controlGraphics = CreateGraphics();
+
+            PrimaryBG = BufferedGraphicsManager.Current.Allocate(controlGraphics, ClientRectangle);
             SecondaryBG = BufferedGraphicsManager.Current.Allocate(PrimaryBG.Graphics, ClientRectangle);
 
-            
-
-            //PrimaryBG.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+            PrimaryBG.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
         }
 
         public ParallelTextControl()
@@ -649,15 +668,30 @@ namespace AglonaReader
 
         }
 
+        [DllImport("gdi32.dll")]
+        static extern uint SetBkColor(IntPtr hdc, int crColor);
+
         public void HighlightWord(ScreenWord sw, Color color)
         {
             if (sw == null)
                 return;
 
-            Graphics g = PrimaryBG.Graphics;
+            //Graphics g = PrimaryBG.Graphics;
 
-            TextRenderer.DrawText(g, sw.Word, textFont, new Point(sw.X1, VMargin + sw.Line * lineHeight),
-                Color.Black, color, TextFormatFlags.NoPadding | TextFormatFlags.SingleLine);
+            secondaryHDC = PrimaryBG.Graphics.GetHdc();
+
+            SetBkColor(secondaryHDC, ColorTranslator.ToWin32(color));
+
+            IntPtr last_font = SelectObject(secondaryHDC, textFont.ToHfont());
+
+            TextOut(secondaryHDC, sw.X1, VMargin + sw.Line * lineHeight, sw.Word, sw.Word.Length);
+
+            DeleteObject(last_font);
+
+            PrimaryBG.Graphics.ReleaseHdc(secondaryHDC);
+
+            //TextRenderer.DrawText(g, sw.Word, textFont, new Point(sw.X1, VMargin + sw.Line * lineHeight),
+            //    Color.Black, color, TextFormatFlags.NoPadding | TextFormatFlags.SingleLine);
         }
 
         bool NeedToLineBreakFirstWord(TextPair p, byte side, ref int occLength, ref int maxWidth, int sL, bool startParagraph)
@@ -951,7 +985,8 @@ namespace AglonaReader
             if (HighlightFirstWords
                 && !(big && HighlightFragments)
                 && list != null
-                && list.Count > 0)
+                && list.Count > 0
+                && first.X2 >= first.X1)
             {
                 Rectangle wordRect = new Rectangle(offset + first.X1, VMargin + (cLine + first.Line) * lineHeight, first.X2 - first.X1 + 1, lineHeight);
 
@@ -971,6 +1006,9 @@ namespace AglonaReader
         static extern bool TextOut(IntPtr hdc, int nXStart, int nYStart,
             string lpString, int cbString);
 
+        [DllImport("gdi32.dll")]
+        static extern uint SetTextColor(IntPtr hdc, int crColor);
+
 
         private void RenderText(Graphics g, int pairIndex, ref int offset, ref int cLine, byte side)
         {
@@ -981,6 +1019,17 @@ namespace AglonaReader
 
             if (!renderedInfo.Valid)
                 return;
+
+            // In view mode, show text in gray if it is not complete
+            int newColor = !EditMode && (renderedInfo.Line1 == -1 || renderedInfo.Line2 == -1 || renderedInfo.Line2 > LastFullScreenLine) ?
+                       2 :
+                       1;
+
+            if (newColor != currentTextColor)
+            {
+                currentTextColor = newColor;
+                SetTextColor(secondaryHDC, ColorTranslator.ToWin32(newColor == 1 ? Color.Black : Color.Gray));
+            }
 
             Collection<WordInfo> list = p.ComputedWords(side);
 
@@ -1047,6 +1096,8 @@ namespace AglonaReader
 
                     string wrd = r.Word;
 
+
+
                     //TextOutW(secondaryHDC, x, VMargin + y * lineHeight, wrd, wrd.Length);
                     TextOut(secondaryHDC, x, VMargin + y * lineHeight, wrd, wrd.Length);
 
@@ -1082,8 +1133,6 @@ namespace AglonaReader
         {
 
             Graphics g = SecondaryBG.Graphics;
-
-            
 
             int offset;
             byte textSide;
@@ -1127,6 +1176,7 @@ namespace AglonaReader
 
             SetBkMode(secondaryHDC, 1);
 
+            
             IntPtr last_font = SelectObject(secondaryHDC, textFont.ToHfont());
 
             // Text itself
@@ -2119,6 +2169,16 @@ namespace AglonaReader
                 Y2 = Selection1Pair;
                 X2 = Selection1Position;
             }
+        }
+
+        internal void SetFont(System.Drawing.Font font)
+        {
+            if (textFont != null)
+                textFont.Dispose();
+            textFont = font;
+            ComputeSpaceLength(PanelGraphics);
+            ProcessLayoutChange();
+
         }
     }
 
