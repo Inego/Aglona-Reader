@@ -59,6 +59,7 @@ namespace AglonaReader
                 || keyData == Keys.Down
                 || keyData == Keys.Right
                 || keyData == Keys.Left
+                || keyData == Keys.Tab
                 )
 
                 return true;

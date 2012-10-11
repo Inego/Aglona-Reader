@@ -405,6 +405,12 @@ namespace AglonaReader
 
             else if (!pTC.EditMode && e.KeyData == (Keys.Control | Keys.C))
                 CopyToClipboard();
+
+            else if (e.KeyData == Keys.Tab)
+            {
+                editModeToolStripMenuItem.Checked = !pTC.EditMode;
+                editModeToolStripMenuItem_Click(null, null);
+            }
             
         }
 
