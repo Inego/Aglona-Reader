@@ -967,7 +967,7 @@ namespace AglonaReader
                 {
                     TextPair nextPair = PText.TextPairs[pairIndex + 1];
                     Collection<WordInfo> nextList = nextPair.ComputedWords(side);
-                    if (nextList.Count > 0)
+                    if (nextList != null && nextList.Count > 0)
                         if (nextList[0].X1 > last.X2)
                             renderedInfo.X2B += nextList[0].X1 - last.X2;
                 }
