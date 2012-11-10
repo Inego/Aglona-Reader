@@ -1605,6 +1605,10 @@ namespace AglonaReader
                 EditWhenNipped = false;
             }
 
+            PText[HighlightedPair].UpdateTotalSize();
+            PText[HighlightedPair + 1].UpdateTotalSize();
+            PText.UpdateAggregates(HighlightedPair);
+
             // Truncate all preceding pairs until true-true
                 
             TextPair _p;
@@ -2023,6 +2027,8 @@ namespace AglonaReader
                     PairChanged(pairIndex + 1, false);
                 }
                 PairChanged(pairIndex, true);
+                PText[pairIndex].UpdateTotalSize();
+                PText.UpdateAggregates(pairIndex);
                 Modified = true;
             }
         }

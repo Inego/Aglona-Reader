@@ -67,7 +67,6 @@ namespace AglonaReader
                     appSettings.FontSize = 18.0F;
             }
 
-
             pTC.HighlightFragments = appSettings.HighlightFragments;
             pTC.HighlightFirstWords = appSettings.HighlightFirstWords;
             pTC.Brightness = appSettings.Brightness;
@@ -97,7 +96,10 @@ namespace AglonaReader
         {
 
             if (load)
+            {
                 pTC.PText.Load(f.FileName);
+                UpdateWindowTitle();
+            }
 
             if (f.SplitterRatio == 0)
                 f.SplitterRatio = 0.5F;
@@ -126,6 +128,28 @@ namespace AglonaReader
                 pTC.FindNaturalDividers(0);
                 Recompute();
             }
+
+            UpdateStatusBar();
+
+        }
+
+        private void UpdateWindowTitle()
+        {
+            string cpt;
+
+            if (string.IsNullOrWhiteSpace(pTC.PText.Title1))
+                cpt = "<No title>";
+            else
+                cpt = pTC.PText.Title1;
+
+            if (!string.IsNullOrWhiteSpace(pTC.PText.Lang1) && !string.IsNullOrWhiteSpace(pTC.PText.Lang2))
+                cpt += " [" + pTC.PText.Lang1 + "-" + pTC.PText.Lang2 + "]";
+
+            if (string.IsNullOrWhiteSpace(cpt))
+                Text = "Aglona Reader";
+            else
+                Text = cpt + " - Aglona Reader";
+
         }
 
         private bool XonSplitter(int x)
@@ -257,7 +281,10 @@ namespace AglonaReader
                         }
 
                         if (pTC.Side1Set && pTC.Side2Set)
+                        {
                             pTC.NipHighlightedPair();
+                            UpdateStatusBar();
+                        }
                         else
                             pTC.Render();
 
@@ -280,17 +307,14 @@ namespace AglonaReader
                         pTC.FindNaturalDividersScreen(0);
                         pTC.ProcessMousePosition(true);
                         pTC.Render();
+
+                        UpdateStatusBar();
                     }
 
                 }
 
                 else
-                {
                     pTC.SelectionFinished = true;
-
-                }
-
-
             }
         }
 
@@ -327,6 +351,9 @@ namespace AglonaReader
                     pTC.MergePairs(pTC.HighlightedPair - 1);
                     pTC.HighlightedPair--;
                     pTC.PairChanged(pTC.HighlightedPair, true);
+                    pTC[pTC.HighlightedPair].UpdateTotalSize();
+                    pTC.PText.UpdateAggregates(pTC.HighlightedPair);
+                    UpdateStatusBar();
                 }
             }
 
@@ -547,6 +574,42 @@ namespace AglonaReader
             pTC.HighlightedPair = newCurrentPair;
 
             pTC.UpdateScreen();
+
+            UpdateStatusBar();
+        }
+
+        private void UpdateStatusBar()
+        {
+
+            if (pTC.Number == 0)
+            {
+                ssPosition.Text = "0 / 0";
+                ssPositionPercent.Text = "---";
+                return;
+            }
+
+
+            ssPosition.Text = (pTC.HighlightedPair + 1).ToString() + " / " + pTC.Number;
+
+            int totalVolume = pTC[pTC.Number - 1].aggregateSize;
+
+            if (totalVolume == 0)
+                ssPositionPercent.Text = "---";
+
+            else
+            {
+                int prevVolume;
+
+                if (pTC.HighlightedPair == 0)
+                    prevVolume = 0;
+                else
+                    prevVolume = pTC[pTC.HighlightedPair - 1].aggregateSize;
+
+                ssPositionPercent.Text = ((float)prevVolume / totalVolume).ToString("P3");
+
+            }
+
+
         }
 
         private void ProcessKeyUp()
@@ -575,6 +638,7 @@ namespace AglonaReader
                 pTC.FindNaturalDividersScreen(0);
                 pTC.ProcessMousePosition(true);
                 pTC.Render();
+                UpdateStatusBar();
             }
             else
             {
@@ -633,6 +697,8 @@ namespace AglonaReader
                 pTC.ProcessMousePosition(true);
 
                 pTC.Render();
+
+                UpdateStatusBar();
             }
             else
             {
@@ -701,7 +767,8 @@ namespace AglonaReader
                 importTextForm.ShowDialog();
             }
 
-            pTC.FindNaturalDividers(0);
+            UpdateStatusBar();
+
             Recompute();
 
         }
@@ -712,6 +779,7 @@ namespace AglonaReader
             {
                 f.ParallelTC = pTC;
                 f.ShowDialog();
+                UpdateWindowTitle();
             }
         }
 
@@ -821,6 +889,10 @@ namespace AglonaReader
             pTC.FindNaturalDividers(0);
 
             Recompute();
+
+            UpdateStatusBar();
+            UpdateWindowTitle();
+
             return fileName;
         }
 
@@ -854,7 +926,10 @@ namespace AglonaReader
             if (e.KeyChar == ' ')
             {
                 if (pTC.NipHighlightedPair())
+                {
+                    UpdateStatusBar();
                     pTC.MouseCurrentWord = null;
+                }
                 else
                     ProcessKeyDown();
 
@@ -864,6 +939,7 @@ namespace AglonaReader
         private void editToolStripMenuItem_Click(object sender, EventArgs e)
         {
             pTC.EditCurrentPair();
+            UpdateStatusBar();
         }
 
         private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -910,7 +986,12 @@ namespace AglonaReader
 
             pTC.CreateNewParallelBook();
 
+            UpdateStatusBar();
+
+            UpdateWindowTitle();
+
             reverseToolStripMenuItem.Checked = false;
+            pTC.ComputeSideCoordinates();
             editModeToolStripMenuItem.Checked = true;
 
             pTC.HighlightedFrame.SetInvisible();

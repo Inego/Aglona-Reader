@@ -44,6 +44,9 @@ namespace AglonaReader
     public class TextPair
     {
 
+        public int aggregateSize = 0;
+        public int totalTextSize = 0;
+
         public string Substring(byte side, int startPosition, int length)
         {
             if (side == 1)
@@ -514,6 +517,19 @@ namespace AglonaReader
         {
             return side == 1 ? StartParagraph1 : StartParagraph2;
         }
+
+        internal void UpdateTotalSize()
+        {
+            if (SB1 == null)
+                totalTextSize = Text1.Length;
+            else
+                totalTextSize = SB1.Length;
+
+            if (SB2 == null)
+                totalTextSize += Text2.Length;
+            else
+                totalTextSize += SB2.Length;
+        }
     }
 
     public class ParallelText
@@ -712,7 +728,7 @@ namespace AglonaReader
 
         public bool Load(string newFileName)
         {
-
+            
             
                 using (XmlTextReader reader = new XmlTextReader(newFileName))
                 {
@@ -848,6 +864,8 @@ namespace AglonaReader
                         else
                             p.Text1 = reader.Value;
 
+                        p.totalTextSize = reader.Value.Length;
+
                         if (!reader.MoveToNextAttribute())
                             return false;
 
@@ -858,6 +876,8 @@ namespace AglonaReader
                             p.SB2 = new StringBuilder(reader.Value);
                         else
                             p.Text2 = reader.Value;
+
+                        p.totalTextSize += reader.Value.Length;
 
                         TextPairs.Add(p);
 
@@ -870,6 +890,9 @@ namespace AglonaReader
 
                     FileName = newFileName;
 
+                    if (TextPairs.Count > 0)
+                        UpdateAggregates(0);
+
                     return true;
 
                 
@@ -877,7 +900,26 @@ namespace AglonaReader
             }
 
         }
-        
+
+
+        internal void UpdateAggregates(int pairIndex)
+        {
+            int accLength;
+
+            if (pairIndex == 0)
+                accLength = -2;
+            else
+                accLength = TextPairs[pairIndex - 1].aggregateSize;
+
+            TextPair tp;
+
+            for (int i = pairIndex; i < Number(); i++)
+            {
+                tp = TextPairs[i];
+                accLength += 2 + tp.totalTextSize;
+                tp.aggregateSize = accLength;
+            }
+        }
     }
 
 }

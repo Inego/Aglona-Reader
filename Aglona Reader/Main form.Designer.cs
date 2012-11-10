@@ -57,8 +57,12 @@
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.statusStrip = new System.Windows.Forms.StatusStrip();
+            this.ssPosition = new System.Windows.Forms.ToolStripStatusLabel();
+            this.ssPositionPercent = new System.Windows.Forms.ToolStripStatusLabel();
             this.pTC = new AglonaReader.ParallelTextControl();
             this.mainMenu.SuspendLayout();
+            this.statusStrip.SuspendLayout();
             this.SuspendLayout();
             // 
             // mainMenu
@@ -275,6 +279,29 @@
             this.aboutToolStripMenuItem.Text = "About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
+            // statusStrip
+            // 
+            this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ssPosition,
+            this.ssPositionPercent});
+            this.statusStrip.Location = new System.Drawing.Point(0, 242);
+            this.statusStrip.Name = "statusStrip";
+            this.statusStrip.Size = new System.Drawing.Size(688, 22);
+            this.statusStrip.TabIndex = 4;
+            this.statusStrip.Text = "statusStrip1";
+            // 
+            // ssPosition
+            // 
+            this.ssPosition.Name = "ssPosition";
+            this.ssPosition.Size = new System.Drawing.Size(30, 17);
+            this.ssPosition.Text = "0 / 0";
+            // 
+            // ssPositionPercent
+            // 
+            this.ssPositionPercent.Name = "ssPositionPercent";
+            this.ssPositionPercent.Size = new System.Drawing.Size(41, 17);
+            this.ssPositionPercent.Text = "0,00 %";
+            // 
             // pTC
             // 
             this.pTC.BackColor = System.Drawing.SystemColors.InactiveBorder;
@@ -300,6 +327,7 @@
             this.pTC.LastMouseY = -1;
             this.pTC.LastRenderedPair = 0;
             this.pTC.Location = new System.Drawing.Point(0, 24);
+            this.pTC.MinimumSize = new System.Drawing.Size(10, 10);
             this.pTC.Modified = false;
             this.pTC.MouseCurrentWord = null;
             this.pTC.MousePressed = false;
@@ -334,7 +362,7 @@
             this.pTC.SelectionSide = ((byte)(0));
             this.pTC.Side1Set = false;
             this.pTC.Side2Set = false;
-            this.pTC.Size = new System.Drawing.Size(688, 240);
+            this.pTC.Size = new System.Drawing.Size(688, 218);
             this.pTC.SpaceLength = 6;
             this.pTC.SplitterMoveOffset = 0;
             this.pTC.SplitterPosition = 445;
@@ -356,6 +384,7 @@
             this.ClientSize = new System.Drawing.Size(688, 264);
             this.Controls.Add(this.pTC);
             this.Controls.Add(this.mainMenu);
+            this.Controls.Add(this.statusStrip);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.KeyPreview = true;
             this.MainMenuStrip = this.mainMenu;
@@ -366,6 +395,8 @@
             this.Resize += new System.EventHandler(this.MainForm_Resize);
             this.mainMenu.ResumeLayout(false);
             this.mainMenu.PerformLayout();
+            this.statusStrip.ResumeLayout(false);
+            this.statusStrip.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -400,6 +431,9 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
         private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
+        private System.Windows.Forms.StatusStrip statusStrip;
+        private System.Windows.Forms.ToolStripStatusLabel ssPosition;
+        private System.Windows.Forms.ToolStripStatusLabel ssPositionPercent;
 
     }
 }

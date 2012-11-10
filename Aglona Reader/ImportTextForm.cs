@@ -54,6 +54,8 @@ namespace AglonaReader
             string t2 = File.ReadAllText(fileName2.Text);
 
             PText.AddPair(t1, t2);
+            PText[PText.Number() - 1].UpdateTotalSize();
+            PText.UpdateAggregates(PText.Number() - 1);
 
             Close();
         }
