@@ -43,6 +43,8 @@ namespace AglonaReader
         // Length of a string to be considered a "big block"
         public const int BigTextSize = 1000;
 
+        public const int horizontalMouseStep = 30;
+
         byte NumberofColors;
 
         // Contains H values of text color table
@@ -203,6 +205,8 @@ namespace AglonaReader
 
         public int SplitterMoveOffset { get; set; }
 
+        public int horizontalStartingPosition = 0;
+
         public int LastMouseX { get; set; }
         public int LastMouseY { get; set; }
 
@@ -296,6 +300,7 @@ namespace AglonaReader
         public StringFormat GT { get; set; } // Generic Typographic
 
         private SortedDictionary<string, int> widthDictionary;
+        public int verticalStartingPosition;
 
         public int SpaceLength { get; set; }
 
@@ -449,8 +454,8 @@ namespace AglonaReader
 
             //textFont = new System.Drawing.Font("Simsun", 18.0F);
             //textFont = new System.Drawing.Font("Arial Unicode MS", 18.0F);
-            textFont = new System.Drawing.Font("Times New Roman", 18.0F);
-            //textFont = new System.Drawing.Font("Arial", 18.0F);
+            //textFont = new System.Drawing.Font("Times New Roman", 18.0F);
+            textFont = new System.Drawing.Font("Arial", 18.0F);
 
             ComputeSpaceLength(PanelGraphics);
 
@@ -465,7 +470,7 @@ namespace AglonaReader
             HighlightFirstWords = true;
             HighlightFragments = true;
 
-            SuggestedPen = Frame.CreatePen(Color.LightBlue, DashStyle.Dash, 2.0F);
+            SuggestedPen = Frame.CreatePen(Color.SteelBlue, DashStyle.Dash, 2.0F);
 
             
         }
@@ -2186,6 +2191,16 @@ namespace AglonaReader
             ProcessLayoutChange();
 
         }
+
+        public void SetHighlightedFrameColor()
+        {
+
+            TextPair p = PText[HighlightedPair];
+
+
+        }
+
+
     }
 
     public class ScreenWord

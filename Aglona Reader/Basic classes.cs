@@ -80,8 +80,8 @@ namespace AglonaReader
             return side == 1 ? RenderedInfo1 : RenderedInfo2;
         }
 
-        private int recommended_natural1;
-        private int recommended_natural2;
+        public int recommended_natural1;
+        public int recommended_natural2;
 
         public void IncRecommendedNatural(byte side)
         {
@@ -314,6 +314,13 @@ namespace AglonaReader
                     case ';':
                     case '!':
                     case '?':
+                    case '…':
+                    case '(':
+                    case ')':
+                    case '‹':
+                    case '›':
+                    case '“':
+                    case '”':
                         if (state == 1)
                             state = 3;
                         else if (state == 2)
@@ -410,7 +417,14 @@ namespace AglonaReader
                     case ':':
                     case ';':
                     case '!':
-                    case '?': 
+                    case '?':
+                    case '…':
+                    case '(':
+                    case ')':
+                    case '‹':
+                    case '›':
+                    case '“':
+                    case '”':
                         if (state == 1)
                             state = 3;
                         else if (state == 2)

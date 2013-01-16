@@ -18,6 +18,11 @@ namespace AglonaReader
         AppSettings appSettings;
 
         byte opState;
+        private int startingRecNatural1;
+        private int startingRecNatural2;
+        private bool startedXMoving = false;
+        private bool startedYMoving = false;
+        private bool justJumped = false;
 
         private void pTC_MouseWheel(object sender, System.Windows.Forms.MouseEventArgs e)
         {
@@ -168,8 +173,80 @@ namespace AglonaReader
 
             if (XonSplitter(pTC.LastMouseX) || opState == 1)
                 Cursor = Cursors.VSplit;
-            else
+
+            else if (pTC.MousePressed && pTC.EditMode)
+            {
+
+                if (!startedXMoving)
+                {
+                    int distanceY = pTC.verticalStartingPosition - e.Y;
+                    if (distanceY >= ParallelTextControl.horizontalMouseStep)
+                    {
+                        startedYMoving = true;
+                        Cursor = Cursors.PanNorth;
+                    }
+                    else
+                    {
+                        startedYMoving = false;
+                        Cursor = Cursors.Default;
+                    }
+                }
+
+                if (!startedYMoving)
+                {
+                    int distance = (e.X - pTC.horizontalStartingPosition) / ParallelTextControl.horizontalMouseStep;
+
+                    if (distance != 0 || startedXMoving)
+                    {
+
+                        Cursor = Cursors.SizeWE;
+
+                        startedXMoving = true;
+
+                        TextPair p = pTC[pTC.HighlightedPair];
+
+                        int newRecNatural1 = startingRecNatural1 + distance;
+                        int newRecNatural2 = startingRecNatural2 + distance;
+
+                        if (newRecNatural1 < 0)
+                            newRecNatural1 = 0;
+
+                        if (newRecNatural2 < 0)
+                            newRecNatural2 = 0;
+
+                        byte needToRender = 0;
+
+                        if (p.recommended_natural1 != newRecNatural1)
+                        {
+                            p.recommended_natural1 = newRecNatural1;
+                            needToRender += 1;
+                            pTC.Side1Set = true;
+                        }
+
+                        if (p.recommended_natural2 != newRecNatural2)
+                        {
+                            p.recommended_natural2 = newRecNatural2;
+                            needToRender += 2;
+                            pTC.Side2Set = true;
+                        }
+
+                        if (needToRender != 0)
+                        {
+                            if (needToRender == 3)
+                                needToRender = 0;
+
+                            pTC.FindNaturalDividers(needToRender);
+                            pTC.FindNaturalDividersScreen(needToRender);
+                            pTC.Render();
+                        }
+                    }
+
+                }
+                
+            }
+                else
                 Cursor = Cursors.Default;
+            
 
             if (opState == 1)
             {
@@ -198,12 +275,17 @@ namespace AglonaReader
             if (pTC.MouseCurrentWord != null)
             {
                 pTC.MouseCurrentWord = null;
+                pTC.mouse_text_line = -1;
                 pTC.Render();
             }
         }
 
         private void parallelTextControl_MouseDown(object sender, MouseEventArgs e)
         {
+
+            if (e.Button != System.Windows.Forms.MouseButtons.Left)
+                return;
+
             pTC.MousePressed = true;
 
             if (opState == 0)
@@ -214,7 +296,52 @@ namespace AglonaReader
                     pTC.SplitterMoveOffset = e.X - pTC.SplitterPosition;
                 }
 
-                else if (!pTC.EditMode)
+                else if (pTC.EditMode)
+                {
+
+                    TextPair p;
+
+                    if (pTC.MouseCurrentWord == null && pTC.mouse_text_word != null)
+                    {
+                        // Set focus to this pair
+                        pTC.HighlightedPair = pTC.mouse_text_word.PairIndex;
+
+                        pTC.Side1Set = false;
+                        pTC.Side2Set = false;
+
+                        p = pTC[pTC.HighlightedPair];
+
+                        if (p.NotFitOnScreen(pTC.LastFullScreenLine))
+                        {
+                            pTC.CurrentPair = pTC.HighlightedPair;
+                            pTC.PrepareScreen();
+                            pTC.RenderPairs();
+                            
+                        }
+
+                        pTC.FindNaturalDividers(0);
+                        pTC.FindNaturalDividersScreen(0);
+                        pTC.ProcessMousePosition(true);
+
+                        justJumped = true;
+
+                    }
+
+
+                    pTC.horizontalStartingPosition = e.X;
+                    pTC.verticalStartingPosition = e.Y;
+
+                    p = pTC[pTC.HighlightedPair];
+
+                    startingRecNatural1 = p.GetRecommendedNatural(1);
+                    startingRecNatural2 = p.GetRecommendedNatural(2);
+
+                    startedXMoving = false;
+                    startedYMoving = false;
+
+                }
+
+                else
                 {
                     // In view mode mouse down begins selection
 
@@ -240,6 +367,8 @@ namespace AglonaReader
 
                 }
 
+                
+
             }
 
             
@@ -247,6 +376,15 @@ namespace AglonaReader
 
         private void parallelTextControl_MouseUp(object sender, MouseEventArgs e)
         {
+
+            if (e.Button == System.Windows.Forms.MouseButtons.Right)
+            {
+                if (pTC.EditMode)
+                    SeparateCurrentPair();
+
+                return;
+            }
+
             if (!pTC.MousePressed)
                 return;
 
@@ -259,63 +397,82 @@ namespace AglonaReader
             {
                 if (pTC.EditMode)
                 {
-
-                    if (pTC.MouseCurrentWord != null && pTC.MouseCurrentWord.Next != null)
+                    if (startedYMoving)
+                        MergeWithPrevious();
+                    else if (startedXMoving)
                     {
-
-                        if (pTC.MouseCurrentWord.Side == 1)
-                        {
-                            pTC.NaturalDividerPosition1W = pTC.MouseCurrentWord.Next;
-                            pTC.NaturalDividerPosition1 = pTC.NaturalDividerPosition1W.Pos;
-                            pTC.SetNippingFrameByScreenWord(1, pTC.NaturalDividerPosition1W);
-                            (pTC.NippingFrame.F1 as Frame).FramePen = pTC.CorrectedPen;
-                            pTC.Side1Set = true;
-                        }
-                        else
-                        {
-                            pTC.NaturalDividerPosition2W = pTC.MouseCurrentWord.Next;
-                            pTC.NaturalDividerPosition2 = pTC.NaturalDividerPosition2W.Pos;
-                            pTC.SetNippingFrameByScreenWord(2, pTC.NaturalDividerPosition2W);
-                            (pTC.NippingFrame.F2 as Frame).FramePen = pTC.CorrectedPen;
-                            pTC.Side2Set = true;
-                        }
-
-                        if (pTC.Side1Set && pTC.Side2Set)
-                        {
-                            pTC.NipHighlightedPair();
-                            UpdateStatusBar();
-                        }
-                        else
-                            pTC.Render();
-
+                        Cursor = Cursors.Default;
+                        startedXMoving = false;
                     }
-                    else if (pTC.mouse_text_word != null)
-                    {
-                        // Set focus to this pair
-                        pTC.HighlightedPair = pTC.mouse_text_word.PairIndex;
-
-                        TextPair p = pTC[pTC.HighlightedPair];
-
-                        if (p.NotFitOnScreen(pTC.LastFullScreenLine))
-                        {
-                            pTC.CurrentPair = pTC.HighlightedPair;
-                            pTC.PrepareScreen();
-                            pTC.RenderPairs();
-                        }
-
-                        pTC.FindNaturalDividers(0);
-                        pTC.FindNaturalDividersScreen(0);
-                        pTC.ProcessMousePosition(true);
-                        pTC.Render();
-
-                        UpdateStatusBar();
-                    }
-
+                    else
+                        MouseUpInEditMode();
                 }
 
                 else
                     pTC.SelectionFinished = true;
             }
+        }
+
+        private void MouseUpInEditMode()
+        {
+
+            bool stillNeedToSetBorders = true;
+            bool needToRender = false;
+            bool needToUpdateStatusBar = false;
+            bool needToNip = false;
+            bool goneToDifferentPair = false;
+
+            if (stillNeedToSetBorders && pTC.MouseCurrentWord != null && pTC.MouseCurrentWord.Next != null)
+            {
+
+                if (pTC.MouseCurrentWord.Side == 1)
+                {
+                    if (pTC.NaturalDividerPosition1W == pTC.MouseCurrentWord.Next && !goneToDifferentPair)
+                        needToNip = true;
+                    else
+                    {
+                        pTC.NaturalDividerPosition1W = pTC.MouseCurrentWord.Next;
+                        pTC.NaturalDividerPosition1 = pTC.NaturalDividerPosition1W.Pos;
+                        pTC.SetNippingFrameByScreenWord(1, pTC.NaturalDividerPosition1W);
+                        (pTC.NippingFrame.F1 as Frame).FramePen = pTC.CorrectedPen;
+                        pTC.Side1Set = true;
+                    }
+                }
+                else
+                {
+                    if (pTC.NaturalDividerPosition2W == pTC.MouseCurrentWord.Next && !goneToDifferentPair)
+                        needToNip = true;
+                    else
+                    {
+                        pTC.NaturalDividerPosition2W = pTC.MouseCurrentWord.Next;
+                        pTC.NaturalDividerPosition2 = pTC.NaturalDividerPosition2W.Pos;
+                        pTC.SetNippingFrameByScreenWord(2, pTC.NaturalDividerPosition2W);
+                        (pTC.NippingFrame.F2 as Frame).FramePen = pTC.CorrectedPen;
+                        pTC.Side2Set = true;
+                    }
+                }
+
+
+                if (pTC.Side1Set && pTC.Side2Set)
+                    needToNip = true;
+
+                if (needToNip && !justJumped)
+                {
+                    pTC.NipHighlightedPair();
+                    needToUpdateStatusBar = true;
+                }
+                else
+                    needToRender = true;
+
+            }
+
+            if (needToUpdateStatusBar)
+                UpdateStatusBar();
+
+            if (needToRender)
+                pTC.Render();
+
+            justJumped = false;
         }
 
         private void reverseToolStripMenuItem_Click(object sender, EventArgs e)
@@ -341,21 +498,9 @@ namespace AglonaReader
             else if (e.KeyData == Keys.Up)
                 ProcessKeyUp();
 
-            else if (e.KeyData == (Keys.Control | Keys.Up))
-            {
-                if (pTC.EditMode && pTC.HighlightedPair > 0)
-                {
-                    if (pTC.CurrentPair == pTC.HighlightedPair)
-                        pTC.CurrentPair--;
-
-                    pTC.MergePairs(pTC.HighlightedPair - 1);
-                    pTC.HighlightedPair--;
-                    pTC.PairChanged(pTC.HighlightedPair, true);
-                    pTC[pTC.HighlightedPair].UpdateTotalSize();
-                    pTC.PText.UpdateAggregates(pTC.HighlightedPair);
-                    UpdateStatusBar();
-                }
-            }
+            else if (e.KeyData == (Keys.Control | Keys.Up)
+                || e.KeyData == Keys.Z)
+                MergeWithPrevious();
 
             else if (e.KeyData == (Keys.Control | Keys.Right))
                 ChangeNatural(1, true);
@@ -439,6 +584,24 @@ namespace AglonaReader
                 editModeToolStripMenuItem_Click(null, null);
             }
             
+        }
+
+        private void MergeWithPrevious()
+        {
+            if (pTC.EditMode && pTC.HighlightedPair > 0)
+            {
+                if (pTC.CurrentPair == pTC.HighlightedPair)
+                    pTC.CurrentPair--;
+
+                pTC.MergePairs(pTC.HighlightedPair - 1);
+                pTC.HighlightedPair--;
+                pTC.PairChanged(pTC.HighlightedPair, true);
+                pTC[pTC.HighlightedPair].UpdateTotalSize();
+                pTC.PText.UpdateAggregates(pTC.HighlightedPair);
+                UpdateStatusBar();
+                pTC.Side1Set = false;
+                pTC.Side2Set = false;
+            }
         }
 
         private void CopyToClipboard()
@@ -573,6 +736,9 @@ namespace AglonaReader
             pTC.CurrentPair = newCurrentPair;
             pTC.HighlightedPair = newCurrentPair;
 
+            pTC.Side1Set = false;
+            pTC.Side2Set = false;
+
             pTC.UpdateScreen();
 
             UpdateStatusBar();
@@ -619,6 +785,9 @@ namespace AglonaReader
 
             if (pTC.EditMode)
             {
+
+                pTC.Side1Set = false;
+                pTC.Side2Set = false;
 
                 TextPair prev_p = pTC[pTC.HighlightedPair];
 
@@ -675,6 +844,9 @@ namespace AglonaReader
 
             if (pTC.EditMode)
             {
+
+                pTC.Side1Set = false;
+                pTC.Side2Set = false;
 
                 pTC.HighlightedPair++;
                 pTC.FindNaturalDividers(0);
@@ -739,6 +911,7 @@ namespace AglonaReader
                         p.DecRecommendedNatural(1);
                     pTC.FindNaturalDividers(1);
                     pTC.FindNaturalDividersScreen(1);
+                    pTC.Side1Set = true;
                 }
 
             if (side == 0 || side == 2)
@@ -750,6 +923,7 @@ namespace AglonaReader
                         p.DecRecommendedNatural(2);
                     pTC.FindNaturalDividers(2);
                     pTC.FindNaturalDividersScreen(2);
+                    pTC.Side2Set = true;
                 }
 
             pTC.Render();
@@ -923,17 +1097,28 @@ namespace AglonaReader
 
         private void pTC_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if (e.KeyChar == ' ')
+            if (pTC.EditMode)
             {
-                if (pTC.NipHighlightedPair())
+                switch (e.KeyChar)
                 {
-                    UpdateStatusBar();
-                    pTC.MouseCurrentWord = null;
+                    case ' ':
+                        SeparateCurrentPair();
+                        break;
                 }
-                else
-                    ProcessKeyDown();
-
             }
+
+            
+        }
+
+        private void SeparateCurrentPair()
+        {
+            if (pTC.NipHighlightedPair())
+            {
+                UpdateStatusBar();
+                pTC.MouseCurrentWord = null;
+            }
+            else
+                ProcessKeyDown();
         }
 
         private void editToolStripMenuItem_Click(object sender, EventArgs e)

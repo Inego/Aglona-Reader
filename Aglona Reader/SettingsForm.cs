@@ -23,10 +23,6 @@ namespace AglonaReader
             InitializeComponent();
         }
 
-
-
-
-
         private void SettingsForm_Shown(object sender, EventArgs e)
         {
             highlightFirstWordsCheckBox.Checked = pTC.HighlightFirstWords;
@@ -113,5 +109,12 @@ namespace AglonaReader
             pTC.RenderPairs();
             pTC.Render();
         }
+
+        private void SettingsForm_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == 27)
+                Close();
+        }
+
     }
 }

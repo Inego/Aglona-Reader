@@ -1,4 +1,6 @@
-﻿namespace AglonaReader
+﻿using System.Windows.Forms;
+
+namespace AglonaReader
 {
     partial class SettingsForm
     {
@@ -34,9 +36,9 @@
             this.fontGroupBox = new System.Windows.Forms.GroupBox();
             this.highlightFirstWordsCheckBox = new System.Windows.Forms.CheckBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.label1 = new System.Windows.Forms.Label();
             this.brightnessBar = new System.Windows.Forms.TrackBar();
             this.highlightFragmentsCheckBox = new System.Windows.Forms.CheckBox();
-            this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.fontSizeTrackBar)).BeginInit();
             this.fontGroupBox.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -108,6 +110,15 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Color Highlighting";
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(111, 15);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(56, 13);
+            this.label1.TabIndex = 10;
+            this.label1.Text = "Brightness";
+            // 
             // brightnessBar
             // 
             this.brightnessBar.Location = new System.Drawing.Point(105, 26);
@@ -131,15 +142,6 @@
             this.highlightFragmentsCheckBox.UseVisualStyleBackColor = true;
             this.highlightFragmentsCheckBox.CheckedChanged += new System.EventHandler(this.highlightFragmentsCheckBox_CheckedChanged);
             // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(111, 15);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(56, 13);
-            this.label1.TabIndex = 10;
-            this.label1.Text = "Brightness";
-            // 
             // SettingsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -148,6 +150,7 @@
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.fontGroupBox);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.KeyPreview = true;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "SettingsForm";
@@ -156,6 +159,7 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Settings";
             this.Shown += new System.EventHandler(this.SettingsForm_Shown);
+            this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.SettingsForm_KeyPress);
             ((System.ComponentModel.ISupportInitialize)(this.fontSizeTrackBar)).EndInit();
             this.fontGroupBox.ResumeLayout(false);
             this.fontGroupBox.PerformLayout();
