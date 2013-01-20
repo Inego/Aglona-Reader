@@ -30,7 +30,7 @@ namespace AglonaReader
         }
 
     }
-    
+
     public class RenderedTextInfo
     {
         public bool Valid { get; set; }
@@ -117,7 +117,7 @@ namespace AglonaReader
         public string Text1 { get; set; }
         public string Text2 { get; set; }
 
-        
+
 
         // Used if texts are large (typically in aligning mode for the "big block")
         public StringBuilder SB1 { get; set; }
@@ -152,7 +152,7 @@ namespace AglonaReader
         /// </summary>
         public bool AllLinesComputed2 { get; set; }
 
-        
+
         /// <summary>
         /// How many lines are required to be added in order to compute the start Line of the Next text Pair.
         /// Zero means that the Next Pair begins at the same Line.
@@ -213,7 +213,8 @@ namespace AglonaReader
 
         }
 
-        public TextPair(string text1, string text2, bool startParagraph1, bool startParagraph2) : this()
+        public TextPair(string text1, string text2, bool startParagraph1, bool startParagraph2)
+            : this()
         {
             if (text1 != null)
                 if (text1.Length >= ParallelTextControl.BigTextSize)
@@ -240,9 +241,12 @@ namespace AglonaReader
                 computedWords2.Clear();
 
             Height = -1;
-                
+
             AllLinesComputed1 = false;
             AllLinesComputed2 = false;
+
+            CurrentPos1 = 0;
+            CurrentPos2 = 0;
 
         }
 
@@ -317,10 +321,7 @@ namespace AglonaReader
                     case '…':
                     case '(':
                     case ')':
-                    case '‹':
-                    case '›':
-                    case '“':
-                    case '”':
+
                         if (state == 1)
                             state = 3;
                         else if (state == 2)
@@ -340,7 +341,8 @@ namespace AglonaReader
                         break;
 
                     default:
-                        if ((c == '\'' || c == '\"' || c == '«' || c == '»') && state != 2)
+                        if ((c == '\'' || c == '\"' || c == '«' || c == '»' || c == '‹' || c == '›'
+                    || c == '“' || c == '”') && state != 2)
                             // do nothing
                             ;
                         else
@@ -385,7 +387,7 @@ namespace AglonaReader
 
         }
 
-        
+
 
         private static int NaturalDividerPosition(string text, int recommended_natural)
         {
@@ -410,7 +412,7 @@ namespace AglonaReader
                         break;
 
                     case '—':
-                    case '.': 
+                    case '.':
                     case '。':
                     case ',':
                     case '，':
@@ -421,10 +423,6 @@ namespace AglonaReader
                     case '…':
                     case '(':
                     case ')':
-                    case '‹':
-                    case '›':
-                    case '“':
-                    case '”':
                         if (state == 1)
                             state = 3;
                         else if (state == 2)
@@ -434,7 +432,7 @@ namespace AglonaReader
                             current_iteration++;
                             state = 3;
                         }
-                       
+
 
                         break;
 
@@ -444,7 +442,8 @@ namespace AglonaReader
                         break;
 
                     default:
-                        if ((c == '\'' || c == '\"' || c == '«' || c == '»') && state != 2)
+                        if ((c == '\'' || c == '\"' || c == '«' || c == '»' || c == '‹' || c == '›'
+                    || c == '“' || c == '”') && state != 2)
                             // do nothing
                             ;
                         else
@@ -486,7 +485,7 @@ namespace AglonaReader
 
             return pos;
 
-            
+
         }
 
 
@@ -598,7 +597,7 @@ namespace AglonaReader
                 new TextPair(text1, text2, startParagraph1, startParagraph2);
 
             TextPairs.Add(newPair);
-            
+
         }
 
         public void AddPair(string text1, string text2)
@@ -613,7 +612,7 @@ namespace AglonaReader
             ComputedPairs.Clear();
         }
 
-        public static void InsertWords(Collection<CommonWordInfo> list, int spaceLeft, byte side)
+        public static void InsertWords(Collection<CommonWordInfo> list, int spaceLeft)
         {
 
             if (list == null)
@@ -621,9 +620,11 @@ namespace AglonaReader
 
             Collection<WordInfo> l = null;
             TextPair prev_p = null;
+            byte prev_side = 0;
+            
 
             int bias = 0;
-            
+
 
             // Spaces can be only in cases like W E or E W or W W,
             // where W is a "western" word and E is an eastern character
@@ -643,7 +644,7 @@ namespace AglonaReader
             }
 
             previousWord = null;
-            
+
             foreach (CommonWordInfo r in list)
             {
 
@@ -658,7 +659,13 @@ namespace AglonaReader
                 if (prev_p != r.TextPair)
                 {
                     prev_p = r.TextPair;
-                    l = prev_p.ComputedWords(side, true);
+                    prev_side = 0;
+                }
+
+                if (r.side != prev_side)
+                {
+                    prev_side = r.side;
+                    l = prev_p.ComputedWords(r.side, true);
                 }
 
                 l.Add(new WordInfo(r.Word, r.Line, r.X1 + bias, r.X2 + bias, r.Pos, r.Eastern));
@@ -677,7 +684,7 @@ namespace AglonaReader
 
             using (XmlTextWriter writer = new XmlTextWriter(newFileName, Encoding.UTF8))
             {
-                
+
                 writer.WriteStartElement("ParallelBook");
 
                 writer.WriteAttributeString("lang1", Lang1);
@@ -691,7 +698,7 @@ namespace AglonaReader
                 writer.WriteAttributeString("info2", Info2);
 
                 writer.WriteAttributeString("info", Info);
-                
+
                 foreach (TextPair p in TextPairs)
                 {
                     writer.WriteStartElement("p");
@@ -728,7 +735,7 @@ namespace AglonaReader
                         writer.WriteAttributeString("t", p.Text2);
                     else
                         writer.WriteAttributeString("t", p.SB2.ToString());
-                    
+
                     writer.WriteEndElement();
                 }
 
@@ -742,174 +749,174 @@ namespace AglonaReader
 
         public bool Load(string newFileName)
         {
-            
-            
-                using (XmlTextReader reader = new XmlTextReader(newFileName))
+
+
+            using (XmlTextReader reader = new XmlTextReader(newFileName))
+            {
+                try
                 {
-                    try
+                    reader.Read();
+                }
+                catch
+                {
+                    System.Windows.Forms.MessageBox.Show("File not found or unavailable: " + newFileName);
+                    return false;
+                }
+
+                if (reader.NodeType != XmlNodeType.Element)
+                    return false;
+
+                if (reader.Name != "ParallelBook")
+                    return false;
+
+                if (!reader.MoveToNextAttribute())
+                    return false;
+
+                if (reader.Name != "lang1")
+                    return false;
+
+                Lang1 = reader.Value;
+
+                if (!reader.MoveToNextAttribute())
+                    return false;
+
+                if (reader.Name != "author1")
+                    return false;
+
+                Author1 = reader.Value;
+
+                if (!reader.MoveToNextAttribute())
+                    return false;
+
+                if (reader.Name != "title1")
+                    return false;
+
+                Title1 = reader.Value;
+
+                if (!reader.MoveToNextAttribute())
+                    return false;
+
+                if (reader.Name != "info1")
+                    return false;
+
+                Info1 = reader.Value;
+
+                if (!reader.MoveToNextAttribute())
+                    return false;
+
+                if (reader.Name != "lang2")
+                    return false;
+
+                Lang2 = reader.Value;
+
+                if (!reader.MoveToNextAttribute())
+                    return false;
+
+                if (reader.Name != "author2")
+                    return false;
+
+                Author2 = reader.Value;
+
+                if (!reader.MoveToNextAttribute())
+                    return false;
+
+                if (reader.Name != "title2")
+                    return false;
+
+                Title2 = reader.Value;
+
+                if (!reader.MoveToNextAttribute())
+                    return false;
+
+                if (reader.Name != "info2")
+                    return false;
+
+                Info2 = reader.Value;
+
+                if (!reader.MoveToNextAttribute())
+                    return false;
+
+                if (reader.Name != "info")
+                    return false;
+
+                Info = reader.Value;
+
+
+            NextPair:
+
+                if (!reader.Read())
+                    return false;
+
+                if (reader.Name == "p" && reader.NodeType == XmlNodeType.Element)
+                {
+                    if (!reader.MoveToNextAttribute())
+                        return false;
+
+                    TextPair p = new TextPair();
+
+                    if (reader.Name == "l")
                     {
-                        reader.Read();
-                    }
-                    catch
-                    {
-                        System.Windows.Forms.MessageBox.Show("File not found or unavailable: " + newFileName);
-                        return false;
-                    }
-
-                    if (reader.NodeType != XmlNodeType.Element)
-                        return false;
-
-                    if (reader.Name != "ParallelBook")
-                        return false;
-
-                    if (!reader.MoveToNextAttribute())
-                        return false;
-
-                    if (reader.Name != "lang1")
-                        return false;
-
-                    Lang1 = reader.Value;
-
-                    if (!reader.MoveToNextAttribute())
-                        return false;
-
-                    if (reader.Name != "author1")
-                        return false;
-
-                    Author1 = reader.Value;
-
-                    if (!reader.MoveToNextAttribute())
-                        return false;
-
-                    if (reader.Name != "title1")
-                        return false;
-
-                    Title1 = reader.Value;
-
-                    if (!reader.MoveToNextAttribute())
-                        return false;
-
-                    if (reader.Name != "info1")
-                        return false;
-
-                    Info1 = reader.Value;
-
-                    if (!reader.MoveToNextAttribute())
-                        return false;
-
-                    if (reader.Name != "lang2")
-                        return false;
-
-                    Lang2 = reader.Value;
-
-                    if (!reader.MoveToNextAttribute())
-                        return false;
-
-                    if (reader.Name != "author2")
-                        return false;
-
-                    Author2 = reader.Value;
-
-                    if (!reader.MoveToNextAttribute())
-                        return false;
-
-                    if (reader.Name != "title2")
-                        return false;
-
-                    Title2 = reader.Value;
-
-                    if (!reader.MoveToNextAttribute())
-                        return false;
-
-                    if (reader.Name != "info2")
-                        return false;
-
-                    Info2 = reader.Value;
-
-                    if (!reader.MoveToNextAttribute())
-                        return false;
-
-                    if (reader.Name != "info")
-                        return false;
-
-                    Info = reader.Value;
-
-
-                NextPair:
-
-                    if (!reader.Read())
-                        return false;
-
-                    if (reader.Name == "p" && reader.NodeType == XmlNodeType.Element)
-                    {
-                        if (!reader.MoveToNextAttribute())
-                            return false;
-
-                        TextPair p = new TextPair();
-
-                        if (reader.Name == "l")
+                        if (reader.Value == "3")
                         {
-                            if (reader.Value == "3")
-                            {
-                                p.StartParagraph1 = true;
-                                p.StartParagraph2 = true;
-                            }
-                            else if (reader.Value == "1")
-                                p.StartParagraph1 = true;
-                            else if (reader.Value == "2")
-                                p.StartParagraph2 = true;
-                            else if (reader.Value == "4")
-                                p.SetStructureLevel(1);
-                            else if (reader.Value == "5")
-                                p.SetStructureLevel(2);
-                            else if (reader.Value == "6")
-                                p.SetStructureLevel(3);
-
-                            if (!reader.MoveToNextAttribute())
-                                return false;
-
+                            p.StartParagraph1 = true;
+                            p.StartParagraph2 = true;
                         }
-
-                        if (reader.Name != "s")
-                            return false;
-
-                        if (reader.Value.Length >= ParallelTextControl.BigTextSize)
-                            p.SB1 = new StringBuilder(reader.Value);
-                        else
-                            p.Text1 = reader.Value;
-
-                        p.totalTextSize = reader.Value.Length;
+                        else if (reader.Value == "1")
+                            p.StartParagraph1 = true;
+                        else if (reader.Value == "2")
+                            p.StartParagraph2 = true;
+                        else if (reader.Value == "4")
+                            p.SetStructureLevel(1);
+                        else if (reader.Value == "5")
+                            p.SetStructureLevel(2);
+                        else if (reader.Value == "6")
+                            p.SetStructureLevel(3);
 
                         if (!reader.MoveToNextAttribute())
                             return false;
 
-                        if (reader.Name != "t")
-                            return false;
-
-                        if (reader.Value.Length >= ParallelTextControl.BigTextSize)
-                            p.SB2 = new StringBuilder(reader.Value);
-                        else
-                            p.Text2 = reader.Value;
-
-                        p.totalTextSize += reader.Value.Length;
-
-                        TextPairs.Add(p);
-
-                        goto NextPair;
-
                     }
 
+                    if (reader.Name != "s")
+                        return false;
 
-                    reader.Close();
+                    if (reader.Value.Length >= ParallelTextControl.BigTextSize)
+                        p.SB1 = new StringBuilder(reader.Value);
+                    else
+                        p.Text1 = reader.Value;
 
-                    FileName = newFileName;
+                    p.totalTextSize = reader.Value.Length;
 
-                    if (TextPairs.Count > 0)
-                        UpdateAggregates(0);
+                    if (!reader.MoveToNextAttribute())
+                        return false;
 
-                    return true;
+                    if (reader.Name != "t")
+                        return false;
 
-                
+                    if (reader.Value.Length >= ParallelTextControl.BigTextSize)
+                        p.SB2 = new StringBuilder(reader.Value);
+                    else
+                        p.Text2 = reader.Value;
+
+                    p.totalTextSize += reader.Value.Length;
+
+                    TextPairs.Add(p);
+
+                    goto NextPair;
+
+                }
+
+
+                reader.Close();
+
+                FileName = newFileName;
+
+                if (TextPairs.Count > 0)
+                    UpdateAggregates(0);
+
+                return true;
+
+
 
             }
 

@@ -39,6 +39,8 @@ namespace AglonaReader
             this.label1 = new System.Windows.Forms.Label();
             this.brightnessBar = new System.Windows.Forms.TrackBar();
             this.highlightFragmentsCheckBox = new System.Windows.Forms.CheckBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.readingModeComboBox = new System.Windows.Forms.ComboBox();
             ((System.ComponentModel.ISupportInitialize)(this.fontSizeTrackBar)).BeginInit();
             this.fontGroupBox.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -56,6 +58,7 @@ namespace AglonaReader
             // 
             // fontsComboBox
             // 
+            this.fontsComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.fontsComboBox.FormattingEnabled = true;
             this.fontsComboBox.Location = new System.Drawing.Point(15, 17);
             this.fontsComboBox.Name = "fontsComboBox";
@@ -142,11 +145,35 @@ namespace AglonaReader
             this.highlightFragmentsCheckBox.UseVisualStyleBackColor = true;
             this.highlightFragmentsCheckBox.CheckedChanged += new System.EventHandler(this.highlightFragmentsCheckBox_CheckedChanged);
             // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(15, 204);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(77, 13);
+            this.label2.TabIndex = 10;
+            this.label2.Text = "Reading Mode";
+            // 
+            // readingModeComboBox
+            // 
+            this.readingModeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.readingModeComboBox.FormattingEnabled = true;
+            this.readingModeComboBox.Items.AddRange(new object[] {
+            "Normal",
+            "Alternating"});
+            this.readingModeComboBox.Location = new System.Drawing.Point(98, 201);
+            this.readingModeComboBox.Name = "readingModeComboBox";
+            this.readingModeComboBox.Size = new System.Drawing.Size(140, 21);
+            this.readingModeComboBox.TabIndex = 11;
+            this.readingModeComboBox.SelectedIndexChanged += new System.EventHandler(this.readingModeComboBox_SelectedIndexChanged);
+            // 
             // SettingsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(717, 203);
+            this.ClientSize = new System.Drawing.Size(717, 278);
+            this.Controls.Add(this.readingModeComboBox);
+            this.Controls.Add(this.label2);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.fontGroupBox);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
@@ -167,6 +194,7 @@ namespace AglonaReader
             this.groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.brightnessBar)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -181,6 +209,8 @@ namespace AglonaReader
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TrackBar brightnessBar;
         private System.Windows.Forms.CheckBox highlightFragmentsCheckBox;
+        private Label label2;
+        private ComboBox readingModeComboBox;
 
     }
 }

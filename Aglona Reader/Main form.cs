@@ -75,7 +75,10 @@ namespace AglonaReader
             pTC.HighlightFragments = appSettings.HighlightFragments;
             pTC.HighlightFirstWords = appSettings.HighlightFirstWords;
             pTC.Brightness = appSettings.Brightness;
-            pTC.SetFont(new Font(appSettings.FontName, appSettings.FontSize));
+            
+            pTC.SetFont(
+                new Font(appSettings.FontName, appSettings.FontSize),
+                new Font(appSettings.FontName, appSettings.FontSize, FontStyle.Italic));
 
             if (appSettings.FileUsages.Count > 0)
             {
@@ -111,11 +114,15 @@ namespace AglonaReader
 
             pTC.Reversed = f.Reversed;
             reverseToolStripMenuItem.Checked = pTC.Reversed;
-            pTC.SetSplitterPositionByRatio(f.SplitterRatio);
+
+            pTC.ReadingMode = f.ReadingMode;
 
             SetEditMode(f.EditMode);
 
-                
+            pTC.SetLayoutMode();
+
+            pTC.SetSplitterPositionByRatio(f.SplitterRatio);
+    
             pTC.Modified = false;
 
             if (pTC.Number > 0)
@@ -159,7 +166,7 @@ namespace AglonaReader
 
         private bool XonSplitter(int x)
         {
-            return (x >= pTC.SplitterPosition && x < pTC.SplitterPosition + pTC.SplitterWidth);
+            return (pTC.LayoutMode == ParallelTextControl.LayoutMode_Normal && x >= pTC.SplitterPosition && x < pTC.SplitterPosition + pTC.SplitterWidth);
         }
 
         private void parallelTextControl_MouseMove(object sender, MouseEventArgs e)
@@ -265,7 +272,7 @@ namespace AglonaReader
             }
 
             else if (opState == 0)
-                pTC.ProcessMousePosition(false);
+                pTC.ProcessMousePosition(false, true);
         }
 
         
@@ -321,7 +328,7 @@ namespace AglonaReader
 
                         pTC.FindNaturalDividers(0);
                         pTC.FindNaturalDividersScreen(0);
-                        pTC.ProcessMousePosition(true);
+                        pTC.ProcessMousePosition(true, true);
 
                         justJumped = true;
 
@@ -416,18 +423,16 @@ namespace AglonaReader
         private void MouseUpInEditMode()
         {
 
-            bool stillNeedToSetBorders = true;
             bool needToRender = false;
             bool needToUpdateStatusBar = false;
             bool needToNip = false;
-            bool goneToDifferentPair = false;
 
-            if (stillNeedToSetBorders && pTC.MouseCurrentWord != null && pTC.MouseCurrentWord.Next != null)
+            if (pTC.MouseCurrentWord != null && pTC.MouseCurrentWord.Next != null)
             {
 
                 if (pTC.MouseCurrentWord.Side == 1)
                 {
-                    if (pTC.NaturalDividerPosition1W == pTC.MouseCurrentWord.Next && !goneToDifferentPair)
+                    if (pTC.NaturalDividerPosition1W == pTC.MouseCurrentWord.Next && !justJumped)
                         needToNip = true;
                     else
                     {
@@ -440,7 +445,7 @@ namespace AglonaReader
                 }
                 else
                 {
-                    if (pTC.NaturalDividerPosition2W == pTC.MouseCurrentWord.Next && !goneToDifferentPair)
+                    if (pTC.NaturalDividerPosition2W == pTC.MouseCurrentWord.Next && !justJumped)
                         needToNip = true;
                     else
                     {
@@ -456,7 +461,7 @@ namespace AglonaReader
                 if (pTC.Side1Set && pTC.Side2Set)
                     needToNip = true;
 
-                if (needToNip && !justJumped)
+                if (needToNip)
                 {
                     pTC.NipHighlightedPair();
                     needToUpdateStatusBar = true;
@@ -479,7 +484,8 @@ namespace AglonaReader
         {
             pTC.Reversed = reverseToolStripMenuItem.Checked;
             pTC.SetSplitterPositionByRatio(1 - pTC.SplitterRatio);
-            pTC.ComputeSideCoordinates();
+            pTC.SetLayoutMode();
+            //pTC.ComputeSideCoordinates();
             Recompute();
         }
 
@@ -805,7 +811,7 @@ namespace AglonaReader
                 }
 
                 pTC.FindNaturalDividersScreen(0);
-                pTC.ProcessMousePosition(true);
+                pTC.ProcessMousePosition(true, false);
                 pTC.Render();
                 UpdateStatusBar();
             }
@@ -866,7 +872,7 @@ namespace AglonaReader
 
                 pTC.FindNaturalDividersScreen(0);
 
-                pTC.ProcessMousePosition(true);
+                pTC.ProcessMousePosition(true, false);
 
                 pTC.Render();
 
@@ -1081,6 +1087,7 @@ namespace AglonaReader
                 f.Reversed = pTC.Reversed;
                 f.SplitterRatio = pTC.SplitterRatio;
                 f.EditMode = pTC.EditMode;
+                f.ReadingMode = pTC.ReadingMode;
             }
 
             appSettings.HighlightFragments = pTC.HighlightFragments;
@@ -1220,10 +1227,15 @@ namespace AglonaReader
             
             pTC.EditMode = editModeToolStripMenuItem.Checked;
 
+            pTC.SetLayoutMode();
+
             ProcessEditModeChange();
 
-            pTC.UpdateScreen();
-
+            if (pTC.ReadingMode != FileUsageInfo.NormalMode)
+                Recompute();
+            else
+                pTC.UpdateScreen();
+            
         }
 
         private void ProcessEditModeChange()
@@ -1274,12 +1286,13 @@ namespace AglonaReader
     public class CommonWordInfo : WordInfo
     {
         public TextPair TextPair { get; set; }
+        public byte side;
 
-        public CommonWordInfo(TextPair textPair, string word, int line, int wordX, int wordX2, int pos, bool eastern)
+        public CommonWordInfo(TextPair textPair, string word, int line, int wordX, int wordX2, int pos, bool eastern, byte side)
             : base(word, line, wordX, wordX2, pos, eastern)
         {
             this.TextPair = textPair;
-
+            this.side = side;
         }
             
     }
@@ -1287,12 +1300,17 @@ namespace AglonaReader
     
     public class FileUsageInfo
     {
+        public const int NormalMode = 0;
+        public const int BeginnerMode = 1;
+
+
         public string FileName { get; set; }
         public int Pair { get; set; }
         public int TopPair { get; set; }
         public bool Reversed { get; set; }
         public float SplitterRatio { get; set; }
         public bool EditMode { get; set; }
+        public int ReadingMode { get; set; }
     }
 
     public class AppSettings
@@ -1310,7 +1328,7 @@ namespace AglonaReader
             HighlightFragments = true;
             HighlightFirstWords = true;
             Brightness = 0.96;
-            FontName = "Times New Roman";
+            FontName = "Arial";
             FontSize = 18.0F;
             FileUsages = new Collection<FileUsageInfo>();
         }

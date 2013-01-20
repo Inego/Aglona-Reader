@@ -28,6 +28,16 @@ namespace AglonaReader
             highlightFirstWordsCheckBox.Checked = pTC.HighlightFirstWords;
             highlightFragmentsCheckBox.Checked = pTC.HighlightFragments;
 
+            switch (pTC.ReadingMode)
+            {
+                case FileUsageInfo.NormalMode:
+                    readingModeComboBox.SelectedIndex = 0;
+                    break;
+                case FileUsageInfo.BeginnerMode:
+                    readingModeComboBox.SelectedIndex = 1;
+                    break;
+            }
+
             prevFont = pTC.textFont.Name;
             float currentFontSize = pTC.textFont.Size;
 
@@ -83,7 +93,9 @@ namespace AglonaReader
 
             fontNameLabel.Text = ff.Name;
 
-            pTC.SetFont(new Font(ff.Name, (float)fontSizeTrackBar.Value * 16 / 1000 + 8));
+            pTC.SetFont(
+                new Font(ff.Name, (float)fontSizeTrackBar.Value * 16 / 1000 + 8),
+                new Font(ff.Name, (float)fontSizeTrackBar.Value * 16 / 1000 + 8, FontStyle.Italic));
 
             prevFont = ff.Name;
             prevSize = fontSizeTrackBar.Value;
@@ -114,6 +126,23 @@ namespace AglonaReader
         {
             if (e.KeyChar == 27)
                 Close();
+        }
+
+        private void readingModeComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            switch (readingModeComboBox.SelectedIndex)
+            {
+                case 0:
+                    pTC.ReadingMode = FileUsageInfo.NormalMode;
+                    break;
+                case 1:
+                    pTC.ReadingMode = FileUsageInfo.BeginnerMode;
+                    break;
+            }
+
+            pTC.SetLayoutMode();
+            pTC.ProcessLayoutChange();
+
         }
 
     }
