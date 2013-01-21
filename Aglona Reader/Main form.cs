@@ -141,7 +141,7 @@ namespace AglonaReader
                 Recompute();
             }
 
-            UpdateStatusBar();
+            UpdateStatusBar(true);
 
         }
 
@@ -472,7 +472,7 @@ namespace AglonaReader
             }
 
             if (needToUpdateStatusBar)
-                UpdateStatusBar();
+                UpdateStatusBar(true);
 
             if (needToRender)
                 pTC.Render();
@@ -604,7 +604,7 @@ namespace AglonaReader
                 pTC.PairChanged(pTC.HighlightedPair, true);
                 pTC[pTC.HighlightedPair].UpdateTotalSize();
                 pTC.PText.UpdateAggregates(pTC.HighlightedPair);
-                UpdateStatusBar();
+                UpdateStatusBar(true);
                 pTC.Side1Set = false;
                 pTC.Side2Set = false;
             }
@@ -747,10 +747,10 @@ namespace AglonaReader
 
             pTC.UpdateScreen();
 
-            UpdateStatusBar();
+            UpdateStatusBar(true);
         }
 
-        private void UpdateStatusBar()
+        private void UpdateStatusBar(bool updateScrollBar)
         {
 
             if (pTC.Number == 0)
@@ -781,6 +781,11 @@ namespace AglonaReader
 
             }
 
+            if (updateScrollBar)
+            {
+                vScrollBar.Maximum = (pTC.Number == 0 ? 0 : pTC.Number - 1);
+                vScrollBar.Value = pTC.CurrentPair;
+            }
 
         }
 
@@ -813,7 +818,7 @@ namespace AglonaReader
                 pTC.FindNaturalDividersScreen(0);
                 pTC.ProcessMousePosition(true, false);
                 pTC.Render();
-                UpdateStatusBar();
+                UpdateStatusBar(true);
             }
             else
             {
@@ -876,7 +881,7 @@ namespace AglonaReader
 
                 pTC.Render();
 
-                UpdateStatusBar();
+                UpdateStatusBar(true);
             }
             else
             {
@@ -947,7 +952,7 @@ namespace AglonaReader
                 importTextForm.ShowDialog();
             }
 
-            UpdateStatusBar();
+            UpdateStatusBar(true);
 
             Recompute();
 
@@ -1070,7 +1075,7 @@ namespace AglonaReader
 
             Recompute();
 
-            UpdateStatusBar();
+            UpdateStatusBar(true);
             UpdateWindowTitle();
 
             return fileName;
@@ -1121,7 +1126,7 @@ namespace AglonaReader
         {
             if (pTC.NipHighlightedPair())
             {
-                UpdateStatusBar();
+                UpdateStatusBar(true);
                 pTC.MouseCurrentWord = null;
             }
             else
@@ -1131,7 +1136,7 @@ namespace AglonaReader
         private void editToolStripMenuItem_Click(object sender, EventArgs e)
         {
             pTC.EditCurrentPair();
-            UpdateStatusBar();
+            UpdateStatusBar(false);
         }
 
         private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1178,7 +1183,7 @@ namespace AglonaReader
 
             pTC.CreateNewParallelBook();
 
-            UpdateStatusBar();
+            UpdateStatusBar(true);
 
             UpdateWindowTitle();
 
@@ -1280,6 +1285,32 @@ namespace AglonaReader
             }
 
         }
+
+        private void vScrollBar_Scroll(object sender, ScrollEventArgs e)
+        {
+            if (e.Type == ScrollEventType.LargeDecrement)
+                ProcessPageUp();
+            else if (e.Type == ScrollEventType.LargeIncrement)
+                ProcessPageDown();
+            else if (e.Type == ScrollEventType.SmallDecrement)
+                ProcessKeyUp();
+            else if (e.Type == ScrollEventType.SmallIncrement)
+                ProcessKeyDown();
+            else if (e.Type == ScrollEventType.ThumbTrack)
+            {
+                GotoPair(e.NewValue);
+                statusStrip.Refresh();
+            }
+            else
+                return;
+
+            e.NewValue = pTC.CurrentPair;
+
+            
+        }
+
+        
+
 
     }
 

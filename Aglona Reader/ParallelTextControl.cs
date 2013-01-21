@@ -317,6 +317,7 @@ namespace AglonaReader
         private SortedDictionary<string, int> widthDictionary;
 
         public int verticalStartingPosition;
+        private int indentLength;
 
         public int SpaceLength { get; set; }
 
@@ -396,6 +397,8 @@ namespace AglonaReader
             IntPtr last_font = SelectObject(secondaryHDC, textFont.ToHfont());
 
             SpaceLength = WordWidth(" ", graphics);
+
+            ComputeIndent();
 
             DeleteObject(last_font);
             PanelGraphics.ReleaseHdc(secondaryHDC);
@@ -945,8 +948,6 @@ namespace AglonaReader
 
                 secondaryHDC = SecondaryBG.Graphics.GetHdc();
 
-
-
                 // Required number of lines that we want to compute for the current Pair.
                 // -1 means we want to compute ALL lines
                 int requiredHeight;
@@ -1015,16 +1016,18 @@ namespace AglonaReader
 
                 }
 
-                if (p.AllLinesComputed1 && p.AllLinesComputed2)
-                    height = p.Height;
+                height = p.Height;
 
-                else
+                if (!(p.AllLinesComputed1 && p.AllLinesComputed2))
                 {
 
-                    height = p.Height;
-
                     if (p.Height == -1)
+                    {
                         PText.ComputedPairs.Add(p);
+                        if (p.StartParagraph1 || p.StartParagraph2)
+                            occLength = indentLength;
+                    }
+                    //else occLength = 0;
 
                     ProcessTextFromPair(p, side1, ref occLength, words, ref height, ref txtWidth, requiredHeight);
                     ProcessTextFromPair(p, side2, ref occLength, words, ref height, ref txtWidth, requiredHeight);
@@ -1064,10 +1067,9 @@ namespace AglonaReader
 
                 p = PText.TextPairs[cPair];
 
-                if (NeedToLineBreakFirstWord(p, side1, ref occLength, ref txtWidth, SpaceLength, p.StartParagraph1 || p.StartParagraph2))
+                if (words.Count > 0 && NeedToLineBreakFirstWord(p, side1, ref occLength, ref txtWidth, SpaceLength, p.StartParagraph1 || p.StartParagraph2))
                 {
-                    ParallelText.InsertWords(words, 
-                        (p.StartParagraph1 || p.StartParagraph2 ? 0 : txtWidth - occLength));
+                    ParallelText.InsertWords(words, (p.StartParagraph1 || p.StartParagraph2 ? 0 : txtWidth - occLength));
                     
                     prev_pair.Height++;
 
@@ -1079,11 +1081,9 @@ namespace AglonaReader
                             goto CommonExit1;
                     }
 
-                    occLength = 0;
+                    occLength = (p.StartParagraph1 || p.StartParagraph2 ? indentLength : 0);
 
                 }
-
-
 
                 if (requiredLines == -1 && cPair > startPair && prev_pair.Height > 0)
                     goto CommonExit1;
@@ -1096,7 +1096,6 @@ namespace AglonaReader
                 SecondaryBG.Graphics.ReleaseHdc(secondaryHDC);
 
             }
-
 
         }
 
@@ -1584,18 +1583,25 @@ namespace AglonaReader
 
         }
 
+
+        void ComputeIndent()
+        {
+            indentLength = (LayoutMode == LayoutMode_Normal ? 0 : SpaceLength * 8);
+        }
+
+
         private void ProcessCurrentWord(StringBuilder word, ref int occLength, Collection<CommonWordInfo> words, ref int Height, TextPair p, byte side, ref int MaxWidth, ref int wordPosition, bool eastern)
         {
 
-            // Current Word complete, let'Word get its length
+            // Current Word complete, let's get its length
 
             int wordLength;
 
             wordLength = WordWidth(word.ToString(), PanelGraphics);
 
-            int newStart = occLength + (occLength == 0 || eastern && words.Count > 0 && words[words.Count - 1].Eastern ? 0 : SpaceLength);
+            int newStart = occLength + (words.Count == 0 || eastern && words.Count > 0 && words[words.Count - 1].Eastern ? 0 : SpaceLength);
 
-            if (newStart + wordLength > MaxWidth && occLength != 0)
+            if (newStart + wordLength > MaxWidth && words.Count != 0)
             {
                 // Move this Word to the Next Line.
                 // Before that we need to flush words to the DB
@@ -1632,7 +1638,9 @@ namespace AglonaReader
                 height = 0;
             }
             else
+            {
                 pos = (side == 1) ? p.CurrentPos1 : p.CurrentPos2;
+            }
 
             wordPos = -1;
 
@@ -1680,7 +1688,7 @@ namespace AglonaReader
                     ParallelText.InsertWords(words, 0);
 
                     height++;
-                    occLength = 0;
+                    occLength = indentLength;
 
                     if (requiredHeight != -1 && requiredHeight == height)
                     {
@@ -2486,15 +2494,18 @@ namespace AglonaReader
 
         public void SetLayoutMode()
         {
-            
+
             if (EditMode || ReadingMode == FileUsageInfo.NormalMode)
                 LayoutMode = LayoutMode_Normal;
             else
                 LayoutMode = LayoutMode_Alternating;
 
+            ComputeIndent();
+
             ComputeSideCoordinates();
 
         }
+        
     }
 
     public class ScreenWord

@@ -60,6 +60,7 @@
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.ssPosition = new System.Windows.Forms.ToolStripStatusLabel();
             this.ssPositionPercent = new System.Windows.Forms.ToolStripStatusLabel();
+            this.vScrollBar = new System.Windows.Forms.VScrollBar();
             this.pTC = new AglonaReader.ParallelTextControl();
             this.mainMenu.SuspendLayout();
             this.statusStrip.SuspendLayout();
@@ -302,6 +303,16 @@
             this.ssPositionPercent.Size = new System.Drawing.Size(41, 17);
             this.ssPositionPercent.Text = "0,00 %";
             // 
+            // vScrollBar
+            // 
+            this.vScrollBar.Dock = System.Windows.Forms.DockStyle.Right;
+            this.vScrollBar.LargeChange = 1;
+            this.vScrollBar.Location = new System.Drawing.Point(670, 24);
+            this.vScrollBar.Name = "vScrollBar";
+            this.vScrollBar.Size = new System.Drawing.Size(18, 218);
+            this.vScrollBar.TabIndex = 5;
+            this.vScrollBar.Scroll += new System.Windows.Forms.ScrollEventHandler(this.vScrollBar_Scroll);
+            // 
             // pTC
             // 
             this.pTC.BackColor = System.Drawing.SystemColors.InactiveBorder;
@@ -351,6 +362,7 @@
             parallelText1.Title1 = null;
             parallelText1.Title2 = null;
             this.pTC.PText = parallelText1;
+            this.pTC.ReadingMode = 0;
             this.pTC.Reversed = false;
             this.pTC.RightPosition = 445;
             this.pTC.SecondaryBG = null;
@@ -362,7 +374,7 @@
             this.pTC.SelectionSide = ((byte)(0));
             this.pTC.Side1Set = false;
             this.pTC.Side2Set = false;
-            this.pTC.Size = new System.Drawing.Size(688, 218);
+            this.pTC.Size = new System.Drawing.Size(670, 218);
             this.pTC.SpaceLength = 6;
             this.pTC.SplitterMoveOffset = 0;
             this.pTC.SplitterPosition = 445;
@@ -383,6 +395,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(688, 264);
             this.Controls.Add(this.pTC);
+            this.Controls.Add(this.vScrollBar);
             this.Controls.Add(this.mainMenu);
             this.Controls.Add(this.statusStrip);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -434,6 +447,7 @@
         private System.Windows.Forms.StatusStrip statusStrip;
         private System.Windows.Forms.ToolStripStatusLabel ssPosition;
         private System.Windows.Forms.ToolStripStatusLabel ssPositionPercent;
+        private System.Windows.Forms.VScrollBar vScrollBar;
 
     }
 }
