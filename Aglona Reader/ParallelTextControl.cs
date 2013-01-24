@@ -12,15 +12,18 @@ using System.Runtime.InteropServices;
 namespace AglonaReader
 {
 
-    
-
     public partial class ParallelTextControl : UserControl
     {
 
         public const int LayoutMode_Normal = 0;
         public const int LayoutMode_Alternating = 1;
+        public const int LayoutMode_Advanced = 2;
+
+        public const int popUpOffsetX = 7;
+        public const int popUpOffsetY = 7;
 
         public int LayoutMode;
+
 
         /// <summary>
         /// 0 = not set; 1 = black; 2 = gray
@@ -37,6 +40,10 @@ namespace AglonaReader
         public int Selection2Position { get; set; }
         public Frame SelectionFrame { get; set; }
         public bool SelectionFinished { get; set; }
+
+        public Frame AdvancedHighlightFrame;
+        private PopUpInfo popUpInfo;
+
 
         public int mouse_text_line = -1;
         private int mouse_text_x = -1;
@@ -231,7 +238,7 @@ namespace AglonaReader
         public void ComputeSideCoordinates()
         {
 
-            if (LayoutMode == LayoutMode_Alternating)
+            if (LayoutMode == LayoutMode_Alternating || LayoutMode == LayoutMode_Advanced)
             {
                 text1start = PanelMargin - frameoffset_x;
                 text1end = Width - PanelMargin + frameoffset_x;
@@ -318,6 +325,13 @@ namespace AglonaReader
 
         public int verticalStartingPosition;
         private int indentLength;
+        
+        private int Advanced_HighlightedPair;
+        
+        private Brush popUpBrush;
+        
+        private Color popUpTextColor;
+        private bool AdvancedMode_ShowPopups;
 
         public int SpaceLength { get; set; }
 
@@ -464,17 +478,22 @@ namespace AglonaReader
             Pen selectionPen = Frame.CreatePen(Color.Black, DashStyle.Solid, 2.0F);
 
             SelectionFrame = new Frame(selectionPen, frames);
+            
 
             GT = (StringFormat)StringFormat.GenericTypographic.Clone();
 
             widthDictionary = new SortedDictionary<string, int>(StringComparer.Ordinal);
+
+            // ADVANCED MODE POPUP
+            popUpInfo = new PopUpInfo();
+            Pen AdvancedHighlightPen = Frame.CreatePen(Color.SteelBlue, DashStyle.Solid, 4.0F);
+            AdvancedHighlightFrame = new Frame(AdvancedHighlightPen, frames);
+            int popUpOpacity = 210;
+            popUpBrush = new SolidBrush(Color.FromArgb(popUpOpacity, Color.Black));
+            popUpTextColor = Color.White;
+            AdvancedMode_ShowPopups = false;
             
             PanelGraphics = CreateGraphics();
-
-            //textFont = new System.Drawing.Font("Simsun", 18.0F);
-            //textFont = new System.Drawing.Font("Arial Unicode MS", 18.0F);
-            //textFont = new System.Drawing.Font("Times New Roman", 18.0F);
-            //textFont = new System.Drawing.Font("Arial", 18.0F);
 
             textFont = new System.Drawing.Font("Arial", 18.0F);
             
@@ -492,7 +511,6 @@ namespace AglonaReader
             HighlightFragments = true;
 
             SuggestedPen = Frame.CreatePen(Color.SteelBlue, DashStyle.Dash, 2.0F);
-
 
         }
 
@@ -513,33 +531,6 @@ namespace AglonaReader
         {
             colorTableH = new List<double>();
 
-            //double current = 0;
-
-            //for (byte charIndex = 1; charIndex <= 10; charIndex++)
-            //{
-            //    colorTableH.Add(current);
-            //    current += 0.3;
-            //    if (current >= 1)
-            //        current -= 1;
-            //}
-
-            //for (byte charIndex = 1; charIndex < 20; charIndex++)
-            //{
-            //    colorTableH.Add(current);
-            //    current += 0.25;
-            //    if (current >= 1)
-            //        current -= 0.95;
-            //}
-
-            //for (byte charIndex = 1; charIndex < 20; charIndex++)
-            //{
-            //    colorTableH.Add(current);
-            //    current += 0.05;
-
-            //}
-
-
-
             colorTableH.Add(0.162);
             colorTableH.Add(0.34);
             colorTableH.Add(0.492);
@@ -548,15 +539,7 @@ namespace AglonaReader
             colorTableH.Add(0);
             //colorTableH.Add(0.11); // Orange? Too close to yellow. Disable for now
 
-
-
-            //colorTableH.Add(0.15);
-            //colorTableH.Add(0.49);
-            //colorTableH.Add(0.115);
-            //colorTableH.Add(0.255);
-
             NumberofColors = (byte)colorTableH.Count;
-
 
             brushTable = new List<SolidBrush>();
             penTable = new List<Pen>();
@@ -574,9 +557,6 @@ namespace AglonaReader
 
             //graphics.FillRectangle(splitterBrush, splitterPosition, VMargin, splitterWidth, Height - 2 * VMargin);
         }
-
-
-
 
         public void DrawFrame(Frame frame)
         {
@@ -690,7 +670,36 @@ namespace AglonaReader
 
             HighlightWord(MouseCurrentWord, Color.LightSkyBlue);
 
+            RenderAdvancedPopup(g);
+
             PrimaryBG.Render();
+
+        }
+
+        private void RenderAdvancedPopup(Graphics g)
+        {
+
+            if (!(LayoutMode == LayoutMode_Advanced && popUpInfo.visible))
+                return;
+
+            DrawBackground(0, popUpInfo.Y, popUpInfo.X, popUpInfo.Y2, popUpInfo.X2, g, popUpBrush);
+
+            secondaryHDC = PrimaryBG.Graphics.GetHdc();
+
+            SetTextColor(secondaryHDC, ColorTranslator.ToWin32(popUpTextColor));
+            SetBkMode(secondaryHDC, 1);
+
+
+            IntPtr last_font = SelectObject(secondaryHDC, textFont.ToHfont());
+
+            foreach(WordInfo sw in popUpInfo.words)
+                TextOut(secondaryHDC, sw.X1 + PanelMargin + popUpInfo.X, VMargin + popUpInfo.offsetY * popUpOffsetY + (popUpInfo.Y + sw.Line) * lineHeight, sw.Word, sw.Word.Length);
+
+            DeleteObject(last_font);
+
+            PrimaryBG.Graphics.ReleaseHdc(secondaryHDC);
+
+
 
         }
 
@@ -775,328 +784,483 @@ namespace AglonaReader
             if (PText.Number() == 0)
                 return;
 
-            // EDIT / NORMAL MODE
-
             if (LayoutMode == LayoutMode_Normal)
+                PrepareScreen_Normal(startPair, requiredLines);
+
+            else if (LayoutMode == LayoutMode_Alternating)
+                PrepareScreen_Alternating(startPair, requiredLines);
+
+            else if (LayoutMode == LayoutMode_Advanced)
+                PrepareScreen_Advanced(startPair, requiredLines);
+
+        }
+
+        private void PrepareScreen_Advanced(int startPair, int requiredLines)
+        {
+            secondaryHDC = SecondaryBG.Graphics.GetHdc();
+
+            // Required number of lines that we want to compute for the current Pair.
+            // -1 means we want to compute ALL lines
+            int requiredHeight;
+
+            int remainder = requiredLines;
+
+            int txtWidth = Width - 2 * PanelMargin;
+
+            TextPair p;
+
+            // If the startPair is not starting from a new Line on both texts (i. e. it is not a true-true Pair)
+            // then we must ensure that all of the preceding pairs starting from the previous true-true pairs are computed,
+            // because we need to know where exactly in the Line our Pair starts on both sides.
+            // Actually, it is sufficient to stop at the closest partially-computed Pair (because if it is partially
+            // computed we can safely compute it to the end)
+
+            int cPair = startPair;
+
+            byte side = (Reversed ? (byte) 2 : (byte) 1);
+
+        Upstairs2:
+
+            p = PText.TextPairs[cPair];
+
+            // Look for the closest true-true or partially computed Pair
+            if (!(p.StartParagraph(side)) && p.Height == -1)
+            {
+                cPair--;
+                goto Upstairs2;
+            }
+
+            Collection<CommonWordInfo> words = new Collection<CommonWordInfo>();
+
+            int occLength = 0; // Occupied length in the current Line
+
+            int height;
+
+            TextPair prev_pair = null;
+
+            IntPtr last_font = SelectObject(secondaryHDC, textFont.ToHfont());
+
+        NextPair2:
+
+            if (cPair < startPair || requiredLines == -1)
+                requiredHeight = -1;
+            else
             {
 
-                secondaryHDC = SecondaryBG.Graphics.GetHdc();
+                if (p.Height != -1 && remainder <= p.Height)
+                    // cool
+                    goto CommonExit2;
 
-                IntPtr last_font = SelectObject(secondaryHDC, textFont.ToHfont());
+                requiredHeight = remainder;
 
-                // Required number of lines that we want to compute for the current Pair.
-                // -1 means we want to compute ALL lines
-                int requiredHeight;
+            }
 
-                int remainder = requiredLines;
+            height = p.Height;
 
-                TextPair p;
+            if (!(p.AllLinesComputed(side)))
+            {
 
-                // If the startPair is not starting from a new Line on both texts (i. e. it is not a true-true Pair)
-                // then we must ensure that all of the preceding pairs starting from the previous true-true pairs are computed,
-                // because we need to know where exactly in the Line our Pair starts on both sides.
-                // Actually, it is sufficient to stop at the closest partially-computed Pair (because if it is partially
-                // computed we can safely compute it to the end)
-
-                int cPair = startPair;
-
-            Upstairs:
-
-                p = PText.TextPairs[cPair];
-
-                // Look for the closest true-true or partially computed Pair
-                if (!(p.StartParagraph1 && p.StartParagraph2) && p.Height == -1)
+                if (p.Height == -1)
                 {
-                    cPair--;
-                    goto Upstairs;
+                    PText.ComputedPairs.Add(p);
+                    if (p.StartParagraph(side))
+                        occLength = indentLength;
                 }
 
-                Collection<CommonWordInfo> words1 = new Collection<CommonWordInfo>();
-                Collection<CommonWordInfo> words2 = new Collection<CommonWordInfo>();
+                ProcessTextFromPair(p, side, ref occLength, words, ref height, ref txtWidth, requiredHeight);
 
-                int occLength1 = 0; // Occupied length in the current Line
-                int occLength2 = 0;
-
-                int height1;
-                int height2;
-                int height;
-
-                TextPair prev_pair = null;
-
-                int width1 = (Reversed ? RightWidth : LeftWidth) - 2 * PanelMargin;
-                int width2 = (Reversed ? LeftWidth : RightWidth) - 2 * PanelMargin;
-
-            NextPair:
-
-                if (cPair < startPair || requiredLines == -1)
-                    requiredHeight = -1;
-                else
+                if (p.AllLinesComputed(side) && (p.StructureLevel > 0
+                    || cPair + 1 < PText.Number() && PText.TextPairs[cPair + 1].StructureLevel > 0))
                 {
-
-                    if (p.Height != -1 && remainder <= p.Height)
-                        // cool
-                        goto CommonExit;
-
-                    requiredHeight = remainder;
-
+                    ParallelText.InsertWords(words, 0);
+                    height += 2;
                 }
 
-                if (p.AllLinesComputed1 && p.AllLinesComputed2)
-                    height = p.Height;
+                p.Height = height;
 
-                else
-                {
+            }
 
-                    height1 = p.Height;
-                    height2 = p.Height;
+            if (requiredHeight != -1)
+            {
+                remainder -= height;
 
-                    if (p.Height == -1)
-                        PText.ComputedPairs.Add(p);
+                if (remainder <= 0)
+                    goto CommonExit2;
 
-                    ProcessTextFromPair(p, 1, ref occLength1, words1, ref height1, ref width1, requiredHeight);
-                    ProcessTextFromPair(p, 2, ref occLength2, words2, ref height2, ref width2, requiredHeight);
+            }
 
-                    // Now we must check whether one of the heights is smaller than the other
+            // Are there more text pairs?
 
-                    height = height1;
+            if (cPair + 1 == PText.Number())
+            {
+                goto CommonExit2;
+            }
 
-                    if (height1 < height2)
-                    {
-                        // Line break 1
-                        ParallelText.InsertWords(words1, 0);
-                        occLength1 = 0;
-                        height = height2;
-                    }
-                    else if (height2 < height1)
-                    {
-                        // Line break 2
-                        ParallelText.InsertWords(words2, 0);
-                        occLength2 = 0;
-                    }
+            // ...There are.
 
-                    if (p.AllLinesComputed1 && p.AllLinesComputed2
-                        && (p.StructureLevel > 0
-                        || cPair + 1 < PText.Number() && PText.TextPairs[cPair + 1].StructureLevel > 0))
-                        height++;
+            cPair++;
 
-                    p.Height = height;
+            prev_pair = p;
 
-                }
+            p = PText.TextPairs[cPair];
+
+            if (
+                words.Count > 0 &&
+                NeedToLineBreakFirstWord(p, side, ref occLength, ref txtWidth, SpaceLength, p.StartParagraph(side)))
+            {
+                ParallelText.InsertWords(words, (p.StartParagraph(side) ? 0 : txtWidth - occLength));
+
+                prev_pair.Height++;
 
                 if (requiredHeight != -1)
                 {
-                    remainder -= height;
+                    remainder--;
 
                     if (remainder <= 0)
-                        goto CommonExit;
+                        goto CommonExit2;
                 }
 
-                // Are there more text pairs?
+                occLength = (p.StartParagraph(side) ? indentLength : 0);
 
-                if (cPair + 1 == PText.Number())
+            }
+
+            if (requiredLines == -1 && cPair > startPair && prev_pair.Height > 0)
+                goto CommonExit2;
+
+            goto NextPair2;
+
+        CommonExit2:
+
+            
+
+            DeleteObject(last_font);
+            SecondaryBG.Graphics.ReleaseHdc(secondaryHDC);
+        }
+
+
+        private void PrepareScreen_Alternating(int startPair, int requiredLines)
+        {
+            secondaryHDC = SecondaryBG.Graphics.GetHdc();
+
+            // Required number of lines that we want to compute for the current Pair.
+            // -1 means we want to compute ALL lines
+            int requiredHeight;
+
+            int remainder = requiredLines;
+
+            int txtWidth = Width - 2 * PanelMargin;
+
+            TextPair p;
+
+            // If the startPair is not starting from a new Line on both texts (i. e. it is not a true-true Pair)
+            // then we must ensure that all of the preceding pairs starting from the previous true-true pairs are computed,
+            // because we need to know where exactly in the Line our Pair starts on both sides.
+            // Actually, it is sufficient to stop at the closest partially-computed Pair (because if it is partially
+            // computed we can safely compute it to the end)
+
+            int cPair = startPair;
+
+        Upstairs1:
+
+            p = PText.TextPairs[cPair];
+
+            // Look for the closest true-true or partially computed Pair
+            if (!(p.StartParagraph1 || p.StartParagraph2) && p.Height == -1)
+            {
+                cPair--;
+                goto Upstairs1;
+            }
+
+            Collection<CommonWordInfo> words = new Collection<CommonWordInfo>();
+
+            int occLength = 0; // Occupied length in the current Line
+
+            int height;
+
+            TextPair prev_pair = null;
+
+            IntPtr last_font = SelectObject(secondaryHDC, textFont.ToHfont());
+
+            byte side1;
+            byte side2;
+
+            if (Reversed)
+            {
+                side1 = 2;
+                side2 = 1;
+            }
+            else
+            {
+                side1 = 1;
+                side2 = 2;
+            }
+
+
+        NextPair1:
+
+            if (cPair < startPair || requiredLines == -1)
+                requiredHeight = -1;
+            else
+            {
+
+                if (p.Height != -1 && remainder <= p.Height)
+                    // cool
+                    goto CommonExit1;
+
+                requiredHeight = remainder;
+
+            }
+
+            height = p.Height;
+
+            if (!(p.AllLinesComputed1 && p.AllLinesComputed2))
+            {
+
+                if (p.Height == -1)
                 {
-                    // This was the last Pair, no more coming.
-                    ParallelText.InsertWords(words1, 0);
-                    ParallelText.InsertWords(words2, 0);
+                    PText.ComputedPairs.Add(p);
+                    if (p.StartParagraph1 || p.StartParagraph2)
+                        occLength = indentLength;
+                }
+                //else occLength = 0;
+
+                ProcessTextFromPair(p, side1, ref occLength, words, ref height, ref txtWidth, requiredHeight);
+                ProcessTextFromPair(p, side2, ref occLength, words, ref height, ref txtWidth, requiredHeight);
+
+
+                if (p.AllLinesComputed1 && p.AllLinesComputed2
+                    && (p.StructureLevel > 0
+                    || cPair + 1 < PText.Number() && PText.TextPairs[cPair + 1].StructureLevel > 0))
+                {
+                    ParallelText.InsertWords(words, 0);
+
+                    height += 2;
+                }
+
+                p.Height = height;
+
+            }
+
+            if (requiredHeight != -1)
+            {
+                remainder -= height;
+
+                if (remainder <= 0)
+                    goto CommonExit1;
+            }
+
+            // Are there more text pairs?
+
+            if (cPair + 1 == PText.Number())
+            {
+                // This was the last Pair, no more coming.
+                ParallelText.InsertWords(words, 0);
+                goto CommonExit1;
+            }
+
+            // ...There are.
+
+            cPair++;
+
+            prev_pair = p;
+
+            p = PText.TextPairs[cPair];
+
+            if (words.Count > 0 && NeedToLineBreakFirstWord(p, side1, ref occLength, ref txtWidth, SpaceLength, p.StartParagraph1 || p.StartParagraph2))
+            {
+                ParallelText.InsertWords(words, (p.StartParagraph1 || p.StartParagraph2 ? 0 : txtWidth - occLength));
+
+                prev_pair.Height++;
+
+                if (requiredHeight != -1)
+                {
+                    remainder--;
+
+                    if (remainder <= 0)
+                        goto CommonExit1;
+                }
+
+                occLength = (p.StartParagraph1 || p.StartParagraph2 ? indentLength : 0);
+
+            }
+
+            if (requiredLines == -1 && cPair > startPair && prev_pair.Height > 0)
+                goto CommonExit1;
+
+            goto NextPair1;
+
+        CommonExit1:
+
+            DeleteObject(last_font);
+            SecondaryBG.Graphics.ReleaseHdc(secondaryHDC);
+        }
+
+        private void PrepareScreen_Normal(int startPair, int requiredLines)
+        {
+            secondaryHDC = SecondaryBG.Graphics.GetHdc();
+
+            IntPtr last_font = SelectObject(secondaryHDC, textFont.ToHfont());
+
+            // Required number of lines that we want to compute for the current Pair.
+            // -1 means we want to compute ALL lines
+            int requiredHeight;
+
+            int remainder = requiredLines;
+
+            TextPair p;
+
+            // If the startPair is not starting from a new Line on both texts (i. e. it is not a true-true Pair)
+            // then we must ensure that all of the preceding pairs starting from the previous true-true pairs are computed,
+            // because we need to know where exactly in the Line our Pair starts on both sides.
+            // Actually, it is sufficient to stop at the closest partially-computed Pair (because if it is partially
+            // computed we can safely compute it to the end)
+
+            int cPair = startPair;
+
+        Upstairs:
+
+            p = PText.TextPairs[cPair];
+
+            // Look for the closest true-true or partially computed Pair
+            if (!(p.StartParagraph1 && p.StartParagraph2) && p.Height == -1)
+            {
+                cPair--;
+                goto Upstairs;
+            }
+
+            Collection<CommonWordInfo> words1 = new Collection<CommonWordInfo>();
+            Collection<CommonWordInfo> words2 = new Collection<CommonWordInfo>();
+
+            int occLength1 = 0; // Occupied length in the current Line
+            int occLength2 = 0;
+
+            int height1;
+            int height2;
+            int height;
+
+            TextPair prev_pair = null;
+
+            int width1 = (Reversed ? RightWidth : LeftWidth) - 2 * PanelMargin;
+            int width2 = (Reversed ? LeftWidth : RightWidth) - 2 * PanelMargin;
+
+        NextPair:
+
+            if (cPair < startPair || requiredLines == -1)
+                requiredHeight = -1;
+            else
+            {
+
+                if (p.Height != -1 && remainder <= p.Height)
+                    // cool
                     goto CommonExit;
-                }
 
-                // ...There are.
+                requiredHeight = remainder;
 
-                cPair++;
+            }
 
-                prev_pair = p;
+            if (p.AllLinesComputed1 && p.AllLinesComputed2)
+                height = p.Height;
 
-                p = PText.TextPairs[cPair];
+            else
+            {
 
-                if (NeedToLineBreakFirstWord(p, 1, ref occLength1, ref width1, SpaceLength, p.StartParagraph1)
-                        || NeedToLineBreakFirstWord(p, 2, ref occLength2, ref width2, SpaceLength, p.StartParagraph2))
+                height1 = p.Height;
+                height2 = p.Height;
+
+                if (p.Height == -1)
+                    PText.ComputedPairs.Add(p);
+
+                ProcessTextFromPair(p, 1, ref occLength1, words1, ref height1, ref width1, requiredHeight);
+                ProcessTextFromPair(p, 2, ref occLength2, words2, ref height2, ref width2, requiredHeight);
+
+                // Now we must check whether one of the heights is smaller than the other
+
+                height = height1;
+
+                if (height1 < height2)
                 {
+                    // Line break 1
                     ParallelText.InsertWords(words1, 0);
-                    ParallelText.InsertWords(words2, 0);
-
-                    prev_pair.Height++;
-
-                    if (requiredHeight != -1)
-                    {
-                        remainder--;
-
-                        if (remainder <= 0)
-                            goto CommonExit;
-                    }
-
                     occLength1 = 0;
+                    height = height2;
+                }
+                else if (height2 < height1)
+                {
+                    // Line break 2
+                    ParallelText.InsertWords(words2, 0);
                     occLength2 = 0;
                 }
 
-                if (requiredLines == -1 && cPair > startPair && prev_pair.Height > 0)
-                    goto CommonExit;
+                if (p.AllLinesComputed1 && p.AllLinesComputed2
+                    && (p.StructureLevel > 0
+                    || cPair + 1 < PText.Number() && PText.TextPairs[cPair + 1].StructureLevel > 0))
+                {
+                    ParallelText.InsertWords(words1, 0);
+                    ParallelText.InsertWords(words2, 0);
+                    occLength1 = 0;
+                    occLength2 = 0;
+                    height += 2;
+                }
 
-                goto NextPair;
-
-            CommonExit:
-
-                DeleteObject(last_font);
-                SecondaryBG.Graphics.ReleaseHdc(secondaryHDC);
+                p.Height = height;
 
             }
 
-            // ALTERNATING MODE
-
-            else if (LayoutMode == LayoutMode_Alternating)
+            if (requiredHeight != -1)
             {
+                remainder -= height;
 
-                secondaryHDC = SecondaryBG.Graphics.GetHdc();
+                if (remainder <= 0)
+                    goto CommonExit;
+            }
 
-                // Required number of lines that we want to compute for the current Pair.
-                // -1 means we want to compute ALL lines
-                int requiredHeight;
+            // Are there more text pairs?
 
-                int remainder = requiredLines;
+            if (cPair + 1 == PText.Number())
+            {
+                // This was the last Pair, no more coming.
+                ParallelText.InsertWords(words1, 0);
+                ParallelText.InsertWords(words2, 0);
+                goto CommonExit;
+            }
 
-                int txtWidth = Width - 2 * PanelMargin;
+            // ...There are.
 
-                TextPair p;
+            cPair++;
 
-                // If the startPair is not starting from a new Line on both texts (i. e. it is not a true-true Pair)
-                // then we must ensure that all of the preceding pairs starting from the previous true-true pairs are computed,
-                // because we need to know where exactly in the Line our Pair starts on both sides.
-                // Actually, it is sufficient to stop at the closest partially-computed Pair (because if it is partially
-                // computed we can safely compute it to the end)
+            prev_pair = p;
 
-                int cPair = startPair;
+            p = PText.TextPairs[cPair];
 
-            Upstairs1:
+            if (NeedToLineBreakFirstWord(p, 1, ref occLength1, ref width1, SpaceLength, p.StartParagraph1)
+                    || NeedToLineBreakFirstWord(p, 2, ref occLength2, ref width2, SpaceLength, p.StartParagraph2))
+            {
+                ParallelText.InsertWords(words1, 0);
+                ParallelText.InsertWords(words2, 0);
 
-                p = PText.TextPairs[cPair];
-
-                // Look for the closest true-true or partially computed Pair
-                if (!(p.StartParagraph1 || p.StartParagraph2) && p.Height == -1)
-                {
-                    cPair--;
-                    goto Upstairs1;
-                }
-
-                Collection<CommonWordInfo> words = new Collection<CommonWordInfo>();
-
-                int occLength = 0; // Occupied length in the current Line
-
-                int height;
-
-                TextPair prev_pair = null;
-
-                IntPtr last_font = SelectObject(secondaryHDC, textFont.ToHfont());
-
-                byte side1;
-                byte side2;
-
-                if (Reversed)
-                {
-                    side1 = 2;
-                    side2 = 1;
-                }
-                else
-                {
-                    side1 = 1;
-                    side2 = 2;
-                }
-
-            NextPair1:
-
-                if (cPair < startPair || requiredLines == -1)
-                    requiredHeight = -1;
-                else
-                {
-
-                    if (p.Height != -1 && remainder <= p.Height)
-                        // cool
-                        goto CommonExit1;
-
-                    requiredHeight = remainder;
-
-                }
-
-                height = p.Height;
-
-                if (!(p.AllLinesComputed1 && p.AllLinesComputed2))
-                {
-
-                    if (p.Height == -1)
-                    {
-                        PText.ComputedPairs.Add(p);
-                        if (p.StartParagraph1 || p.StartParagraph2)
-                            occLength = indentLength;
-                    }
-                    //else occLength = 0;
-
-                    ProcessTextFromPair(p, side1, ref occLength, words, ref height, ref txtWidth, requiredHeight);
-                    ProcessTextFromPair(p, side2, ref occLength, words, ref height, ref txtWidth, requiredHeight);
-                    
-
-                    if (p.AllLinesComputed1 && p.AllLinesComputed2
-                        && (p.StructureLevel > 0
-                        || cPair + 1 < PText.Number() && PText.TextPairs[cPair + 1].StructureLevel > 0))
-                        height++;
-
-                    p.Height = height;
-
-                }
+                prev_pair.Height++;
 
                 if (requiredHeight != -1)
                 {
-                    remainder -= height;
+                    remainder--;
 
                     if (remainder <= 0)
-                        goto CommonExit1;
+                        goto CommonExit;
                 }
 
-                // Are there more text pairs?
-
-                if (cPair + 1 == PText.Number())
-                {
-                    // This was the last Pair, no more coming.
-                    ParallelText.InsertWords(words, 0);
-                    goto CommonExit1;
-                }
-
-                // ...There are.
-
-                cPair++;
-
-                prev_pair = p;
-
-                p = PText.TextPairs[cPair];
-
-                if (words.Count > 0 && NeedToLineBreakFirstWord(p, side1, ref occLength, ref txtWidth, SpaceLength, p.StartParagraph1 || p.StartParagraph2))
-                {
-                    ParallelText.InsertWords(words, (p.StartParagraph1 || p.StartParagraph2 ? 0 : txtWidth - occLength));
-                    
-                    prev_pair.Height++;
-
-                    if (requiredHeight != -1)
-                    {
-                        remainder--;
-
-                        if (remainder <= 0)
-                            goto CommonExit1;
-                    }
-
-                    occLength = (p.StartParagraph1 || p.StartParagraph2 ? indentLength : 0);
-
-                }
-
-                if (requiredLines == -1 && cPair > startPair && prev_pair.Height > 0)
-                    goto CommonExit1;
-
-                goto NextPair1;
-
-            CommonExit1:
-
-                DeleteObject(last_font);
-                SecondaryBG.Graphics.ReleaseHdc(secondaryHDC);
-
+                occLength1 = 0;
+                occLength2 = 0;
             }
 
+            if (requiredLines == -1 && cPair > startPair && prev_pair.Height > 0)
+                goto CommonExit;
+
+            goto NextPair;
+
+        CommonExit:
+
+            DeleteObject(last_font);
+            SecondaryBG.Graphics.ReleaseHdc(secondaryHDC);
         }
 
         public void PrepareScreen()
@@ -1142,7 +1306,7 @@ namespace AglonaReader
                 renderedInfo.X1 = first.X1;
             }
 
-            bool alternating = (LayoutMode == LayoutMode_Alternating);
+            //bool alternating = (LayoutMode == LayoutMode_Alternating);
 
             if (cLine + last.Line >= NumberOfScreenLines || !(side == 1 ? p.AllLinesComputed1 : p.AllLinesComputed2))
                 renderedInfo.Line2 = -1;
@@ -1155,7 +1319,7 @@ namespace AglonaReader
                 Collection<WordInfo> nextList = null;
                 TextPair nextPair = null;
 
-                if (alternating)
+                if (LayoutMode == LayoutMode_Alternating)
                 {
 
                     if (Reversed == (side == 1))
@@ -1169,7 +1333,7 @@ namespace AglonaReader
                 }
                 else
                 {
-                    // NORMAL mode
+                    // NORMAL and ADVANCED mode
                     if (pairIndex < PText.Number() - 1 && last.Line == p.Height)
                     {
                         nextPair = PText.TextPairs[pairIndex + 1];
@@ -1183,8 +1347,8 @@ namespace AglonaReader
 
             }
 
-            // Alternating mode doesn't use colored backgrounds
-            if (alternating)
+            // Alternating and advanced mode don't use colored backgrounds
+            if (LayoutMode != LayoutMode_Normal)
                 return;
 
             bool big = ((side == 1 ? p.SB1 : p.SB2) != null);
@@ -1223,6 +1387,34 @@ namespace AglonaReader
         static extern uint SetTextColor(IntPtr hdc, int crColor);
 
 
+        public bool NotFitOnScreen(TextPair p)
+        {
+
+            if (LayoutMode == LayoutMode_Advanced)
+            {
+                if (Reversed)
+                    return (p.RenderedInfo2.Line2 == -1
+                        || p.RenderedInfo2.Line2 > LastFullScreenLine)
+                        && !p.IsBig()
+                        || p.RenderedInfo2.Line1 == -1;
+                else
+                    return (p.RenderedInfo1.Line2 == -1
+                        || p.RenderedInfo1.Line2 > LastFullScreenLine)
+                        && !p.IsBig()
+                        || p.RenderedInfo1.Line1 == -1;
+
+            }
+            else
+
+            return (p.RenderedInfo1.Line2 == -1
+                        || p.RenderedInfo1.Line2 > LastFullScreenLine
+                        || p.RenderedInfo2.Line2 == -1
+                        || p.RenderedInfo2.Line2 > LastFullScreenLine)
+                        && !p.IsBig()
+                        || p.RenderedInfo1.Line1 == -1
+                        || p.RenderedInfo2.Line1 == -1;
+        }
+
         private void RenderText(Graphics g, int pairIndex, ref int offset, ref int cLine, byte side)
         {
 
@@ -1238,7 +1430,7 @@ namespace AglonaReader
             bool alternating = (LayoutMode == LayoutMode_Alternating);
 
             // In view mode, show text in gray if it is not complete
-            newColor = !EditMode && p.NotFitOnScreen(LastFullScreenLine) ?
+            newColor = !EditMode && NotFitOnScreen(p) ?
                        2 :
                        (alternating && Reversed == (side == 2) ? 3 : 1);
 
@@ -1352,6 +1544,9 @@ namespace AglonaReader
         [DllImport("gdi32.dll")]
         public static extern bool DeleteObject(IntPtr objectHandle);
 
+        //[DllImport("gdi32.dll")]
+        //static extern uint SetTextColor(IntPtr hdc, int crColor);
+
         /// <summary>
         /// Renders a newSide
         /// </summary>
@@ -1361,24 +1556,10 @@ namespace AglonaReader
 
             Graphics g = SecondaryBG.Graphics;
 
-            bool alternating = (LayoutMode == LayoutMode_Alternating);
-
-
             int offset;
             byte textSide;
 
-            if (side == 1 || alternating)
-                offset = PanelMargin;
-            else
-                offset = SplitterPosition + SplitterWidth + PanelMargin;
-
-            if (Reversed == (side == 1))
-                textSide = 2;
-            else
-                textSide = 1;
-
-            if (alternating)
-                textSide = (byte)(3 - textSide);
+            DefineVarsByLayoutMode(side, out offset, out textSide);
 
             int cPair = startPair;
             int cLine = -negHeight;
@@ -1418,14 +1599,14 @@ namespace AglonaReader
 
         public void RenderPairs()
         {
+            Advanced_HighlightedPair = -2;
+
             DrawSecondary();
 
             wordsOnScreen.Clear();
 
             if (PText.Number() == 0)
                 return;
-
-
 
             TextPair p;
 
@@ -1435,9 +1616,39 @@ namespace AglonaReader
 
             p = PText.TextPairs[startPair];
 
+            FirstRenderedPair = -1;
+            LastRenderedPair = -1;
+
             // REWIND
 
-            if (LayoutMode == LayoutMode_Alternating)
+            if (LayoutMode == LayoutMode_Advanced)
+            {
+
+                byte side = (Reversed ? (byte) 2 : (byte) 1);
+
+                // Special rewinding algorithm for advanced mode
+                if (!(p.StartParagraph(side)))
+                {
+                    do
+                    {
+                        startPair--;
+                        p = PText.TextPairs[startPair];
+                    }
+                    while (!(p.StartParagraph(side)) && p.Height == 0);
+
+                    negHeight = p.Height;
+
+                }
+
+                currentTextColor = -1;
+
+                RenderBackgroundSide(side, startPair, negHeight);
+                RenderPairText(side, startPair, negHeight);
+
+                return;
+                
+            }
+            else if (LayoutMode == LayoutMode_Alternating)
             {
                 // Special rewinding algorithm for alternating mode    
                 if (!(p.StartParagraph1 || p.StartParagraph2))
@@ -1473,28 +1684,13 @@ namespace AglonaReader
                     negHeight = p.Height;
 
                 }
+
             }
-
-            FirstRenderedPair = -1;
-            LastRenderedPair = -1;
-
-            // NOTE. Pairs are run twice (instead of only once, rendering both pairs of text from them simultaneously),
-            // because we want to fill wordsOnScreen in such a way that every Line has words with strictly increasing cursorX.
-            // If we render Text1 and Text2 from the second Pair, then Text1 and Text2 from the first Pair
-            // and so on, when more than one Pair is on one Line, the corresponding List in
-            // wordsOnScreen will have these coordinates (let ai be cursorX coords of the second text,
-            // bi be cursorX coords of the first text of the Pair):
-            // p1a1 p1a2 ... p1an p1b1 p1b2 ... p1bn p2a1 p2a2 ... p2an p2b1 p2b2 ... p2bn
-            // ...which is incorrect (because p1bn is greater than p2a1).
-            // Correct sequence is
-            // p1a1 p1a2 ... p1an p2a1 p2a2 ... p2an p1b1 p1b2 ... p1bn p2b1 p2b2 ... p2bn
-
 
             RenderBackgroundSide(1, startPair, negHeight);
             RenderBackgroundSide(2, startPair, negHeight);
 
             currentTextColor = -1;
-
 
             RenderPairText(1, startPair, negHeight);
             RenderPairText(2, startPair, negHeight);
@@ -1506,25 +1702,12 @@ namespace AglonaReader
 
             Graphics g = SecondaryBG.Graphics;
 
-            bool alternating = (LayoutMode == LayoutMode_Alternating);
-
-
             int offset;
             byte textSide;
 
-            if (side == 1 || alternating)
-                offset = PanelMargin;
-            else
-                offset = SplitterPosition + SplitterWidth + PanelMargin;
+            DefineVarsByLayoutMode(side, out offset, out textSide);
 
-            if (Reversed == (side == 1))
-                textSide = 2;
-            else
-                textSide = 1;
-
-            if (alternating)
-                textSide = (byte)(3 - textSide);
-
+            
             int cPair = startPair;
             int cLine = -negHeight;
 
@@ -1549,6 +1732,50 @@ namespace AglonaReader
 
             }
 
+        }
+
+        private void DefineVarsByLayoutMode(int side, out int offset, out byte textSide)
+        {
+            switch (LayoutMode)
+            {
+                case LayoutMode_Normal:
+
+                    if (side == 1)
+                        offset = PanelMargin;
+                    else
+                        offset = SplitterPosition + SplitterWidth + PanelMargin;
+
+                    if (Reversed == (side == 1))
+                        textSide = 2;
+                    else
+                        textSide = 1;
+
+                    break;
+
+                case LayoutMode_Alternating:
+
+                    if (Reversed == (side == 1))
+                        textSide = 1;
+                    else
+                        textSide = 2;
+
+                    offset = PanelMargin;
+
+                    break;
+
+                case LayoutMode_Advanced:
+
+                    offset = PanelMargin;
+
+                    textSide = (byte)side;
+
+                    break;
+
+                default:
+                    textSide = 0;
+                    offset = 0;
+                    break;
+            }
         }
 
         public void FindNaturalDividersScreen(byte side)
@@ -2078,18 +2305,32 @@ namespace AglonaReader
             int textstart;
             int textend;
             int width;
+            int oY; // vertical offset
+            int mX; // Background's own X margin (used only in Advanced mode for popup background)
 
-            if (side == 1 && !Reversed || side == 2 && Reversed)
+            if (LayoutMode == LayoutMode_Advanced)
+            {
+                textstart = PanelMargin;
+                textend = Width - PanelMargin;
+                width = Width - 2 * PanelMargin;
+                oY = popUpInfo.offsetY * popUpOffsetY;
+                mX = 5;
+            }
+            else if (side == 1 && !Reversed || side == 2 && Reversed)
             {
                 textstart = PanelMargin;
                 textend = leftWidth - PanelMargin;
                 width = leftWidth - 2 * PanelMargin;
+                oY = 0;
+                mX = 0;
             }
             else
             {
                 textstart = splitterPosition + splitterWidth + PanelMargin;
                 textend = Width - PanelMargin;
                 width = rightWidth - 2 * PanelMargin;
+                oY = 0;
+                mX = 0;
             }
 
             if (line1 == line2)
@@ -2097,65 +2338,65 @@ namespace AglonaReader
                 {
                     // The frame begins and ends beyond the screen
                     // We draw two parallel, unconnected lines on both sides
-                    g.FillRectangle(brush, textstart, 0, width, Height);
+                    g.FillRectangle(brush, textstart - mX, oY, width + 2 * mX, Height);
                 }
                 else
                     // A piece of text
-                    g.FillRectangle(brush, textstart + x1, VMargin + line1 * lineHeight,
-                    x2 - x1, lineHeight);
+                    g.FillRectangle(brush, textstart + x1 - mX, VMargin + line1 * lineHeight + oY,
+                    x2 - x1 + 2 * mX, lineHeight);
 
             else if (line1 == -1)
                 g.FillPolygon(brush, new Point[]
                 {
-                    new Point(textstart, 0),
-                    new Point(textstart, VMargin + (line2 + 1) * lineHeight),
-                    new Point(textstart + x2, VMargin + (line2 + 1) * lineHeight),
-                    new Point(textstart + x2, VMargin + line2 * lineHeight),
-                    new Point(textend, VMargin + line2 * lineHeight),
-                    new Point(textend, 0)
+                    new Point(textstart - mX, oY),
+                    new Point(textstart - mX, VMargin + (line2 + 1) * lineHeight + oY),
+                    new Point(textstart + x2 + mX, VMargin + (line2 + 1) * lineHeight + oY),
+                    new Point(textstart + x2 + mX, VMargin + line2 * lineHeight + oY),
+                    new Point(textend + mX, VMargin + line2 * lineHeight + oY),
+                    new Point(textend + mX,  oY)
                 });
 
             else if (line2 == -1)
                 if (x1 == 0) // Top starts at cursorX = 0
                     g.FillPolygon(brush, new Point[]
                     {
-                        new Point(textstart, Height - 1),
-                        new Point(textstart, VMargin + line1 * lineHeight),
-                        new Point(textend, VMargin + line1 * lineHeight),
-                        new Point(textend, Height - 1)
+                        new Point(textstart - mX, Height - 1 + oY),
+                        new Point(textstart - mX, VMargin + line1 * lineHeight + oY),
+                        new Point(textend + mX, VMargin + line1 * lineHeight + oY),
+                        new Point(textend + mX, Height - 1 + oY)
                     });
                 else
                     g.FillPolygon(brush, new Point[]
                     {
-                        new Point(textstart, Height - 1),
-                        new Point(textstart, VMargin + (line1 + 1) * lineHeight),
-                        new Point(textstart + x1, VMargin + (line1 + 1) * lineHeight),
-                        new Point(textstart + x1, VMargin + line1 * lineHeight),
-                        new Point(textend, VMargin + line1 * lineHeight),
-                        new Point(textend, Height - 1)
+                        new Point(textstart - mX, Height - 1 + oY),
+                        new Point(textstart - mX, VMargin + (line1 + 1) * lineHeight + oY),
+                        new Point(textstart + x1 - mX, VMargin + (line1 + 1) * lineHeight + oY),
+                        new Point(textstart + x1 - mX, VMargin + line1 * lineHeight + oY),
+                        new Point(textend + mX, VMargin + line1 * lineHeight + oY),
+                        new Point(textend + mX, Height - 1 + oY)
                     });
 
             else if (x1 == 0)
                 g.FillPolygon(brush, new Point[]
                 {
-                    new Point(textend, VMargin + line1 * lineHeight),   
-                    new Point(textstart, VMargin + line1 * lineHeight),
-                    new Point(textstart, VMargin + (line2 + 1) * lineHeight),
-                    new Point(textstart + x2, VMargin + (line2 + 1) * lineHeight),
-                    new Point(textstart + x2, VMargin + line2 * lineHeight),
-                    new Point(textend, VMargin + line2 * lineHeight)
+                    new Point(textend + mX, VMargin + line1 * lineHeight + oY),   
+                    new Point(textstart - mX, VMargin + line1 * lineHeight + oY),
+                    new Point(textstart - mX, VMargin + (line2 + 1) * lineHeight + oY),
+                    new Point(textstart + x2 + mX, VMargin + (line2 + 1) * lineHeight + oY),
+                    new Point(textstart + x2 + mX, VMargin + line2 * lineHeight + oY),
+                    new Point(textend + mX, VMargin + line2 * lineHeight + oY)
                 });
             else
                 g.FillPolygon(brush, new Point[]
                 {
-                    new Point(textend, VMargin + line1 * lineHeight),
-                    new Point(textstart + x1, VMargin + line1 * lineHeight),
-                    new Point(textstart + x1, VMargin + (line1 + 1) * lineHeight),
-                    new Point(textstart, VMargin + (line1 + 1) * lineHeight),
-                    new Point(textstart, VMargin + (line2 + 1) * lineHeight),
-                    new Point(textstart + x2, VMargin + (line2 + 1) * lineHeight),
-                    new Point(textstart + x2, VMargin + (line2) * lineHeight),
-                    new Point(textend, VMargin + (line2) * lineHeight)
+                    new Point(textend + mX, VMargin + line1 * lineHeight + oY),
+                    new Point(textstart + x1 - mX, VMargin + line1 * lineHeight + oY),
+                    new Point(textstart + x1 - mX, VMargin + (line1 + 1) * lineHeight + oY),
+                    new Point(textstart - mX, VMargin + (line1 + 1) * lineHeight + oY),
+                    new Point(textstart - mX, VMargin + (line2 + 1) * lineHeight + oY),
+                    new Point(textstart + x2 + mX, VMargin + (line2 + 1) * lineHeight + oY),
+                    new Point(textstart + x2 + mX, VMargin + (line2) * lineHeight + oY),
+                    new Point(textend + mX, VMargin + (line2) * lineHeight + oY)
                 });
         }
 
@@ -2240,6 +2481,8 @@ namespace AglonaReader
 
             int side;
 
+            bool needToRender = false;
+
 
             if (!EditMode && !SelectionFinished)
                 // When selection started in one side, look always for words on that side
@@ -2273,26 +2516,209 @@ namespace AglonaReader
                         MouseCurrentWord = null;
                     else
                         MouseCurrentWord = found_word;
+
                     if (renderRequired)
-                        Render();
+                        needToRender = true;
                 }
-                else if (!SelectionFinished && mouse_text_word != null)
+                else
                 {
-                    // Update second part of the selection
-                    if (Selection2Pair != mouse_text_word.PairIndex
-                        || Selection2Position != mouse_text_word.Pos)
+
+                    if (LayoutMode == LayoutMode_Advanced && AdvancedMode_ShowPopups)
                     {
-                        Selection2Pair = mouse_text_word.PairIndex;
-                        Selection2Position = mouse_text_word.Pos;
 
-                        UpdateSelectionFrame();
+                        int newPair = (mouse_text_word == null ? -1 : mouse_text_word.PairIndex);
 
-                        if (renderRequired)
-                            Render();
+                        if (newPair != Advanced_HighlightedPair)
+                        {
+                            Advanced_HighlightedPair = newPair;
+
+                            popUpInfo.visible = false;
+
+                            if (newPair == -1)
+                            {
+                                AdvancedHighlightFrame.Visible = false;
+                            }
+                            else
+                            {
+
+                                TextPair p = PText[newPair];
+
+                                RenderedTextInfo r = (Reversed ? p.RenderedInfo2 : p.RenderedInfo1);
+
+                                if (r.Valid)
+                                {
+
+                                    AdvancedHighlightFrame.Visible = true;
+                                    AdvancedHighlightFrame.Side = mouse_text_word.Side;
+                                    AdvancedHighlightFrame.Line1 = r.Line1;
+                                    AdvancedHighlightFrame.Line2 = r.Line2;
+                                    AdvancedHighlightFrame.X1 = r.X1;
+                                    AdvancedHighlightFrame.X2 = r.X2;
+
+                                    byte trSide = (Reversed ? (byte)1 : (byte)2);
+
+                                    Collection<CommonWordInfo> words = new Collection<CommonWordInfo>();
+
+                                    int occLength = 0;
+
+                                    int maxWidth = Width - 2 * PanelMargin;
+
+                                    int height = 0;
+
+                                    Collection<WordInfo> c = p.ComputedWords(trSide);
+
+                                    if (c == null || c.Count == 0)
+                                    {
+                                        ProcessTextFromPair(p, trSide, ref occLength, words, ref height, ref maxWidth, NumberOfScreenLines);
+                                        ParallelText.InsertWords(words, 0);
+                                        c = p.ComputedWords(trSide);
+                                    }
+
+                                    if (c != null && c.Count != 0)
+                                        DeterminePopupPosition(c, r, maxWidth);
+
+                                }
+
+                                else // !r.Valid
+                                {
+                                    
+                                }
+
+                            }
+
+                            needToRender = true;
+                        }
+
                     }
+
+                    if (!SelectionFinished && mouse_text_word != null)
+                    {
+                        // Update second part of the selection
+                        if (Selection2Pair != mouse_text_word.PairIndex
+                            || Selection2Position != mouse_text_word.Pos)
+                        {
+                            Selection2Pair = mouse_text_word.PairIndex;
+                            Selection2Position = mouse_text_word.Pos;
+
+                            UpdateSelectionFrame();
+
+                            if (renderRequired)
+                                needToRender = true;
+                        }       
+                                
+                    }
+
                 }
 
             }
+
+            if (needToRender)
+                Render();
+        }
+
+        private void DeterminePopupPosition(Collection<WordInfo> c, RenderedTextInfo r, int maxWidth)
+        {
+            
+            popUpInfo.visible = true;
+            popUpInfo.words = c;
+
+            WordInfo last = c[c.Count - 1];
+
+            // h: height
+
+            int h1;
+            int up;
+            int down;
+
+
+            if (r.Line1 == -1)
+                up = 0;
+            else
+                up = r.Line1;
+
+            if (r.Line2 == -1)
+                down = 0;
+            else
+                down = LastFullScreenLine - r.Line2;
+
+            if (r.Line1 == -1 || r.Line2 == -1)
+                h1 = LastFullScreenLine + 1;
+            else
+                h1 = r.Line2 - r.Line1 + 1;
+            
+            int h2 = last.Line + 1;
+
+            // s: single
+            bool s1 = (h1 == 1);
+            bool s2 = (h2 == 1);
+
+            int length2 = last.X2;
+
+
+            popUpInfo.Y = -1;
+
+            char q = ' ';
+
+            if (s1 && s2)
+            {
+                if (down > 0)
+                {
+                    if (r.X1 + length2 <= maxWidth)
+                        SetPopUpCoordinates(r.Line2 + 1, r.X1, 1, 0);
+                    else
+                        SetPopUpCoordinates(r.Line2 + 1, maxWidth - length2, 1, 0);
+                }
+                else if (up > 0)
+                {
+                    if (r.X1 + length2 <= maxWidth)
+                        SetPopUpCoordinates(r.Line1 - 1, r.X1, -1, 0);
+                    else
+                        SetPopUpCoordinates(r.Line1 - 1, maxWidth - length2, -1, 0);
+                }
+                else if (popUpOffsetX + r.X2 + length2 <= maxWidth)
+                    SetPopUpCoordinates(r.Line1, r.X2, 0, 1);
+                else if (r.X1 >= popUpOffsetX + length2)
+                    SetPopUpCoordinates(r.Line1, r.X1 - length2, 0, -1);
+                
+            }
+            else
+            {
+                if (h2 <= down)
+                    SetPopUpCoordinates(r.Line2 + 1, 0, 1, 0);
+                else if (s2 && r.Line2 != -1 && r.X2 + popUpOffsetX + length2 <= maxWidth)
+                    SetPopUpCoordinates(r.Line2, r.X2, 0, 1);
+                else if (h2 <= up)
+                    if (h2 == 1)
+                        SetPopUpCoordinates(r.Line1 - 1, maxWidth - length2, -1, 0);
+                    else
+                        if (r.Line1 != -1 && r.X1 >= length2 + popUpOffsetX)
+                            SetPopUpCoordinates(r.Line1 - h2 + 1, 0, -1, 0);
+                        else
+                            SetPopUpCoordinates(r.Line1 - h2, 0, -1, 0);
+                else if (s2 && r.Line1 != -1 && r.X1 >= length2 + popUpOffsetX)
+                    SetPopUpCoordinates(r.Line1, r.X1 - length2, 0, -1);
+            }
+
+            if (popUpInfo.Y == -1)
+                // The worst case: draw over
+                SetPopUpCoordinates((NumberOfScreenLines - h2 + 1) / 2, 0, 0, 0);
+
+            popUpInfo.Y2 = popUpInfo.Y + h2 - 1;
+            popUpInfo.X2 = popUpInfo.X + last.X2;
+
+            //DebugString = "[" + h1.ToString() + ']'
+            //    + r.Line1.ToString() + ':' + r.X1.ToString() + '—'
+            //    + r.Line2.ToString() + ':' + r.X2.ToString()
+            //    + " -- > [" + h2.ToString() + ']' + popUpInfo.Y.ToString() + ':' + popUpInfo.X.ToString();
+
+        }
+
+        private void SetPopUpCoordinates(int Y, int X, int offY, int offX)
+        {
+            popUpInfo.Y = Y;
+            popUpInfo.X = X + offX * popUpOffsetX;
+            popUpInfo.offsetY = offY;
+            
         }
 
 
@@ -2497,15 +2923,38 @@ namespace AglonaReader
 
             if (EditMode || ReadingMode == FileUsageInfo.NormalMode)
                 LayoutMode = LayoutMode_Normal;
-            else
+            else if (ReadingMode == FileUsageInfo.AlternatingMode)
                 LayoutMode = LayoutMode_Alternating;
+            else
+                LayoutMode = LayoutMode_Advanced;
 
             ComputeIndent();
 
             ComputeSideCoordinates();
 
+            Advanced_HighlightedPair = -1;
+            AdvancedHighlightFrame.Visible = false;
+
         }
-        
+
+
+        internal void SwitchAdvancedShowPopups()
+        {
+            if (AdvancedMode_ShowPopups)
+            {
+                AdvancedMode_ShowPopups = false;
+                AdvancedHighlightFrame.Visible = false;
+                popUpInfo.visible = false;
+                Advanced_HighlightedPair = -3;
+                //ProcessMousePosition(true, true);
+                Render();
+            }
+            else
+            {
+                AdvancedMode_ShowPopups = true;
+                ProcessMousePosition(true, true);
+            }
+        }
     }
 
     public class ScreenWord
@@ -2527,4 +2976,26 @@ namespace AglonaReader
         public ScreenWord Next { get; set; }
 
     }
+
+    class PopUpInfo
+    {
+        public int X;
+        public int Y;
+        public bool visible;
+        public int offsetY;
+        public int X2;
+        public int Y2;
+        public Collection<WordInfo> words;
+        
+        public PopUpInfo()
+        {
+            X = -1;
+            Y = -1;
+            offsetY = 0;
+
+            visible = false;
+        }
+    }
+
+
 }

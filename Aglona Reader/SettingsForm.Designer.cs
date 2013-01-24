@@ -160,7 +160,8 @@ namespace AglonaReader
             this.readingModeComboBox.FormattingEnabled = true;
             this.readingModeComboBox.Items.AddRange(new object[] {
             "Normal",
-            "Alternating"});
+            "Alternating",
+            "Advanced"});
             this.readingModeComboBox.Location = new System.Drawing.Point(98, 201);
             this.readingModeComboBox.Name = "readingModeComboBox";
             this.readingModeComboBox.Size = new System.Drawing.Size(140, 21);

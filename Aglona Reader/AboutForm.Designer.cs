@@ -60,7 +60,7 @@
             this.programVersionLabel.Name = "programVersionLabel";
             this.programVersionLabel.Size = new System.Drawing.Size(36, 13);
             this.programVersionLabel.TabIndex = 2;
-            this.programVersionLabel.Text = "1.3.1";
+            this.programVersionLabel.Text = "1.4.0";
             // 
             // releaseDateLabel
             // 
@@ -70,13 +70,13 @@
             this.releaseDateLabel.Name = "releaseDateLabel";
             this.releaseDateLabel.Size = new System.Drawing.Size(61, 13);
             this.releaseDateLabel.TabIndex = 3;
-            this.releaseDateLabel.Text = "2013-01-21";
+            this.releaseDateLabel.Text = "2013-01-24";
             // 
             // AboutForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(182, 57);
+            this.ClientSize = new System.Drawing.Size(195, 57);
             this.Controls.Add(this.releaseDateLabel);
             this.Controls.Add(this.programVersionLabel);
             this.Controls.Add(this.label2);

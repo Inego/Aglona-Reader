@@ -33,8 +33,11 @@ namespace AglonaReader
                 case FileUsageInfo.NormalMode:
                     readingModeComboBox.SelectedIndex = 0;
                     break;
-                case FileUsageInfo.BeginnerMode:
+                case FileUsageInfo.AlternatingMode:
                     readingModeComboBox.SelectedIndex = 1;
+                    break;
+                case FileUsageInfo.AdvancedMode:
+                    readingModeComboBox.SelectedIndex = 2;
                     break;
             }
 
@@ -136,7 +139,10 @@ namespace AglonaReader
                     pTC.ReadingMode = FileUsageInfo.NormalMode;
                     break;
                 case 1:
-                    pTC.ReadingMode = FileUsageInfo.BeginnerMode;
+                    pTC.ReadingMode = FileUsageInfo.AlternatingMode;
+                    break;
+                case 2:
+                    pTC.ReadingMode = FileUsageInfo.AdvancedMode;
                     break;
             }
 

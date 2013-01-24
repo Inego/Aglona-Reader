@@ -166,7 +166,9 @@ namespace AglonaReader
 
         private bool XonSplitter(int x)
         {
-            return (pTC.LayoutMode == ParallelTextControl.LayoutMode_Normal && x >= pTC.SplitterPosition && x < pTC.SplitterPosition + pTC.SplitterWidth);
+            return (pTC.LayoutMode == ParallelTextControl.LayoutMode_Normal
+                && x >= pTC.SplitterPosition
+                && x < pTC.SplitterPosition + pTC.SplitterWidth);
         }
 
         private void parallelTextControl_MouseMove(object sender, MouseEventArgs e)
@@ -279,12 +281,21 @@ namespace AglonaReader
         private void parallelTextControl_MouseLeave(object sender, EventArgs e)
         {
             Cursor = Cursors.Default;
-            if (pTC.MouseCurrentWord != null)
-            {
-                pTC.MouseCurrentWord = null;
-                pTC.mouse_text_line = -1;
-                pTC.Render();
-            }
+
+            pTC.LastMouseX = -1;
+            pTC.LastMouseY = -1;
+
+            pTC.ProcessMousePosition(true, true);
+
+            //if (pTC.MouseCurrentWord != null)
+            //{
+            //    pTC.MouseCurrentWord = null;
+            //    pTC.mouse_text_line = -1;
+                
+            //    pTC.Render();
+            //}
+
+            
         }
 
         private void parallelTextControl_MouseDown(object sender, MouseEventArgs e)
@@ -318,7 +329,7 @@ namespace AglonaReader
 
                         p = pTC[pTC.HighlightedPair];
 
-                        if (p.NotFitOnScreen(pTC.LastFullScreenLine))
+                        if (pTC.NotFitOnScreen(p))
                         {
                             pTC.CurrentPair = pTC.HighlightedPair;
                             pTC.PrepareScreen();
@@ -374,10 +385,7 @@ namespace AglonaReader
 
                 }
 
-                
-
             }
-
             
         }
 
@@ -388,6 +396,11 @@ namespace AglonaReader
             {
                 if (pTC.EditMode)
                     SeparateCurrentPair();
+                else
+                {
+                    if (pTC.LayoutMode == ParallelTextControl.LayoutMode_Advanced)
+                        pTC.SwitchAdvancedShowPopups();
+                }
 
                 return;
             }
@@ -686,7 +699,7 @@ namespace AglonaReader
             {
                 int pairIndex = pTC.LastRenderedPair;
 
-                while (pairIndex > 0 && pTC[pairIndex].NotFitOnScreen(pTC.LastFullScreenLine))
+                while (pairIndex > 0 && pTC.NotFitOnScreen(pTC[pairIndex]))
                     pairIndex--;
 
                 pairIndex++;
@@ -1332,7 +1345,8 @@ namespace AglonaReader
     public class FileUsageInfo
     {
         public const int NormalMode = 0;
-        public const int BeginnerMode = 1;
+        public const int AlternatingMode = 1;
+        public const int AdvancedMode = 2;
 
 
         public string FileName { get; set; }
@@ -1365,8 +1379,5 @@ namespace AglonaReader
         }
 
     }
-
-    
-
 
 }

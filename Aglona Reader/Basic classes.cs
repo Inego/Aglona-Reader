@@ -26,7 +26,6 @@ namespace AglonaReader
             this.X2 = wordX2;
             this.Pos = pos;
             this.Eastern = eastern;
-
         }
 
     }
@@ -501,17 +500,6 @@ namespace AglonaReader
             recommended_natural2 = 0;
         }
 
-        internal bool NotFitOnScreen(int lastFullScreenLine)
-        {
-            return (RenderedInfo1.Line2 == -1
-                        || RenderedInfo1.Line2 > lastFullScreenLine
-                        || RenderedInfo2.Line2 == -1
-                        || RenderedInfo2.Line2 > lastFullScreenLine)
-                        && !IsBig()
-                        || RenderedInfo1.Line1 == -1
-                        || RenderedInfo2.Line1 == -1;
-        }
-
         internal string GetText(byte side)
         {
             if (side == 1)
@@ -542,6 +530,15 @@ namespace AglonaReader
                 totalTextSize += Text2.Length;
             else
                 totalTextSize += SB2.Length;
+        }
+
+        internal bool AllLinesComputed(byte side)
+        {
+            if (side == 1)
+                return AllLinesComputed1;
+            else
+                return AllLinesComputed2;
+
         }
     }
 
@@ -941,6 +938,9 @@ namespace AglonaReader
                 tp.aggregateSize = accLength;
             }
         }
+
+        
+
     }
 
 }
