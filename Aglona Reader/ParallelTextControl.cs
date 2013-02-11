@@ -699,8 +699,6 @@ namespace AglonaReader
 
             PrimaryBG.Graphics.ReleaseHdc(secondaryHDC);
 
-
-
         }
 
         [DllImport("gdi32.dll")]
@@ -716,6 +714,8 @@ namespace AglonaReader
             secondaryHDC = PrimaryBG.Graphics.GetHdc();
 
             SetBkColor(secondaryHDC, ColorTranslator.ToWin32(color));
+            SetBkMode(secondaryHDC, 2);
+            SetTextColor(secondaryHDC, 0);
 
             IntPtr last_font = SelectObject(secondaryHDC, textFont.ToHfont());
 
@@ -1427,12 +1427,10 @@ namespace AglonaReader
 
             int newColor;
 
-            bool alternating = (LayoutMode == LayoutMode_Alternating);
-
             // In view mode, show text in gray if it is not complete
             newColor = !EditMode && NotFitOnScreen(p) ?
                        2 :
-                       (alternating && Reversed == (side == 2) ? 3 : 1);
+                       ((LayoutMode == LayoutMode_Alternating) && Reversed == (side == 2) ? 3 : 1);
 
             if (newColor != currentTextColor)
             {
@@ -1455,8 +1453,6 @@ namespace AglonaReader
 
             Collection<WordInfo> list = p.ComputedWords(side);
 
-            WordInfo last = list[list.Count - 1];
-
             int x;
             int y = -1;
 
@@ -1465,8 +1461,6 @@ namespace AglonaReader
             List<ScreenWord> l = null;
 
             int prev_y = -1;
-
-            //bool big = ((side == 1 ? p.SB1 : p.SB2) != null);
 
             if (list != null)
                 for (int i = 0; i < list.Count; i++)
@@ -1668,7 +1662,7 @@ namespace AglonaReader
 
             else // NORMAL mode
             {
-                // Standard rewinding algorightm
+                // Standard rewinding algorithm
                 if (!(p.StartParagraph1 && p.StartParagraph2))
                 {
                     // Must rewind back for the closest (from above) Pair that is either true-true or
@@ -1863,10 +1857,33 @@ namespace AglonaReader
             {
                 pos = 0;
                 height = 0;
+                if (side == 1)
+                    p.ContinueFromNewLine1 = false;
+                else
+                    p.ContinueFromNewLine2 = false;
             }
             else
             {
-                pos = (side == 1) ? p.CurrentPos1 : p.CurrentPos2;
+                if (side == 1)
+                {
+                    pos = p.CurrentPos1;
+                    if (p.ContinueFromNewLine1)
+                    {
+                        occLength = indentLength;
+                        p.ContinueFromNewLine1 = false;
+                    }
+                    
+                }
+                else
+                {
+                    pos = p.CurrentPos2;
+                    if (p.ContinueFromNewLine2)
+                    {
+                        occLength = indentLength;
+                        p.ContinueFromNewLine2 = false;
+                    }
+                }
+                
             }
 
             wordPos = -1;
@@ -1919,7 +1936,12 @@ namespace AglonaReader
 
                     if (requiredHeight != -1 && requiredHeight == height)
                     {
+                        //height--;
                         wordPos = ++pos;
+                        if (side == 1)
+                            p.ContinueFromNewLine1 = true;
+                        else
+                            p.ContinueFromNewLine2 = true;
                         goto CommonExit;
                     }
 
@@ -1980,9 +2002,13 @@ namespace AglonaReader
         CommonExit:
 
             if (side == 1)
+            {
                 p.CurrentPos1 = wordPos;
+            }
             else
+            {
                 p.CurrentPos2 = wordPos;
+            }
 
         }
 
@@ -2017,6 +2043,7 @@ namespace AglonaReader
             int lastPos1 = -1;
             int lastPos2 = -1;
 
+
             foreach (KeyValuePair<int, List<ScreenWord>> kv in wordsOnScreen)
                 foreach (ScreenWord sw in kv.Value)
                     if (sw.PairIndex == pairIndex)
@@ -2035,7 +2062,7 @@ namespace AglonaReader
                         }
                     }
 
-            return (pos1 >= lastPos1 || pos2 >= lastPos2);
+            return (pos1 > lastPos1 || pos2 > lastPos2);
 
         }
 
@@ -2572,10 +2599,25 @@ namespace AglonaReader
                                         ProcessTextFromPair(p, trSide, ref occLength, words, ref height, ref maxWidth, NumberOfScreenLines);
                                         ParallelText.InsertWords(words, 0);
                                         c = p.ComputedWords(trSide);
+
                                     }
 
                                     if (c != null && c.Count != 0)
+                                    {
+                                        
+                                        if (c[0].Line > 0)
+                                        {
+                                            int linesToDec = c[0].Line;
+
+                                            foreach (WordInfo wi in c)
+                                                wi.Line -= linesToDec;
+                                        }
+
+                                        
+
                                         DeterminePopupPosition(c, r, maxWidth);
+
+                                    }
 
                                 }
 
@@ -2656,8 +2698,6 @@ namespace AglonaReader
 
 
             popUpInfo.Y = -1;
-
-            char q = ' ';
 
             if (s1 && s2)
             {

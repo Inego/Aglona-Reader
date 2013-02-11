@@ -609,12 +609,17 @@ namespace AglonaReader
         {
             if (pTC.EditMode && pTC.HighlightedPair > 0)
             {
-                if (pTC.CurrentPair == pTC.HighlightedPair)
-                    pTC.CurrentPair--;
-
                 pTC.MergePairs(pTC.HighlightedPair - 1);
                 pTC.HighlightedPair--;
-                pTC.PairChanged(pTC.HighlightedPair, true);
+                
+                if (pTC.CurrentPair >= pTC.HighlightedPair)
+                {
+                    pTC.PairChanged(pTC.HighlightedPair, false);
+                    GotoPair(pTC.HighlightedPair, true);
+                }
+                else
+                    pTC.PairChanged(pTC.HighlightedPair, true);
+
                 pTC[pTC.HighlightedPair].UpdateTotalSize();
                 pTC.PText.UpdateAggregates(pTC.HighlightedPair);
                 UpdateStatusBar(true);
@@ -749,7 +754,12 @@ namespace AglonaReader
 
         private void GotoPair(int newCurrentPair)
         {
-            if (pTC.CurrentPair == newCurrentPair)
+            GotoPair(newCurrentPair, false);
+        }
+
+        private void GotoPair(int newCurrentPair, bool forced)
+        {
+            if (pTC.CurrentPair == newCurrentPair && !forced)
                 return;
 
             pTC.CurrentPair = newCurrentPair;
@@ -820,8 +830,10 @@ namespace AglonaReader
 
                 TextPair p = pTC[pTC.HighlightedPair];
 
-                if (prev_p.RenderedInfo1.Line1 == 0 && (prev_p.RenderedInfo1.X1 == 0 || p.Height > 0)
-                    || prev_p.RenderedInfo2.Line1 == 0 && (prev_p.RenderedInfo2.X1 == 0 || p.Height > 0))
+                //if (prev_p.RenderedInfo1.Line1 == 0 && (prev_p.RenderedInfo1.X1 == 0 || p.Height > 0)
+                //    || prev_p.RenderedInfo2.Line1 == 0 && (prev_p.RenderedInfo2.X1 == 0 || p.Height > 0))
+                if (pTC.HighlightedPair < pTC.FirstRenderedPair
+                    || p.Height == -1 || !p.RenderedInfo1.Valid || p.RenderedInfo1.Line1 == -1 || p.RenderedInfo1.Line2 == -1)
                 {
                     pTC.CurrentPair = pTC.HighlightedPair;
                     pTC.PrepareScreen();

@@ -163,6 +163,8 @@ namespace AglonaReader
 
         private Collection<WordInfo> computedWords1;
         private Collection<WordInfo> computedWords2;
+        public bool ContinueFromNewLine1;
+        public bool ContinueFromNewLine2;
 
         public char GetChar(byte side, int charIndex)
         {

@@ -23,6 +23,8 @@ namespace AglonaReader
             }
             base.Dispose(disposing);
             drawBrush.Dispose();
+            popUpBrush.Dispose();
+            AdvancedHighlightFrame.Dispose();
             textFont.Dispose();
         }
 
