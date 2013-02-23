@@ -1841,7 +1841,7 @@ namespace AglonaReader
             words.Add(new CommonWordInfo(p, word.ToString(), Height, newStart, newStart + wordLength - 1, wordPosition, eastern, side));
             occLength = newStart + wordLength;
 
-            word.Clear();
+            word.Length = 0;
 
         }
 
@@ -2026,7 +2026,7 @@ namespace AglonaReader
             UpdateScreen();
         }
 
-        private ScreenWord FindScreenWordByPosition(int pairIndex, int pos, byte side)
+        public ScreenWord FindScreenWordByPosition(int pairIndex, int pos, byte side)
         {
             if (pos != -1)
                 foreach (KeyValuePair<int, List<ScreenWord>> kv in wordsOnScreen)
@@ -2108,24 +2108,6 @@ namespace AglonaReader
         }
 
 
-
-        internal void FindNaturalDividers(byte side)
-        {
-
-            if (!EditMode || PText.Number() == 0)
-                return;
-
-            // Look for natural dividers in the current (highlighted) Pair
-
-            TextPair p = PText.TextPairs[HighlightedPair];
-
-            if (side == 0 || side == 1)
-                NaturalDividerPosition1 = p.NaturalDividerPosition(1);
-            if (side == 0 || side == 2)
-                NaturalDividerPosition2 = p.NaturalDividerPosition(2);
-
-        }
-
         internal bool NipHighlightedPair()
         {
             if (NaturalDividerPosition1W == null
@@ -2136,9 +2118,6 @@ namespace AglonaReader
             TextPair np = new TextPair();
 
             TextPair hp = PText.TextPairs[HighlightedPair];
-
-            np.SetRecommendedNaturals(hp);
-            hp.ClearRecommendedNaturals();
 
             np.StartParagraph1 = hp.StartParagraph1;
             np.StartParagraph2 = hp.StartParagraph2;
@@ -2199,7 +2178,7 @@ namespace AglonaReader
             PrepareScreen();
             RenderPairs();
 
-            FindNaturalDividers(0);
+            FindFirstNaturalDividers();
 
             if (CurrentPair != HighlightedPair
                 && PosIsOnOrAfterLastScreenWord(HighlightedPair, NaturalDividerPosition1, NaturalDividerPosition2))
@@ -2487,14 +2466,16 @@ namespace AglonaReader
             }
 
             if (forceUpdate)
+            {
+                FindFirstNaturalDividers();
                 UpdateScreen();
+            }
         }
 
         public void UpdateScreen()
         {
             PrepareScreen();
             RenderPairs();
-            FindNaturalDividers(0);
             FindNaturalDividersScreen(0);
             ProcessMousePosition(true, false);
             Render();
@@ -2613,17 +2594,10 @@ namespace AglonaReader
                                                 wi.Line -= linesToDec;
                                         }
 
-                                        
-
                                         DeterminePopupPosition(c, r, maxWidth);
 
                                     }
 
-                                }
-
-                                else // !r.Valid
-                                {
-                                    
                                 }
 
                             }
@@ -2725,7 +2699,7 @@ namespace AglonaReader
             {
                 if (h2 <= down)
                     SetPopUpCoordinates(r.Line2 + 1, 0, 1, 0);
-                else if (s2 && r.Line2 != -1 && r.X2 + popUpOffsetX + length2 <= maxWidth)
+                else if (s2 && r.Line2 != -1 && r.Line2 <= LastFullScreenLine && r.X2 + popUpOffsetX + length2 <= maxWidth)
                     SetPopUpCoordinates(r.Line2, r.X2, 0, 1);
                 else if (h2 <= up)
                     if (h2 == 1)
@@ -2986,7 +2960,6 @@ namespace AglonaReader
                 AdvancedHighlightFrame.Visible = false;
                 popUpInfo.visible = false;
                 Advanced_HighlightedPair = -3;
-                //ProcessMousePosition(true, true);
                 Render();
             }
             else
@@ -2994,6 +2967,68 @@ namespace AglonaReader
                 AdvancedMode_ShowPopups = true;
                 ProcessMousePosition(true, true);
             }
+        }
+
+        internal ScreenWord FindFirstScreenWord(int pairIndex, byte side)
+        {
+            foreach (KeyValuePair<int, List<ScreenWord>> kv in wordsOnScreen)
+                    foreach (ScreenWord sw in kv.Value)
+                        if (sw.PairIndex == pairIndex && sw.Side == side)
+                            return sw;
+
+            return null;
+        }
+
+        internal ScreenWord FindLastScreenWord(int pairIndex, byte side)
+        {
+            ScreenWord lastFound = null;
+
+            foreach (KeyValuePair<int, List<ScreenWord>> kv in wordsOnScreen)
+                foreach (ScreenWord sw in kv.Value)
+                    if (sw.PairIndex == pairIndex && sw.Side == side)
+                        lastFound = sw;
+
+            return lastFound;
+        }
+
+
+
+        internal bool NextRecommended(byte side, bool forward)
+        {
+
+            int divPos;
+
+            divPos = side == 1 ? NaturalDividerPosition1 : NaturalDividerPosition2;
+
+            int newPos = PText[HighlightedPair].NaturalDividerPosition(side, divPos, forward);
+
+            if (newPos == -1)
+                return false;
+            else
+            {
+                if (side == 1)
+                    NaturalDividerPosition1 = newPos;
+                else
+                    NaturalDividerPosition2 = newPos;
+
+                return true;
+            }
+
+
+        }
+
+        internal void FindFirstNaturalDividers()
+        {
+            Side1Set = false;
+            Side2Set = false;
+
+            NaturalDividerPosition1 = -1;
+            NaturalDividerPosition2 = -1;
+
+            NextRecommended(1, true);
+            NextRecommended(2, true);
+
+
         }
     }
 
@@ -3009,9 +3044,6 @@ namespace AglonaReader
         public int FX2 { get; set; }
         public int Line { get; set; }
 
-        /// <summary>
-        /// Previous screen Word from the same Pair
-        /// </summary>
         public ScreenWord Prev { get; set; }
         public ScreenWord Next { get; set; }
 

@@ -62,7 +62,6 @@ namespace AglonaReader
             this.bottomPanel.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
@@ -214,6 +213,7 @@ namespace AglonaReader
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(369, 175);
             this.textBox1.TabIndex = 1;
+            this.textBox1.Enter += new System.EventHandler(this.textBox1_Enter);
             // 
             // textBox2
             // 
@@ -225,6 +225,7 @@ namespace AglonaReader
             this.textBox2.Name = "textBox2";
             this.textBox2.Size = new System.Drawing.Size(361, 175);
             this.textBox2.TabIndex = 2;
+            this.textBox2.Enter += new System.EventHandler(this.textBox2_Enter);
             // 
             // EditPairForm
             // 
@@ -253,7 +254,6 @@ namespace AglonaReader
             this.splitContainer1.Panel1.PerformLayout();
             this.splitContainer1.Panel2.ResumeLayout(false);
             this.splitContainer1.Panel2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
             this.ResumeLayout(false);
 

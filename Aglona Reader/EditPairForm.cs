@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
-using System.Linq;
+using System.Globalization;
 using System.Text;
 using System.Windows.Forms;
 
@@ -108,6 +108,52 @@ namespace AglonaReader
             
         }
 
+        private void textBox1_Enter(object sender, EventArgs e)
+        {
+            ShiftLanguage(1);
+        }
+
+        private void textBox2_Enter(object sender, EventArgs e)
+        {
+            ShiftLanguage(2);
+        }
+        
+        private void ShiftLanguage(int side)
+        {
+            if (ParallelTextControl.Reversed)
+                side = 3 - side;
+
+            string langCode = (side == 1 ? ParallelTextControl.PText.Lang1 : ParallelTextControl.PText.Lang2).Trim().ToUpper();
+
+            string cult;
+
+            switch (langCode)
+            {
+                case "EN":
+                    cult = "en-US";
+                    break;
+                case "RU":
+                    cult = "ru-RU";
+                    break;
+                case "DE":
+                    cult = "de-DE";
+                    break;
+                case "ES":
+                    cult = "es-ES";
+                    break;
+                case "IT":
+                    cult = "it-IT";
+                    break;
+                case "FR":
+                    cult = "fr-FR";
+                    break;
+                default:
+                    return;
+            }
+
+            InputLanguage.CurrentInputLanguage = InputLanguage.FromCulture(new CultureInfo(cult));
+
+        }
         
     }
 }

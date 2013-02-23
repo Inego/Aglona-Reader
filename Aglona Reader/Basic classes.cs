@@ -1,6 +1,5 @@
 ﻿using System.Collections.ObjectModel;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Xml;
 using System.ComponentModel;
@@ -77,33 +76,6 @@ namespace AglonaReader
         public RenderedTextInfo RenderedInfo(byte side)
         {
             return side == 1 ? RenderedInfo1 : RenderedInfo2;
-        }
-
-        public int recommended_natural1;
-        public int recommended_natural2;
-
-        public void IncRecommendedNatural(byte side)
-        {
-            if (side == 1)
-                recommended_natural1++;
-            else
-                recommended_natural2++;
-        }
-
-        public void DecRecommendedNatural(byte side)
-        {
-            if (side == 1)
-                recommended_natural1--;
-            else
-                recommended_natural2--;
-        }
-
-        public int GetRecommendedNatural(byte side)
-        {
-            if (side == 1)
-                return recommended_natural1;
-            else
-                return recommended_natural2;
         }
 
         public bool IsBig()
@@ -272,236 +244,258 @@ namespace AglonaReader
             StartParagraph2 = true;
         }
 
+        private static int NaturalDividerPosition(StringBuilder text, int startingPos, bool forward)
+        {
+            byte state = 0;
 
-        internal int NaturalDividerPosition(byte side)
+            int currentWordStart = -1;
+            int prevNatural = -1;
+
+            int length = text.Length;
+
+            int pos = 0;
+
+            char c;
+
+            while (pos <= length - 1)
+            {
+                c = text[pos];
+
+                switch (c)
+                {
+                    case '\n':
+                        state = 2;
+                        currentWordStart = -1;
+                        break;
+
+                    case '—':
+                    case '.':
+                    case '。':
+                    case ',':
+                    case '，':
+                    case ':':
+                    case ';':
+                    case '!':
+                    case '?':
+                    case '…':
+                    case '(':
+                    case ')':
+
+                        if (currentWordStart == -1)
+                            currentWordStart = pos;
+
+                        if (state == 1)
+                            state = 3;
+                        else if (state == 2)
+                        {
+                            /////
+                            if (forward)
+                            {
+                                if (currentWordStart > startingPos)
+                                    return currentWordStart;
+                            }
+                            else
+                            {
+                                if (currentWordStart >= startingPos)
+                                    return prevNatural;
+                            }
+
+                            prevNatural = currentWordStart;
+                            /////
+                            
+                            state = 3;
+                        }
+
+
+                        break;
+
+                    case ' ':
+                    case '\t':
+                    case '\r':
+                        currentWordStart = -1;
+                        break;
+
+                    default:
+
+                        if (currentWordStart == -1)
+                            currentWordStart = pos;
+
+                        if ((c == '\'' || c == '\"' || c == '«' || c == '»' || c == '‹' || c == '›'
+                            || c == '“' || c == '”') && state != 2)
+                            // do nothing
+                            ;
+                        else
+                            if (state == 0)
+                                state = 1;
+                            else if (state == 2 || state == 3)
+                            {
+                                /////
+                                if (forward)
+                                {
+                                    if (currentWordStart > startingPos)
+                                        return currentWordStart;
+                                }
+                                else
+                                {
+                                    if (currentWordStart >= startingPos)
+                                        return prevNatural;
+                                }
+
+                                prevNatural = currentWordStart;
+                                /////
+
+
+                                state = 1;
+                            }
+
+                        
+
+                        break;
+                }
+
+                pos++;
+
+            }
+
+            return -1;
+
+        }
+
+
+        private static int NaturalDividerPosition(string text, int startingPos, bool forward)
+        {
+            byte state = 0;
+
+            int currentWordStart = -1;
+            int prevNatural = -1;
+
+            int length = text.Length;
+
+            int pos = 0;
+
+            char c;
+
+            while (pos <= length - 1)
+            {
+                c = text[pos];
+
+                switch (c)
+                {
+                    case '\n':
+                        state = 2;
+                        currentWordStart = -1;
+                        break;
+
+                    case '—':
+                    case '.':
+                    case '。':
+                    case ',':
+                    case '，':
+                    case ':':
+                    case ';':
+                    case '!':
+                    case '?':
+                    case '…':
+                    case '(':
+                    case ')':
+
+                        if (currentWordStart == -1)
+                            currentWordStart = pos;
+
+                        if (state == 1)
+                            state = 3;
+                        else if (state == 2)
+                        {
+                            /////
+                            if (forward)
+                            {
+                                if (currentWordStart > startingPos)
+                                    return currentWordStart;
+                            }
+                            else
+                            {
+                                if (currentWordStart >= startingPos)
+                                    return prevNatural;
+                            }
+
+                            prevNatural = currentWordStart;
+                            /////
+
+                            state = 3;
+                        }
+
+
+                        break;
+
+                    case ' ':
+                    case '\t':
+                    case '\r':
+                        currentWordStart = -1;
+                        break;
+
+                    default:
+
+                        if (currentWordStart == -1)
+                            currentWordStart = pos;
+
+                        if ((c == '\'' || c == '\"' || c == '«' || c == '»' || c == '‹' || c == '›'
+                            || c == '“' || c == '”') && state != 2)
+                            // do nothing
+                            ;
+                        else
+                            if (state == 0)
+                                state = 1;
+                            else if (state == 2 || state == 3)
+                            {
+                                /////
+                                if (forward)
+                                {
+                                    if (currentWordStart > startingPos)
+                                        return currentWordStart;
+                                }
+                                else
+                                {
+                                    if (currentWordStart >= startingPos)
+                                        return prevNatural;
+                                }
+
+                                prevNatural = currentWordStart;
+                                /////
+
+
+                                state = 1;
+                            }
+
+
+
+                        break;
+                }
+
+                pos++;
+
+            }
+
+            return -1;
+
+        }
+
+        
+
+        public int NaturalDividerPosition(byte side, int startingPos, bool forward)
         {
             if (side == 1)
                 if (SB1 == null)
-                    return NaturalDividerPosition(Text1, recommended_natural1);
+                    return NaturalDividerPosition(Text1, startingPos, forward);
                 else
-                    return NaturalDividerPosition(SB1, recommended_natural1);
+                    return NaturalDividerPosition(SB1, startingPos, forward);
             else
                 if (SB2 == null)
-                    return NaturalDividerPosition(Text2, recommended_natural2);
+                    return NaturalDividerPosition(Text2, startingPos, forward);
                 else
-                    return NaturalDividerPosition(SB2, recommended_natural2);
-        }
-
-
-        private static int NaturalDividerPosition(StringBuilder text, int recommended_natural)
-        {
-            int current_iteration = 0;
-
-            byte state = 0;
-
-            int length = text.Length;
-
-            int pos = 0;
-
-            char c;
-
-            while (pos <= length - 1)
-            {
-                c = text[pos];
-
-                switch (c)
-                {
-                    case '\n':
-                        state = 2;
-                        break;
-
-                    case '—':
-                    case '.':
-                    case '。':
-                    case ',':
-                    case '，':
-                    case ':':
-                    case ';':
-                    case '!':
-                    case '?':
-                    case '…':
-                    case '(':
-                    case ')':
-
-                        if (state == 1)
-                            state = 3;
-                        else if (state == 2)
-                        {
-                            if (current_iteration == recommended_natural)
-                                goto CorrectAndReturn;
-                            current_iteration++;
-                            state = 3;
-                        }
-
-
-                        break;
-
-                    case ' ':
-                    case '\t':
-                    case '\r':
-                        break;
-
-                    default:
-                        if ((c == '\'' || c == '\"' || c == '«' || c == '»' || c == '‹' || c == '›'
-                    || c == '“' || c == '”') && state != 2)
-                            // do nothing
-                            ;
-                        else
-                            if (state == 0)
-                                state = 1;
-                            else if (state == 2 || state == 3)
-                            {
-                                if (current_iteration == recommended_natural)
-                                    goto CorrectAndReturn;
-                                current_iteration++;
-                                state = 1;
-                            }
-                        break;
-                }
-
-                pos++;
-
-            }
-
-            return -1;
-
-        CorrectAndReturn:
-
-            char prev;
-
-            if (pos > 0)
-            {
-                prev = text[pos - 1];
-                if (!(prev == ' '
-                    || prev == '\n'
-                    || prev == '\t'
-                    || prev == '\r'
-                    || ParallelTextControl.IsEasternCharacter(prev)))
-                {
-                    pos--;
-                    goto CorrectAndReturn;
-                }
-            }
-
-            return pos;
-
+                    return NaturalDividerPosition(SB2, startingPos, forward);
 
         }
-
-
-
-        private static int NaturalDividerPosition(string text, int recommended_natural)
-        {
-            int current_iteration = 0;
-
-            byte state = 0;
-
-            int length = text.Length;
-
-            int pos = 0;
-
-            char c;
-
-            while (pos <= length - 1)
-            {
-                c = text[pos];
-
-                switch (c)
-                {
-                    case '\n':
-                        state = 2;
-                        break;
-
-                    case '—':
-                    case '.':
-                    case '。':
-                    case ',':
-                    case '，':
-                    case ':':
-                    case ';':
-                    case '!':
-                    case '?':
-                    case '…':
-                    case '(':
-                    case ')':
-                        if (state == 1)
-                            state = 3;
-                        else if (state == 2)
-                        {
-                            if (current_iteration == recommended_natural)
-                                goto CorrectAndReturn;
-                            current_iteration++;
-                            state = 3;
-                        }
-
-
-                        break;
-
-                    case ' ':
-                    case '\t':
-                    case '\r':
-                        break;
-
-                    default:
-                        if ((c == '\'' || c == '\"' || c == '«' || c == '»' || c == '‹' || c == '›'
-                    || c == '“' || c == '”') && state != 2)
-                            // do nothing
-                            ;
-                        else
-                            if (state == 0)
-                                state = 1;
-                            else if (state == 2 || state == 3)
-                            {
-                                if (current_iteration == recommended_natural)
-                                    goto CorrectAndReturn;
-                                current_iteration++;
-                                state = 1;
-                            }
-                        break;
-                }
-
-                pos++;
-
-            }
-
-            return -1;
-
-        CorrectAndReturn:
-
-            char prev;
-
-            if (pos > 0)
-            {
-                prev = text[pos - 1];
-                if (!(prev == ' '
-                    || prev == '\n'
-                    || prev == '\t'
-                    || prev == '\r'
-                    || ParallelTextControl.IsEasternCharacter(prev)))
-                {
-                    pos--;
-                    goto CorrectAndReturn;
-                }
-            }
-
-            return pos;
-
-
-        }
-
-
-        internal void SetRecommendedNaturals(TextPair hp)
-        {
-            recommended_natural1 = hp.GetRecommendedNatural(1);
-            recommended_natural2 = hp.GetRecommendedNatural(2);
-        }
-
-        internal void ClearRecommendedNaturals()
-        {
-            recommended_natural1 = 0;
-            recommended_natural2 = 0;
-        }
-
+        
         internal string GetText(byte side)
         {
             if (side == 1)
@@ -576,7 +570,7 @@ namespace AglonaReader
         public List<TextPair> ComputedPairs { get; set; }
 
         public int Number()
-        { return TextPairs.Count(); }
+        { return TextPairs.Count; }
 
         public ParallelText()
         {

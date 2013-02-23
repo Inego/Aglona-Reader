@@ -18,11 +18,18 @@ namespace AglonaReader
         AppSettings appSettings;
 
         byte opState;
-        private int startingRecNatural1;
-        private int startingRecNatural2;
         private bool startedXMoving = false;
         private bool startedYMoving = false;
         private bool justJumped = false;
+        private int prevHorizontalDistance = 0;
+
+        protected override bool ProcessDialogKey(Keys keyData)
+        {
+            if (keyData == (Keys.Alt | Keys.RButton | Keys.ShiftKey))
+                return true;
+            
+            return base.ProcessDialogKey(keyData);
+        }
 
         private void pTC_MouseWheel(object sender, System.Windows.Forms.MouseEventArgs e)
         {
@@ -137,7 +144,7 @@ namespace AglonaReader
                 else
                     pTC.CurrentPair = f.TopPair;
 
-                pTC.FindNaturalDividers(0);
+                pTC.FindFirstNaturalDividers();
                 Recompute();
             }
 
@@ -145,19 +152,31 @@ namespace AglonaReader
 
         }
 
+        bool IsNullOrWhiteSpace(string value)
+        {
+            if (value == null) return true;
+
+            for (int i = 0; i < value.Length; i++)
+            {
+                if (!Char.IsWhiteSpace(value[i])) return false;
+            }
+
+            return true;
+        }
+
         private void UpdateWindowTitle()
         {
             string cpt;
 
-            if (string.IsNullOrWhiteSpace(pTC.PText.Title1))
+            if (IsNullOrWhiteSpace(pTC.PText.Title1))
                 cpt = "<No title>";
             else
                 cpt = pTC.PText.Title1;
 
-            if (!string.IsNullOrWhiteSpace(pTC.PText.Lang1) && !string.IsNullOrWhiteSpace(pTC.PText.Lang2))
+            if (!IsNullOrWhiteSpace(pTC.PText.Lang1) && !IsNullOrWhiteSpace(pTC.PText.Lang2))
                 cpt += " [" + pTC.PText.Lang1 + "-" + pTC.PText.Lang2 + "]";
 
-            if (string.IsNullOrWhiteSpace(cpt))
+            if (IsNullOrWhiteSpace(cpt))
                 Text = "Aglona Reader";
             else
                 Text = cpt + " - Aglona Reader";
@@ -205,7 +224,7 @@ namespace AglonaReader
                 {
                     int distance = (e.X - pTC.horizontalStartingPosition) / ParallelTextControl.horizontalMouseStep;
 
-                    if (distance != 0 || startedXMoving)
+                    if (distance != prevHorizontalDistance)
                     {
 
                         Cursor = Cursors.SizeWE;
@@ -214,27 +233,25 @@ namespace AglonaReader
 
                         TextPair p = pTC[pTC.HighlightedPair];
 
-                        int newRecNatural1 = startingRecNatural1 + distance;
-                        int newRecNatural2 = startingRecNatural2 + distance;
+                        bool forward = (distance > prevHorizontalDistance);
 
-                        if (newRecNatural1 < 0)
-                            newRecNatural1 = 0;
+                        //pTC.DebugString = distance.ToString() + " " + prevHorizontalDistance.ToString() + " " + forward;
 
-                        if (newRecNatural2 < 0)
-                            newRecNatural2 = 0;
+                        prevHorizontalDistance = distance;
 
                         byte needToRender = 0;
 
-                        if (p.recommended_natural1 != newRecNatural1)
+                        bool MovedRec1 = pTC.NextRecommended(1, forward);
+                        bool MovedRec2 = pTC.NextRecommended(2, forward);
+
+                        if (MovedRec1)
                         {
-                            p.recommended_natural1 = newRecNatural1;
                             needToRender += 1;
                             pTC.Side1Set = true;
                         }
 
-                        if (p.recommended_natural2 != newRecNatural2)
+                        if (MovedRec2)
                         {
-                            p.recommended_natural2 = newRecNatural2;
                             needToRender += 2;
                             pTC.Side2Set = true;
                         }
@@ -244,7 +261,6 @@ namespace AglonaReader
                             if (needToRender == 3)
                                 needToRender = 0;
 
-                            pTC.FindNaturalDividers(needToRender);
                             pTC.FindNaturalDividersScreen(needToRender);
                             pTC.Render();
                         }
@@ -287,15 +303,6 @@ namespace AglonaReader
 
             pTC.ProcessMousePosition(true, true);
 
-            //if (pTC.MouseCurrentWord != null)
-            //{
-            //    pTC.MouseCurrentWord = null;
-            //    pTC.mouse_text_line = -1;
-                
-            //    pTC.Render();
-            //}
-
-            
         }
 
         private void parallelTextControl_MouseDown(object sender, MouseEventArgs e)
@@ -337,7 +344,7 @@ namespace AglonaReader
                             
                         }
 
-                        pTC.FindNaturalDividers(0);
+                        pTC.FindFirstNaturalDividers();
                         pTC.FindNaturalDividersScreen(0);
                         pTC.ProcessMousePosition(true, true);
 
@@ -350,9 +357,6 @@ namespace AglonaReader
                     pTC.verticalStartingPosition = e.Y;
 
                     p = pTC[pTC.HighlightedPair];
-
-                    startingRecNatural1 = p.GetRecommendedNatural(1);
-                    startingRecNatural2 = p.GetRecommendedNatural(2);
 
                     startedXMoving = false;
                     startedYMoving = false;
@@ -423,6 +427,7 @@ namespace AglonaReader
                     {
                         Cursor = Cursors.Default;
                         startedXMoving = false;
+                        prevHorizontalDistance = 0;
                     }
                     else
                         MouseUpInEditMode();
@@ -511,6 +516,10 @@ namespace AglonaReader
 
         private void pTC_KeyDown(object sender, KeyEventArgs e)
         {
+
+            //pTC.DebugString = e.KeyData.ToString();
+            //pTC.Render();
+
             if (e.KeyData == Keys.Down)
                 ProcessKeyDown();
 
@@ -521,22 +530,54 @@ namespace AglonaReader
                 || e.KeyData == Keys.Z)
                 MergeWithPrevious();
 
-            else if (e.KeyData == (Keys.Control | Keys.Right))
+            else if (e.KeyData == (Keys.Control | Keys.Right)
+                || e.KeyData == Keys.E
+                || e.KeyData == Keys.D)
                 ChangeNatural(1, true);
 
-            else if (e.KeyData == (Keys.Control | Keys.Left))
+            else if (e.KeyData == (Keys.Control | Keys.Left)
+                || e.KeyData == Keys.W
+                || e.KeyData == Keys.S)
                 ChangeNatural(1, false);
 
-            else if (e.KeyData == (Keys.Alt | Keys.Right))
+            else if (e.KeyData == (Keys.Alt | Keys.Right)
+                || e.KeyData == Keys.O
+                || e.KeyData == Keys.L)
                 ChangeNatural(2, true);
 
-            else if (e.KeyData == (Keys.Alt | Keys.Left))
+            else if (e.KeyData == (Keys.Alt | Keys.Left)
+                || e.KeyData == Keys.I
+                || e.KeyData == Keys.K)
                 ChangeNatural(2, false);
 
-            else if (e.KeyData == Keys.Right)
+            else if (e.KeyData == Keys.R
+                || e.KeyData == Keys.F
+                || e.KeyData == (Keys.Shift | Keys.Control | Keys.Right))
+                StepOneWord(1, true);
+
+            else if (e.KeyData == Keys.Q
+                || e.KeyData == Keys.A
+                || e.KeyData == (Keys.Shift | Keys.Control | Keys.Left))
+                StepOneWord(1, false);
+
+            else if (e.KeyData == Keys.P
+                || e.KeyData == Keys.Oem1
+                || e.KeyData == (Keys.Shift | Keys.Alt | Keys.Right))
+                StepOneWord(2, true);
+
+            else if (e.KeyData == Keys.U
+                || e.KeyData == Keys.J
+                || e.KeyData == (Keys.Shift | Keys.Alt | Keys.Left))
+                StepOneWord(2, false);
+
+            else if (e.KeyData == Keys.Right
+                || e.KeyData == Keys.Y
+                || e.KeyData == Keys.H)
                 ChangeNatural(0, true);
 
-            else if (e.KeyData == Keys.Left)
+            else if (e.KeyData == Keys.Left
+                || e.KeyData == Keys.T
+                || e.KeyData == Keys.G)
                 ChangeNatural(0, false);
 
             else if (e.KeyData == (Keys.Control | Keys.End))
@@ -556,26 +597,6 @@ namespace AglonaReader
                     return;
 
                 GotoPair(0);
-            }
-
-            else if (e.KeyData == (Keys.Control | Keys.OemOpenBrackets))
-            {
-                if (pTC.Brightness > 0.6)
-                {
-                    pTC.Brightness -= 0.005;
-                    pTC.RenderPairs();
-                    pTC.Render();
-                }
-            }
-
-            else if (e.KeyData == (Keys.Control | Keys.OemCloseBrackets))
-            {
-                if (pTC.Brightness < 0.995)
-                {
-                    pTC.Brightness += 0.005;
-                    pTC.RenderPairs();
-                    pTC.Render();
-                }
             }
 
             else if (e.KeyData == Keys.PageUp)
@@ -604,6 +625,70 @@ namespace AglonaReader
             }
             
         }
+
+        private void StepOneWord(byte screenSide, bool forward)
+        {
+
+            byte side = pTC.Reversed ? (byte)(3 - screenSide) : screenSide;
+
+            ScreenWord current = side == 1 ? pTC.NaturalDividerPosition1W : pTC.NaturalDividerPosition2W;
+
+            if (current == null)
+            {
+
+                if (forward)
+                {
+                    current = pTC.FindFirstScreenWord(pTC.HighlightedPair, side);
+                    if (current == null)
+                        return;
+                }
+                else
+                {
+                    current = pTC.FindLastScreenWord(pTC.HighlightedPair, side);
+                    if (current == null)
+                        return;
+                    goto CurrentFound;
+                }
+
+            }
+
+            if (forward)
+                current = current.Next;
+            else
+            {
+                current = current.Prev;
+                if (current != null && current.Prev == null)
+                    return;
+            }
+
+            
+
+            if (current == null)
+                return;
+
+            CurrentFound:
+
+            if (side == 1)
+            {
+                pTC.NaturalDividerPosition1W = current;
+                pTC.NaturalDividerPosition1 = current.Pos;
+                (pTC.NippingFrame.F1 as Frame).FramePen = pTC.CorrectedPen;
+                pTC.Side1Set = true;
+            }
+            else
+            {
+                pTC.NaturalDividerPosition2W = current;
+                pTC.NaturalDividerPosition2 = current.Pos;
+                (pTC.NippingFrame.F2 as Frame).FramePen = pTC.CorrectedPen;
+                pTC.Side2Set = true;
+            }
+
+            pTC.SetNippingFrameByScreenWord(side, current);
+
+            pTC.Render();
+
+        }
+
 
         private void MergeWithPrevious()
         {
@@ -765,8 +850,7 @@ namespace AglonaReader
             pTC.CurrentPair = newCurrentPair;
             pTC.HighlightedPair = newCurrentPair;
 
-            pTC.Side1Set = false;
-            pTC.Side2Set = false;
+            pTC.FindFirstNaturalDividers();
 
             pTC.UpdateScreen();
 
@@ -826,7 +910,7 @@ namespace AglonaReader
                 TextPair prev_p = pTC[pTC.HighlightedPair];
 
                 pTC.HighlightedPair--;
-                pTC.FindNaturalDividers(0);
+                pTC.FindFirstNaturalDividers();
 
                 TextPair p = pTC[pTC.HighlightedPair];
 
@@ -885,7 +969,7 @@ namespace AglonaReader
                 pTC.Side2Set = false;
 
                 pTC.HighlightedPair++;
-                pTC.FindNaturalDividers(0);
+                pTC.FindFirstNaturalDividers();
 
                 TextPair p = pTC[pTC.HighlightedPair];
 
@@ -938,31 +1022,26 @@ namespace AglonaReader
             else
                 side = screen_side;
 
+            bool NeedToRender = false;
+
             if (side == 0 || side == 1)
-                if (inc || p.GetRecommendedNatural(1) > 0)
+                if (pTC.NextRecommended(1, inc))
                 {
-                    if (inc)
-                        p.IncRecommendedNatural(1);
-                    else
-                        p.DecRecommendedNatural(1);
-                    pTC.FindNaturalDividers(1);
+                    NeedToRender = true;
                     pTC.FindNaturalDividersScreen(1);
                     pTC.Side1Set = true;
                 }
 
             if (side == 0 || side == 2)
-                if (inc || p.GetRecommendedNatural(2) > 0)
+                if (pTC.NextRecommended(2, inc))
                 {
-                    if (inc)
-                        p.IncRecommendedNatural(2);
-                    else
-                        p.DecRecommendedNatural(2);
-                    pTC.FindNaturalDividers(2);
+                    NeedToRender = true;
                     pTC.FindNaturalDividersScreen(2);
                     pTC.Side2Set = true;
                 }
 
-            pTC.Render();
+            if (NeedToRender)
+                pTC.Render();
 
         }
 
@@ -1096,7 +1175,7 @@ namespace AglonaReader
 
             pTC.Modified = false;
 
-            pTC.FindNaturalDividers(0);
+            pTC.FindFirstNaturalDividers();
 
             Recompute();
 
