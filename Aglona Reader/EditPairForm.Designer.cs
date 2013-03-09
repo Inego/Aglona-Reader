@@ -242,7 +242,7 @@ namespace AglonaReader
             this.MinimizeBox = false;
             this.Name = "EditPairForm";
             this.ShowInTaskbar = false;
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "Edit pair";
             this.Shown += new System.EventHandler(this.EditPairForm_Shown);
             this.bottomPanel.ResumeLayout(false);

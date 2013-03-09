@@ -23,6 +23,8 @@ namespace AglonaReader
         private bool justJumped = false;
         private int prevHorizontalDistance = 0;
 
+        FindForm findForm;
+
         protected override bool ProcessDialogKey(Keys keyData)
         {
             if (keyData == (Keys.Alt | Keys.RButton | Keys.ShiftKey))
@@ -326,7 +328,8 @@ namespace AglonaReader
 
                     TextPair p;
 
-                    if (pTC.MouseCurrentWord == null && pTC.mouse_text_word != null)
+                    if (pTC.MouseCurrentWord == null && pTC.mouse_text_word != null
+                        && pTC.HighlightedPair != pTC.mouse_text_word.PairIndex)
                     {
                         // Set focus to this pair
                         pTC.HighlightedPair = pTC.mouse_text_word.PairIndex;
@@ -837,12 +840,12 @@ namespace AglonaReader
 
         }
 
-        private void GotoPair(int newCurrentPair)
+        public void GotoPair(int newCurrentPair)
         {
             GotoPair(newCurrentPair, false);
         }
 
-        private void GotoPair(int newCurrentPair, bool forced)
+        public void GotoPair(int newCurrentPair, bool forced)
         {
             if (pTC.CurrentPair == newCurrentPair && !forced)
                 return;
@@ -953,7 +956,7 @@ namespace AglonaReader
             }
         }
 
-        private void ProcessKeyDown()
+        public void ProcessKeyDown()
         {
             if (pTC.HighlightedPair == pTC.Number - 1)
             {
@@ -1413,8 +1416,22 @@ namespace AglonaReader
             
         }
 
-        
+        private void findToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (findForm == null)
+            {
+                findForm = new FindForm();
+                findForm.Left = (Width - findForm.Width) / 2;
+                findForm.Top = (Height - findForm.Height) / 2;
+                findForm.pTC = pTC;
+                findForm.mainForm = this;
+                
+                
+            }
 
+            findForm.ShowDialog();
+
+        }
 
     }
 

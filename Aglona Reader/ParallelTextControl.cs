@@ -499,8 +499,6 @@ namespace AglonaReader
             
             ComputeSpaceLength(PanelGraphics);
 
-            editPairForm = new EditPairForm();
-
             EditWhenNipped = false;
 
             InitializeColors();
@@ -2745,6 +2743,17 @@ namespace AglonaReader
                 EditWhenNipped = !EditWhenNipped;
                 Render();
                 return;
+            }
+
+            if (editPairForm == null)
+            {
+                editPairForm = new EditPairForm();
+
+                Form parentForm = FindForm();
+
+                editPairForm.Left = parentForm.Left + (parentForm.Width - editPairForm.Width) / 2;
+                editPairForm.Top = parentForm.Top + (parentForm.Height - editPairForm.Height) / 2;
+
             }
 
             editPairForm.ParallelTextControl = this;
