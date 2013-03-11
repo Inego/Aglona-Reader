@@ -2127,6 +2127,8 @@ namespace AglonaReader
 
             if (EditWhenNipped)
             {
+                PrepareEditForm();
+
                 editPairForm.ParallelTextControl = this;
                 editPairForm.PairIndex = HighlightedPair;
                 editPairForm.ShowDialog();
@@ -2745,16 +2747,7 @@ namespace AglonaReader
                 return;
             }
 
-            if (editPairForm == null)
-            {
-                editPairForm = new EditPairForm();
-
-                Form parentForm = FindForm();
-
-                editPairForm.Left = parentForm.Left + (parentForm.Width - editPairForm.Width) / 2;
-                editPairForm.Top = parentForm.Top + (parentForm.Height - editPairForm.Height) / 2;
-
-            }
+            PrepareEditForm();
 
             editPairForm.ParallelTextControl = this;
             editPairForm.PairIndex = pairIndex;
@@ -2774,6 +2767,20 @@ namespace AglonaReader
                 PText[pairIndex].UpdateTotalSize();
                 PText.UpdateAggregates(pairIndex);
                 Modified = true;
+            }
+        }
+
+        private void PrepareEditForm()
+        {
+            if (editPairForm == null)
+            {
+                editPairForm = new EditPairForm();
+
+                Form parentForm = FindForm();
+
+                editPairForm.Left = parentForm.Left + (parentForm.Width - editPairForm.Width) / 2;
+                editPairForm.Top = parentForm.Top + (parentForm.Height - editPairForm.Height) / 2;
+
             }
         }
 
