@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FindForm));
             this.label1 = new System.Windows.Forms.Label();
             this.textToFindBox = new System.Windows.Forms.TextBox();
             this.leftTextRadioButton = new System.Windows.Forms.RadioButton();
@@ -125,10 +126,12 @@
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.textToFindBox);
             this.Controls.Add(this.label1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.MinimumSize = new System.Drawing.Size(383, 174);
             this.Name = "FindForm";
+            this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "Find text";
             this.Load += new System.EventHandler(this.FindForm_Load);

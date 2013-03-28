@@ -576,6 +576,19 @@ namespace AglonaReader
         {
             TextPairs = new List<TextPair>();
             ComputedPairs = new List<TextPair>();
+
+            Author1 = "";
+            Title1 = "";
+            Info1 = "";
+            Lang1 = "";
+
+            Author2 = "";
+            Title2 = "";
+            Info2 = "";
+            Lang2 = "";
+
+            Info = "";
+            
         }
 
         public TextPair this[int pairIndex]
