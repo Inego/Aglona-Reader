@@ -31,6 +31,8 @@ namespace AglonaReader
         private void findNextButton_Click(object sender, EventArgs e)
         {
 
+            textToFindBox.SelectAll();
+
             String textToFind = textToFindBox.Text;
 
             if (String.IsNullOrEmpty(textToFind))
@@ -111,6 +113,13 @@ namespace AglonaReader
         private void FindForm_Load(object sender, EventArgs e)
         {
             bothTextsRadioButton.Checked = true;
+        }
+
+
+        private void FindForm_Activated(object sender, EventArgs e)
+        {
+            textToFindBox.SelectAll();
+            textToFindBox.Focus();
         }
 
     }

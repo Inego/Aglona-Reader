@@ -50,14 +50,11 @@
             // 
             // textToFindBox
             // 
-            this.textToFindBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.textToFindBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textToFindBox.Location = new System.Drawing.Point(15, 25);
-            this.textToFindBox.MinimumSize = new System.Drawing.Size(336, 52);
-            this.textToFindBox.Multiline = true;
+            this.textToFindBox.Location = new System.Drawing.Point(79, 6);
             this.textToFindBox.Name = "textToFindBox";
-            this.textToFindBox.Size = new System.Drawing.Size(336, 52);
+            this.textToFindBox.Size = new System.Drawing.Size(309, 20);
             this.textToFindBox.TabIndex = 1;
             // 
             // leftTextRadioButton
@@ -77,7 +74,7 @@
             this.groupBox1.Controls.Add(this.rightTextRadioButton);
             this.groupBox1.Controls.Add(this.bothTextsRadioButton);
             this.groupBox1.Controls.Add(this.leftTextRadioButton);
-            this.groupBox1.Location = new System.Drawing.Point(15, 83);
+            this.groupBox1.Location = new System.Drawing.Point(12, 35);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(162, 44);
             this.groupBox1.TabIndex = 3;
@@ -109,7 +106,7 @@
             // findNextButton
             // 
             this.findNextButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.findNextButton.Location = new System.Drawing.Point(276, 104);
+            this.findNextButton.Location = new System.Drawing.Point(313, 56);
             this.findNextButton.Name = "findNextButton";
             this.findNextButton.Size = new System.Drawing.Size(75, 23);
             this.findNextButton.TabIndex = 2;
@@ -119,9 +116,10 @@
             // 
             // FindForm
             // 
+            this.AcceptButton = this.findNextButton;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(367, 136);
+            this.ClientSize = new System.Drawing.Size(400, 91);
             this.Controls.Add(this.findNextButton);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.textToFindBox);
@@ -129,11 +127,12 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(383, 174);
+            this.MinimumSize = new System.Drawing.Size(416, 129);
             this.Name = "FindForm";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "Find text";
+            this.Activated += new System.EventHandler(this.FindForm_Activated);
             this.Load += new System.EventHandler(this.FindForm_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();

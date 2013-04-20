@@ -55,6 +55,7 @@ namespace AglonaReader
             PText.AddPair(t1, t2);
             PText[PText.Number() - 1].UpdateTotalSize();
             PText.UpdateAggregates(PText.Number() - 1);
+            
 
             Close();
         }

@@ -1426,7 +1426,7 @@ namespace AglonaReader
             int newColor;
 
             // In view mode, show text in gray if it is not complete
-            newColor = !EditMode && NotFitOnScreen(p) ?
+            newColor = !EditMode && (NotFitOnScreen(p) || pairIndex < CurrentPair) ?
                        2 :
                        ((LayoutMode == LayoutMode_Alternating) && Reversed == (side == 2) ? 3 : 1);
 

@@ -1059,6 +1059,8 @@ namespace AglonaReader
                 importTextForm.ShowDialog();
             }
 
+            pTC.FindFirstNaturalDividers();
+
             UpdateStatusBar(true);
 
             Recompute();
