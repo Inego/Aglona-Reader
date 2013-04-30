@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Text;
+using System.Diagnostics;
 
 
 [assembly: CLSCompliant(true)]
@@ -23,7 +24,10 @@ namespace AglonaReader
         private bool justJumped = false;
         private int prevHorizontalDistance = 0;
 
+        
+
         FindForm findForm;
+        
 
         protected override bool ProcessDialogKey(Keys keyData)
         {
@@ -50,7 +54,6 @@ namespace AglonaReader
 
             opState = 0;
             this.WindowState = FormWindowState.Maximized;
-
             
         }
         
@@ -887,7 +890,72 @@ namespace AglonaReader
                 else
                     prevVolume = pTC[pTC.HighlightedPair - 1].aggregateSize;
 
-                ssPositionPercent.Text = ((float)prevVolume / totalVolume).ToString("P3");
+                string s = ((float)prevVolume / totalVolume).ToString("P3");
+
+                if (pTC.EditMode)
+                {
+
+                    s += "    ";
+
+                    if (pTC.stopwatchStarted)
+                    {
+                        s += pTC.stopWatch.IsRunning ? "Aligning..." : "Aligning [PAUSED]";
+
+                        if (pTC.Number > pTC.startingNumberOfFrags)
+                        {
+
+                            // Let's count speed
+                            long elapsed = pTC.stopWatch.ElapsedMilliseconds;
+
+                            s += "  " + ((pTC.Number - pTC.startingNumberOfFrags) * 3600000 / elapsed).ToString() + " f/hr";
+
+
+
+                            // current top percent
+
+                            float currentPercent;
+
+                            if (pTC.Number > 1)
+                                currentPercent = (float)pTC[pTC.Number - 2].aggregateSize / pTC[pTC.Number - 1].aggregateSize;
+                            else
+                                currentPercent = 0;
+
+                            if (currentPercent > pTC.startingPercent)
+                            {
+                                float percentDiff = currentPercent - pTC.startingPercent;
+
+                                s += "  Aligned " + percentDiff.ToString("P3");
+
+                                float whatIsLeft = 1.0f - currentPercent;
+
+                                //float percentSpeed = percentDiff / elapsed;
+
+                                int secondsLeft = (int)(whatIsLeft / percentDiff * elapsed / 1000);
+
+                                int hoursLeft = secondsLeft / 3600;
+
+                                secondsLeft -= hoursLeft * 3600;
+
+                                int minutesLeft = secondsLeft / 60;
+
+                                secondsLeft -= minutesLeft * 60;
+
+                                s += "  ETA " + string.Format("{0:00}:{1:D2}:{2:D2}",
+                                                hoursLeft, minutesLeft, secondsLeft);
+
+                            }
+
+                        }
+
+                    }
+
+                    else
+                        s += " Aligning not started";
+
+                }
+
+
+                ssPositionPercent.Text = s;
 
             }
 
@@ -1176,6 +1244,8 @@ namespace AglonaReader
 
             ProcessEditModeChange();
 
+            pTC.stopwatchStarted = false;
+
             newBook = false;
 
             pTC.Modified = false;
@@ -1292,6 +1362,8 @@ namespace AglonaReader
 
             pTC.CreateNewParallelBook();
 
+            pTC.stopwatchStarted = false;
+
             UpdateStatusBar(true);
 
             UpdateWindowTitle();
@@ -1365,6 +1437,8 @@ namespace AglonaReader
                 pTC.NippingFrame.SetInvisible();
                 pTC.MouseCurrentWord = null;
             }
+
+            UpdateStatusBar(false);
         }
 
         private void openRecentToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1433,6 +1507,30 @@ namespace AglonaReader
 
             findForm.ShowDialog();
 
+        }
+
+        private void startpauseStopwatchToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+            if (!pTC.EditMode)
+                return;
+
+            if (!pTC.stopwatchStarted)
+                pTC.ResetStopwatch(1);
+            else
+                if (pTC.stopWatch.IsRunning)
+                    pTC.stopWatch.Stop();
+                else
+                    pTC.stopWatch.Start();
+
+            UpdateStatusBar(false);
+
+        }
+
+        private void resetStopwatchToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            pTC.ResetStopwatch(0);
+            UpdateStatusBar(false);
         }
 
     }

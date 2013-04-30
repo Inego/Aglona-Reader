@@ -50,10 +50,14 @@
             this.structureleftToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.structurerightToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.findToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
             this.editModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pairToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.importToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.statsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.startpauseStopwatchToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -62,8 +66,7 @@
             this.ssPositionPercent = new System.Windows.Forms.ToolStripStatusLabel();
             this.vScrollBar = new System.Windows.Forms.VScrollBar();
             this.pTC = new AglonaReader.ParallelTextControl();
-            this.findToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
+            this.resetStopwatchToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mainMenu.SuspendLayout();
             this.statusStrip.SuspendLayout();
             this.SuspendLayout();
@@ -74,6 +77,7 @@
             this.fileToolStripMenuItem,
             this.bookToolStripMenuItem,
             this.pairToolStripMenuItem,
+            this.statsToolStripMenuItem,
             this.settingsToolStripMenuItem,
             this.helpToolStripMenuItem});
             this.mainMenu.Location = new System.Drawing.Point(0, 0);
@@ -226,6 +230,19 @@
             this.toolStripSeparator3.Name = "toolStripSeparator3";
             this.toolStripSeparator3.Size = new System.Drawing.Size(197, 6);
             // 
+            // findToolStripMenuItem
+            // 
+            this.findToolStripMenuItem.Name = "findToolStripMenuItem";
+            this.findToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F)));
+            this.findToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
+            this.findToolStripMenuItem.Text = "Find...";
+            this.findToolStripMenuItem.Click += new System.EventHandler(this.findToolStripMenuItem_Click);
+            // 
+            // toolStripMenuItem1
+            // 
+            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(197, 6);
+            // 
             // editModeToolStripMenuItem
             // 
             this.editModeToolStripMenuItem.CheckOnClick = true;
@@ -259,6 +276,23 @@
             this.editToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
             this.editToolStripMenuItem.Text = "Edit";
             this.editToolStripMenuItem.Click += new System.EventHandler(this.editToolStripMenuItem_Click);
+            // 
+            // statsToolStripMenuItem
+            // 
+            this.statsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.startpauseStopwatchToolStripMenuItem,
+            this.resetStopwatchToolStripMenuItem});
+            this.statsToolStripMenuItem.Name = "statsToolStripMenuItem";
+            this.statsToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
+            this.statsToolStripMenuItem.Text = "Stats";
+            // 
+            // startpauseStopwatchToolStripMenuItem
+            // 
+            this.startpauseStopwatchToolStripMenuItem.Name = "startpauseStopwatchToolStripMenuItem";
+            this.startpauseStopwatchToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F5;
+            this.startpauseStopwatchToolStripMenuItem.Size = new System.Drawing.Size(211, 22);
+            this.startpauseStopwatchToolStripMenuItem.Text = "Start/pause stopwatch";
+            this.startpauseStopwatchToolStripMenuItem.Click += new System.EventHandler(this.startpauseStopwatchToolStripMenuItem_Click);
             // 
             // settingsToolStripMenuItem
             // 
@@ -393,18 +427,13 @@
             this.pTC.MouseMove += new System.Windows.Forms.MouseEventHandler(this.parallelTextControl_MouseMove);
             this.pTC.MouseUp += new System.Windows.Forms.MouseEventHandler(this.parallelTextControl_MouseUp);
             // 
-            // findToolStripMenuItem
+            // resetStopwatchToolStripMenuItem
             // 
-            this.findToolStripMenuItem.Name = "findToolStripMenuItem";
-            this.findToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F)));
-            this.findToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
-            this.findToolStripMenuItem.Text = "Find...";
-            this.findToolStripMenuItem.Click += new System.EventHandler(this.findToolStripMenuItem_Click);
-            // 
-            // toolStripMenuItem1
-            // 
-            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(197, 6);
+            this.resetStopwatchToolStripMenuItem.Name = "resetStopwatchToolStripMenuItem";
+            this.resetStopwatchToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F5)));
+            this.resetStopwatchToolStripMenuItem.Size = new System.Drawing.Size(211, 22);
+            this.resetStopwatchToolStripMenuItem.Text = "Reset stopwatch";
+            this.resetStopwatchToolStripMenuItem.Click += new System.EventHandler(this.resetStopwatchToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -467,6 +496,9 @@
         private System.Windows.Forms.VScrollBar vScrollBar;
         private System.Windows.Forms.ToolStripMenuItem findToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem statsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem startpauseStopwatchToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem resetStopwatchToolStripMenuItem;
 
     }
 }

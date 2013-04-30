@@ -7,6 +7,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using System.Diagnostics;
 
 
 namespace AglonaReader
@@ -14,6 +15,13 @@ namespace AglonaReader
 
     public partial class ParallelTextControl : UserControl
     {
+
+        public float startingPercent = 0.0F;
+        public int startingNumberOfFrags = 0;
+        public bool stopwatchStarted = false;
+        public Stopwatch stopWatch;
+        
+
 
         public const int LayoutMode_Normal = 0;
         public const int LayoutMode_Alternating = 1;
@@ -451,6 +459,8 @@ namespace AglonaReader
         public ParallelTextControl()
         {
             InitializeComponent();
+
+            stopWatch = new Stopwatch();
 
             CreateNewParallelBook();
 
@@ -2175,6 +2185,12 @@ namespace AglonaReader
                 _q.ClearComputedWords();
             }
 
+            if (!stopwatchStarted)
+                ResetStopwatch(1);
+            else
+                if (!stopWatch.IsRunning)
+                    stopWatch.Start();
+
             PrepareScreen();
             RenderPairs();
 
@@ -2199,6 +2215,31 @@ namespace AglonaReader
 
             return true;
 
+        }
+
+        // mode
+        //  0: don't change
+        //  1: force start
+        //  2: force stop
+        //
+        public void ResetStopwatch(int mode)
+        {
+
+            int whatToDo = mode == 0 ? (stopWatch.IsRunning ? 1 : 2) : mode;
+
+            stopwatchStarted = true;
+            
+            stopWatch.Reset();
+            
+            if (whatToDo == 1)
+                stopWatch.Start();
+            
+            startingNumberOfFrags = Number;
+
+            if (Number > 1)
+                startingPercent = (float)this[Number - 2].aggregateSize / this[Number - 1].aggregateSize;
+            else
+                startingPercent = 0;
         }
 
 
