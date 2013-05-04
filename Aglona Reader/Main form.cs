@@ -907,9 +907,7 @@ namespace AglonaReader
                             // Let's count speed
                             long elapsed = pTC.stopWatch.ElapsedMilliseconds;
 
-                            s += "  " + ((pTC.Number - pTC.startingNumberOfFrags) * 3600000 / elapsed).ToString() + " f/hr";
-
-
+                            s += "  " + ((long)((double)(pTC.Number - pTC.startingNumberOfFrags) * 3600000 / elapsed)).ToString() + " f/hr";
 
                             // current top percent
 
