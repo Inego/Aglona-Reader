@@ -3087,6 +3087,17 @@ namespace AglonaReader
 
 
         }
+
+        internal void ExportText(string fileName, bool leftSide)
+        {
+
+            int sideToExport = (leftSide ? 1 : 2);
+
+            if (Reversed)
+                sideToExport = 3 - sideToExport;
+
+            PText.ExportText(fileName, sideToExport);
+        }
     }
 
     public class ScreenWord

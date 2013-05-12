@@ -40,6 +40,8 @@
             this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
             this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
+            this.exportLeftTextToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.bookToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -58,6 +60,7 @@
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.startpauseStopwatchToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.resetStopwatchToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -66,7 +69,7 @@
             this.ssPositionPercent = new System.Windows.Forms.ToolStripStatusLabel();
             this.vScrollBar = new System.Windows.Forms.VScrollBar();
             this.pTC = new AglonaReader.ParallelTextControl();
-            this.resetStopwatchToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportRightTextToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mainMenu.SuspendLayout();
             this.statusStrip.SuspendLayout();
             this.SuspendLayout();
@@ -96,6 +99,9 @@
             this.toolStripSeparator6,
             this.saveToolStripMenuItem,
             this.saveAsToolStripMenuItem,
+            this.toolStripMenuItem2,
+            this.exportLeftTextToolStripMenuItem,
+            this.exportRightTextToolStripMenuItem,
             this.toolStripSeparator5,
             this.exitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
@@ -151,6 +157,18 @@
             this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(214, 22);
             this.saveAsToolStripMenuItem.Text = "Save as";
             this.saveAsToolStripMenuItem.Click += new System.EventHandler(this.saveAsToolStripMenuItem_Click);
+            // 
+            // toolStripMenuItem2
+            // 
+            this.toolStripMenuItem2.Name = "toolStripMenuItem2";
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(211, 6);
+            // 
+            // exportLeftTextToolStripMenuItem
+            // 
+            this.exportLeftTextToolStripMenuItem.Name = "exportLeftTextToolStripMenuItem";
+            this.exportLeftTextToolStripMenuItem.Size = new System.Drawing.Size(214, 22);
+            this.exportLeftTextToolStripMenuItem.Text = "Export left text";
+            this.exportLeftTextToolStripMenuItem.Click += new System.EventHandler(this.exportLeftTextToolStripMenuItem_Click);
             // 
             // toolStripSeparator5
             // 
@@ -294,6 +312,14 @@
             this.startpauseStopwatchToolStripMenuItem.Text = "Start/pause stopwatch";
             this.startpauseStopwatchToolStripMenuItem.Click += new System.EventHandler(this.startpauseStopwatchToolStripMenuItem_Click);
             // 
+            // resetStopwatchToolStripMenuItem
+            // 
+            this.resetStopwatchToolStripMenuItem.Name = "resetStopwatchToolStripMenuItem";
+            this.resetStopwatchToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F5)));
+            this.resetStopwatchToolStripMenuItem.Size = new System.Drawing.Size(211, 22);
+            this.resetStopwatchToolStripMenuItem.Text = "Reset stopwatch";
+            this.resetStopwatchToolStripMenuItem.Click += new System.EventHandler(this.resetStopwatchToolStripMenuItem_Click);
+            // 
             // settingsToolStripMenuItem
             // 
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
@@ -427,13 +453,12 @@
             this.pTC.MouseMove += new System.Windows.Forms.MouseEventHandler(this.parallelTextControl_MouseMove);
             this.pTC.MouseUp += new System.Windows.Forms.MouseEventHandler(this.parallelTextControl_MouseUp);
             // 
-            // resetStopwatchToolStripMenuItem
+            // exportRightTextToolStripMenuItem
             // 
-            this.resetStopwatchToolStripMenuItem.Name = "resetStopwatchToolStripMenuItem";
-            this.resetStopwatchToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F5)));
-            this.resetStopwatchToolStripMenuItem.Size = new System.Drawing.Size(211, 22);
-            this.resetStopwatchToolStripMenuItem.Text = "Reset stopwatch";
-            this.resetStopwatchToolStripMenuItem.Click += new System.EventHandler(this.resetStopwatchToolStripMenuItem_Click);
+            this.exportRightTextToolStripMenuItem.Name = "exportRightTextToolStripMenuItem";
+            this.exportRightTextToolStripMenuItem.Size = new System.Drawing.Size(214, 22);
+            this.exportRightTextToolStripMenuItem.Text = "Export right text";
+            this.exportRightTextToolStripMenuItem.Click += new System.EventHandler(this.exportRightTextToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -499,6 +524,9 @@
         private System.Windows.Forms.ToolStripMenuItem statsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem startpauseStopwatchToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem resetStopwatchToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem2;
+        private System.Windows.Forms.ToolStripMenuItem exportLeftTextToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem exportRightTextToolStripMenuItem;
 
     }
 }

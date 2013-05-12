@@ -1531,6 +1531,38 @@ namespace AglonaReader
             UpdateStatusBar(false);
         }
 
+        private void exportLeftTextToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ExportText(true);
+        }
+
+        private void ExportText(bool leftSide)
+        {
+            // Ask for the file name
+            using (SaveFileDialog d = new SaveFileDialog())
+            {
+                d.Filter = "Text files (*.txt)|*.txt";
+                
+                d.RestoreDirectory = true;
+                
+                DialogResult dialogResult = d.ShowDialog();
+
+                if (dialogResult != DialogResult.OK)
+                    return;
+
+                pTC.ExportText(d.FileName, leftSide);
+
+            }
+
+
+
+        }
+
+        private void exportRightTextToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ExportText(false);
+        }
+
     }
 
     public class CommonWordInfo : WordInfo

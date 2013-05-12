@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 using System.ComponentModel;
+using System.IO;
+using System;
+
 
 
 namespace AglonaReader
@@ -948,8 +951,96 @@ namespace AglonaReader
             }
         }
 
-        
 
+        void WriteIfNotEmpty(StreamWriter outfile, string s)
+        {
+            if (!String.IsNullOrEmpty(s))
+            {
+                outfile.WriteLine(s);
+                outfile.WriteLine();
+            }
+        }
+
+
+
+        internal void ExportText(string fileName, int sideToExport)
+        {
+
+            using (StreamWriter outfile = new StreamWriter(fileName, false, Encoding.UTF8))
+            {
+
+                TextPair p = null;
+                TextPair pprev = null;
+
+                if (sideToExport == 1)
+                {
+                    WriteIfNotEmpty(outfile, Author1);
+                    WriteIfNotEmpty(outfile, Title1);
+                    WriteIfNotEmpty(outfile, Info1);
+                    WriteIfNotEmpty(outfile, Info);
+
+                    for (int i = 0; i < Number(); i++)
+                    {
+                        p = this[i];
+
+                        if (pprev != null && (p.StructureLevel > 0 || pprev.StructureLevel > 0))
+                            outfile.WriteLine();
+
+                        if (p.StartParagraph1)
+                            outfile.WriteLine();
+                        else
+                            outfile.Write(' ');
+
+                        if (p.SB1 == null)
+                            outfile.Write(p.Text1);
+                        else
+                            outfile.Write(p.SB1);
+
+                        pprev = p;
+
+                    }
+
+                }
+                else
+                {
+
+                    WriteIfNotEmpty(outfile, Author2);
+                    WriteIfNotEmpty(outfile, Title2);
+                    WriteIfNotEmpty(outfile, Info2);
+                    WriteIfNotEmpty(outfile, Info);
+
+                    for (int i = 0; i < Number(); i++)
+                    {
+                        p = this[i];
+
+                        if (pprev != null && (p.StructureLevel > 0 || pprev.StructureLevel > 0))
+                            outfile.WriteLine();
+
+                        if (p.StartParagraph2)
+                            outfile.WriteLine();
+                        else
+                            outfile.Write(' ');
+
+                        if (p.SB2 == null)
+                            outfile.Write(p.Text2);
+                        else
+                            outfile.Write(p.SB2);
+
+                        pprev = p;
+
+                    }
+
+                }
+
+                outfile.Close();
+
+                
+
+            }
+
+
+
+        }
     }
 
 }
