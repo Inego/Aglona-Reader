@@ -901,6 +901,7 @@ namespace AglonaReader
 
             if (cPair + 1 == PText.Number())
             {
+                ParallelText.InsertWords(words, 0);
                 goto CommonExit2;
             }
 
