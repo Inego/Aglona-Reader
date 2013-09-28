@@ -95,7 +95,7 @@ namespace AglonaReader
                 {
 
                     if (!pTC.EditMode || current > pTC.LastRenderedPair || current < pTC.CurrentPair)
-                        mainForm.GotoPair(current);
+                        mainForm.GotoPair(current, false, false, 1);
                     else
                     {
                         pTC.HighlightedPair = current - 1;

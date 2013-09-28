@@ -88,10 +88,14 @@ namespace AglonaReader
 
         public byte StructureLevel { get; set; }
 
+        
+        public uint AudioFileNumber { get; set; }
+        public uint TimeBeg { get; set; }
+        public uint TimeEnd { get; set; }
+        
+
         public string Text1 { get; set; }
-        public string Text2 { get; set; }
-
-
+        public string Text2 { get; set; }        
 
         // Used if texts are large (typically in aligning mode for the "big block")
         public StringBuilder SB1 { get; set; }
@@ -193,6 +197,27 @@ namespace AglonaReader
             : this()
         {
             if (text1 != null)
+                if (text1.Length >= 1000)//ParallelTextControl.BigTextSize)
+                    this.SB1 = new StringBuilder(text1);
+                else
+                    this.Text1 = text1;
+
+            if (text2 != null)
+                if (text2.Length >= 1000)//ParallelTextControl.BigTextSize)
+                    this.SB2 = new StringBuilder(text2);
+                else
+                    this.Text2 = text2;
+
+            this.StartParagraph1 = startParagraph1;
+            this.StartParagraph2 = startParagraph2;
+
+        }
+
+        
+        public TextPair(string text1, string text2, bool startParagraph1, bool startParagraph2, uint audioFileNum, uint timeBeg, uint timeEnd)
+            : this()
+        {
+            if (text1 != null)
                 if (text1.Length >= ParallelTextControl.BigTextSize)
                     this.SB1 = new StringBuilder(text1);
                 else
@@ -206,6 +231,10 @@ namespace AglonaReader
 
             this.StartParagraph1 = startParagraph1;
             this.StartParagraph2 = startParagraph2;
+
+            this.AudioFileNumber = audioFileNum;
+            this.TimeBeg = timeBeg;
+            this.TimeEnd = timeEnd;
 
         }
 
@@ -305,7 +334,7 @@ namespace AglonaReader
 
                             prevNatural = currentWordStart;
                             /////
-                            
+
                             state = 3;
                         }
 
@@ -351,7 +380,7 @@ namespace AglonaReader
                                 state = 1;
                             }
 
-                        
+
 
                         break;
                 }
@@ -482,7 +511,7 @@ namespace AglonaReader
 
         }
 
-        
+
 
         public int NaturalDividerPosition(byte side, int startingPos, bool forward)
         {
@@ -498,7 +527,7 @@ namespace AglonaReader
                     return NaturalDividerPosition(SB2, startingPos, forward);
 
         }
-        
+
         internal string GetText(byte side)
         {
             if (side == 1)
@@ -557,6 +586,8 @@ namespace AglonaReader
 
         public string FileName { get; set; }
 
+        public bool WithAudio { get; set; }
+
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -591,7 +622,7 @@ namespace AglonaReader
             Lang2 = "";
 
             Info = "";
-            
+
         }
 
         public TextPair this[int pairIndex]
@@ -607,6 +638,12 @@ namespace AglonaReader
 
             TextPairs.Add(newPair);
 
+        }
+
+        public void AddPair(string text1, string text2, uint audioFileNum, uint timeBeg, uint timeEnd)
+        {
+            TextPair newPair = new TextPair(text1, text2, true, true, audioFileNum, timeBeg, timeEnd);
+            TextPairs.Add(newPair);
         }
 
         public void AddPair(string text1, string text2)
@@ -630,7 +667,7 @@ namespace AglonaReader
             Collection<WordInfo> l = null;
             TextPair prev_p = null;
             byte prev_side = 0;
-            
+
 
             int bias = 0;
 
@@ -745,6 +782,13 @@ namespace AglonaReader
                     else
                         writer.WriteAttributeString("t", p.SB2.ToString());
 
+                    if (WithAudio && (p.AudioFileNumber > 0))
+                    {
+                        writer.WriteAttributeString("f", p.AudioFileNumber.ToString());
+                        writer.WriteAttributeString("b", p.TimeBeg.ToString());
+                        writer.WriteAttributeString("e", p.TimeEnd.ToString());
+                    }
+                    
                     writer.WriteEndElement();
                 }
 
@@ -758,7 +802,7 @@ namespace AglonaReader
 
         public bool Load(string newFileName)
         {
-
+            WithAudio = newFileName.EndsWith(".pbs");
 
             using (XmlTextReader reader = new XmlTextReader(newFileName))
             {
@@ -907,6 +951,30 @@ namespace AglonaReader
                     else
                         p.Text2 = reader.Value;
 
+                    if (WithAudio && (reader.MoveToNextAttribute()))
+                    {
+                        if (reader.Name != "f")
+                            return false;
+
+                        p.AudioFileNumber = uint.Parse(reader.Value);
+
+                        if (!reader.MoveToNextAttribute())
+                            return false;
+
+                        if (reader.Name != "b")
+                            return false;
+
+                        p.TimeBeg = uint.Parse(reader.Value);
+
+                        if (!reader.MoveToNextAttribute())
+                            return false;
+
+                        if (reader.Name != "e")
+                            return false;
+
+                        p.TimeEnd = uint.Parse(reader.Value);
+                    }
+                    
                     p.totalTextSize += reader.Value.Length;
 
                     TextPairs.Add(p);
@@ -914,7 +982,6 @@ namespace AglonaReader
                     goto NextPair;
 
                 }
-
 
                 reader.Close();
 
@@ -924,8 +991,6 @@ namespace AglonaReader
                     UpdateAggregates(0);
 
                 return true;
-
-
 
             }
 
@@ -1034,12 +1099,25 @@ namespace AglonaReader
 
                 outfile.Close();
 
-                
+
 
             }
 
 
 
+        }
+    }
+
+    public class CommonWordInfo : WordInfo
+    {
+        public TextPair TextPair { get; set; }
+        public byte side;
+
+        public CommonWordInfo(TextPair textPair, string word, int line, int wordX, int wordX2, int pos, bool eastern, byte side)
+            : base(word, line, wordX, wordX2, pos, eastern)
+        {
+            this.TextPair = textPair;
+            this.side = side;
         }
     }
 

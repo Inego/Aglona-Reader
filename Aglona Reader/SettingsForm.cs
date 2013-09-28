@@ -146,7 +146,20 @@ namespace AglonaReader
             }
 
             pTC.SetLayoutMode();
-            pTC.ProcessLayoutChange();
+            
+            if (pTC.EditMode)
+            {
+                pTC.SelectionSide = 0;
+                pTC.SelectionFrame.Visible = false;
+            }
+            else
+            {
+                pTC.HighlightedFrame.SetVisibility(false);
+                pTC.NippingFrame.SetVisibility(false);
+                pTC.MouseCurrentWord = null;
+            }
+            
+            pTC.ProcessLayoutChange(true);
 
         }
 

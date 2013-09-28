@@ -77,6 +77,14 @@ namespace AglonaReader
         List<Color> lightColorTable;
         Color grayColor; // Changes with Brightness
 
+
+        public TextPair hp {
+            get
+            {
+                return PText[HighlightedPair];
+            }
+        }
+
         private double brightness;
         public double Brightness
         {
@@ -245,7 +253,6 @@ namespace AglonaReader
 
         public void ComputeSideCoordinates()
         {
-
             if (LayoutMode == LayoutMode_Alternating || LayoutMode == LayoutMode_Advanced)
             {
                 text1start = PanelMargin - frameoffset_x;
@@ -311,11 +318,13 @@ namespace AglonaReader
         Brush splitterBrush;
 
         public Pen HighlightedPen { get; set; }
+        public Pen AudioPen { get; set; }
         public Pen SuggestedPen { get; set; }
         public Pen CorrectedPen { get; set; }
 
         public DoubleFrame HighlightedFrame { get; set; }
         public DoubleFrame NippingFrame { get; set; }
+        public Frame AudioSingleFrame { get; set; } // Used for highlighting audio in Alternating and Advanced modes
 
         private Collection<AbstractFrame> frames;
 
@@ -479,7 +488,12 @@ namespace AglonaReader
             frames = new Collection<AbstractFrame>();
 
             HighlightedPen = Frame.CreatePen(Color.LightBlue, DashStyle.Solid, 4.0F);
+            
+            AudioPen = Frame.CreatePen(Color.Gray, DashStyle.Dot, 2.0F);
+
             HighlightedFrame = new DoubleFrame(HighlightedPen, frames);
+
+            AudioSingleFrame = new Frame(AudioPen, frames);
 
             CorrectedPen = Frame.CreatePen(Color.Peru, DashStyle.Solid, 2.0F);
 
@@ -539,14 +553,23 @@ namespace AglonaReader
         {
             colorTableH = new List<double>();
 
-            colorTableH.Add(0.162);
-            colorTableH.Add(0.34);
-            colorTableH.Add(0.492);
-            colorTableH.Add(0.68);
-            colorTableH.Add(0.83);
-            colorTableH.Add(0);
-            //colorTableH.Add(0.11); // Orange? Too close to yellow. Disable for now
+            // CLASSIC (RAINBOW)
 
+            //colorTableH.Add(0.162); // Yellow
+            //colorTableH.Add(0.34);  // Green
+            //colorTableH.Add(0.492); // Cyan
+            //colorTableH.Add(0.68);  // Blue
+            //colorTableH.Add(0.83);  // Pink
+            //colorTableH.Add(0);     // Red
+            ////colorTableH.Add(0.11); // Orange? Too close to yellow. Disable for now
+
+            colorTableH.Add(0.162); // Yellow
+            colorTableH.Add(0.83);  // Pink
+            colorTableH.Add(0.34);  // Green
+            colorTableH.Add(0.492); // Cyan
+            colorTableH.Add(0);     // Red
+            colorTableH.Add(0.68);  // Blue
+            
             NumberofColors = (byte)colorTableH.Count;
 
             brushTable = new List<SolidBrush>();
@@ -1396,18 +1419,24 @@ namespace AglonaReader
         static extern uint SetTextColor(IntPtr hdc, int crColor);
 
 
-        public bool NotFitOnScreen(TextPair p)
+        public bool NotFitOnScreen(int pairIndex)
         {
+            if (pairIndex < CurrentPair)
+                return true;
+                
+            TextPair p = PText[pairIndex];
 
             if (LayoutMode == LayoutMode_Advanced)
             {
                 if (Reversed)
-                    return (p.RenderedInfo2.Line2 == -1
+                    return (!p.RenderedInfo2.Valid
+                        || p.RenderedInfo2.Line2 == -1
                         || p.RenderedInfo2.Line2 > LastFullScreenLine)
                         && !p.IsBig()
                         || p.RenderedInfo2.Line1 == -1;
                 else
-                    return (p.RenderedInfo1.Line2 == -1
+                    return (!p.RenderedInfo1.Valid
+                        || p.RenderedInfo1.Line2 == -1
                         || p.RenderedInfo1.Line2 > LastFullScreenLine)
                         && !p.IsBig()
                         || p.RenderedInfo1.Line1 == -1;
@@ -1415,11 +1444,13 @@ namespace AglonaReader
             }
             else
 
-            return (p.RenderedInfo1.Line2 == -1
+                return (p.RenderedInfo1.Line2 == -1
                         || p.RenderedInfo1.Line2 > LastFullScreenLine
                         || p.RenderedInfo2.Line2 == -1
                         || p.RenderedInfo2.Line2 > LastFullScreenLine)
                         && !p.IsBig()
+                        || !p.RenderedInfo1.Valid
+                        || !p.RenderedInfo2.Valid
                         || p.RenderedInfo1.Line1 == -1
                         || p.RenderedInfo2.Line1 == -1;
         }
@@ -1437,7 +1468,7 @@ namespace AglonaReader
             int newColor;
 
             // In view mode, show text in gray if it is not complete
-            newColor = !EditMode && (NotFitOnScreen(p) || pairIndex < CurrentPair) ?
+            newColor = !EditMode && (NotFitOnScreen(pairIndex)) ?
                        2 :
                        ((LayoutMode == LayoutMode_Alternating) && Reversed == (side == 2) ? 3 : 1);
 
@@ -1781,7 +1812,7 @@ namespace AglonaReader
             }
         }
 
-        public void FindNaturalDividersScreen(byte side)
+        public void UpdateFramesOnScreen(byte side)
         {
             if (PText.Number() == 0)
                 return;
@@ -1809,7 +1840,36 @@ namespace AglonaReader
             }
 
             else
+            {                
+                if (PText.WithAudio)
+                {
+                    TextPair h = PText.TextPairs[HighlightedPair];
+
+                    if (side == 0)
+                    {
+                        if (LayoutMode == LayoutMode_Normal)
+                            SetFramesByPair(h, HighlightedFrame);
+                        else if (LayoutMode == LayoutMode_Alternating)
+                        {
+
+                            RenderedTextInfo _r1 = Reversed ? h.RenderedInfo2 : h.RenderedInfo1;
+                            RenderedTextInfo _r2 = Reversed ? h.RenderedInfo1 : h.RenderedInfo2;
+
+                            AudioSingleFrame.Line1 = _r1.Line1;
+                            AudioSingleFrame.Line2 = _r2.Line2;
+                            AudioSingleFrame.X1 = _r1.X1;
+                            AudioSingleFrame.X2 = _r2.X2;
+
+                        }
+                        else // Advanced
+                            AudioSingleFrame.FillByRenderInfo(Reversed ? h.RenderedInfo2 : h.RenderedInfo1, 0);
+                    }
+
+                }
+
                 UpdateSelectionFrame();
+                
+            }
 
         }
 
@@ -2027,7 +2087,7 @@ namespace AglonaReader
                 && !(c >= (char)0xac00 && c <= (char)0xd7a3)); // Hangul
         }
 
-        public void ProcessLayoutChange()
+        public void ProcessLayoutChange(bool updateScreen)
         {
             // erase both tables
             PText.Truncate();
@@ -2134,6 +2194,14 @@ namespace AglonaReader
             NipASide(hp, np, 1);
             NipASide(hp, np, 2);
 
+            np.AudioFileNumber = hp.AudioFileNumber;
+            np.TimeBeg = hp.TimeBeg;
+            np.TimeEnd = hp.TimeEnd;
+
+            hp.AudioFileNumber = 0;
+            hp.TimeBeg = 0;
+            hp.TimeEnd = 0;
+
             PText.TextPairs.Insert(HighlightedPair, np);
 
             if (EditWhenNipped)
@@ -2205,7 +2273,7 @@ namespace AglonaReader
                 RenderPairs();
             }
 
-            FindNaturalDividersScreen(0);
+            UpdateFramesOnScreen(0);
             ProcessMousePosition(true, false);
             Render();
 
@@ -2490,8 +2558,6 @@ namespace AglonaReader
 
             while (!_p.StartParagraph1 || !_p.StartParagraph2);
 
-
-
             // Truncate all following pairs until end or true-true
 
             int j = pairIndex;
@@ -2518,7 +2584,7 @@ namespace AglonaReader
         {
             PrepareScreen();
             RenderPairs();
-            FindNaturalDividersScreen(0);
+            UpdateFramesOnScreen(0);
             ProcessMousePosition(true, false);
             Render();
         }
@@ -2896,6 +2962,9 @@ namespace AglonaReader
                 second.SB2 = null;
             }
 
+            if (first.AudioFileNumber == second.AudioFileNumber)
+                second.TimeBeg = first.TimeBeg;
+
             Modified = true;
 
         }
@@ -2921,7 +2990,6 @@ namespace AglonaReader
             int X2;
 
             AssignProperSelectionOrder(out Y1, out Y2, out X1, out X2);
-
 
             ScreenWord word1 = FindScreenWordByPosition(Y1, X1, SelectionSide);
             ScreenWord word2 = FindScreenWordByPosition(Y2, X2, SelectionSide);
@@ -2979,7 +3047,7 @@ namespace AglonaReader
             
             ComputeSpaceLength(PanelGraphics);
             
-            ProcessLayoutChange();
+            ProcessLayoutChange(true);
 
         }
 
@@ -2994,11 +3062,16 @@ namespace AglonaReader
         {
 
             if (EditMode || ReadingMode == FileUsageInfo.NormalMode)
+            {
                 LayoutMode = LayoutMode_Normal;
+            }
             else if (ReadingMode == FileUsageInfo.AlternatingMode)
                 LayoutMode = LayoutMode_Alternating;
             else
                 LayoutMode = LayoutMode_Advanced;
+
+            AudioSingleFrame.Visible = (WithAudio() && !EditMode && LayoutMode != LayoutMode_Normal);
+            HighlightedFrame.SetVisibility(!AudioSingleFrame.Visible);
 
             ComputeIndent();
 
@@ -3083,9 +3156,11 @@ namespace AglonaReader
             NaturalDividerPosition1 = -1;
             NaturalDividerPosition2 = -1;
 
+            if (Number == 0)
+                return;
+
             NextRecommended(1, true);
             NextRecommended(2, true);
-
 
         }
 
@@ -3098,6 +3173,11 @@ namespace AglonaReader
                 sideToExport = 3 - sideToExport;
 
             PText.ExportText(fileName, sideToExport);
+        }
+
+        public bool WithAudio()
+        {
+            return PText.WithAudio;
         }
     }
 

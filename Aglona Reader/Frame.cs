@@ -10,6 +10,8 @@ namespace AglonaReader
     public abstract class AbstractFrame
     {
 
+        public Pen FramePen;
+
         /// <summary>
         /// Denotes the newSide of the text where the frame is applied.
         /// 1 = second text; 2 = first text.
@@ -29,7 +31,6 @@ namespace AglonaReader
             if (list != null)
                 list.Add(this);
         }
-
 
         public void FillByRenderInfo(RenderedTextInfo renderedTextInfo, byte newSide)
         {
@@ -78,15 +79,22 @@ namespace AglonaReader
             this.F2.Side = 2;
         }
 
+        public void SetPen(Pen pen)
+        {
+            F1.FramePen = pen;
+            F2.FramePen = pen;
+        }
+
+
         internal AbstractFrame Frame(byte side)
         {
             return side == 1 ? F1 : F2;
         }
 
-        public void SetInvisible()
+        public void SetVisibility(bool visibility)
         {
-            this.F1.Visible = false;
-            this.F2.Visible = false;
+            this.F1.Visible = visibility;
+            this.F2.Visible = visibility;
         }
 
     }
@@ -118,8 +126,6 @@ namespace AglonaReader
 
     public class Frame : AbstractFrame, IDisposable
     {
-
-        public Pen FramePen { get; set; }
 
         public static Pen CreatePen(Color color, DashStyle dashStyle, float width)
         {
@@ -175,9 +181,6 @@ namespace AglonaReader
             if (parallelTextControl != null)
                 parallelTextControl.DrawFrame(this);
         }
-
-        
-        
 
     }
 }

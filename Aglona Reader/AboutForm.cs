@@ -22,6 +22,11 @@ namespace AglonaReader
             return base.ProcessCmdKey(ref msg, keyData);
         }
 
+        private void releaseDateLabel_Click(object sender, System.EventArgs e)
+        {
+
+        }
+
         
     }
 }

@@ -5,7 +5,8 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.Text;
 using System.Diagnostics;
-
+using System.IO;
+using AglonaReader.Mp3Player;
 
 [assembly: CLSCompliant(true)]
 namespace AglonaReader
@@ -14,6 +15,15 @@ namespace AglonaReader
     public partial class MainForm : Form
     {
 
+        private const int timerInterval = 100;
+        private const int timerHalfInterval = timerInterval / 2;
+
+        AudioPlayer player = new AudioPlayer();
+
+        Timer playbackTimer = new Timer();
+        long nextTime = -1;
+        int nextPairToPlay = -1;
+        
         bool newBook;
 
         AppSettings appSettings;
@@ -24,10 +34,9 @@ namespace AglonaReader
         private bool justJumped = false;
         private int prevHorizontalDistance = 0;
 
-        
-
         FindForm findForm;
-        
+        private bool CtrlPressed;
+        private int currentAudioFileNumber;
 
         protected override bool ProcessDialogKey(Keys keyData)
         {
@@ -50,13 +59,131 @@ namespace AglonaReader
         {
             InitializeComponent();
 
-            this.pTC.MouseWheel += new MouseEventHandler(this.pTC_MouseWheel);
+            pTC.MouseWheel += new MouseEventHandler(pTC_MouseWheel);
 
             opState = 0;
-            this.WindowState = FormWindowState.Maximized;
+            CtrlPressed = false;
+            WindowState = FormWindowState.Maximized;
+
+            playbackTimer.Interval = timerInterval;
+            playbackTimer.Tick += playbackTimer_Tick;
+
+            currentAudioFileNumber = -1;
             
         }
-        
+
+        void playbackTimer_Tick(object sender, EventArgs e)
+        {
+            uint currentTime = player.CurrentTime;
+
+            if (currentTime >= nextTime || !player.Playing)
+            {
+
+                if (nextPairToPlay == -1)
+                {
+                    playbackTimer.Enabled = false;
+                    StopPlayback();
+                    return;
+                }
+                
+                // Update selection
+
+                if (pTC[nextPairToPlay].AudioFileNumber != currentAudioFileNumber)
+                {
+                    playbackTimer.Enabled = false;
+                    pTC.HighlightedPair = nextPairToPlay - 1;
+                    StartPlayback(true);
+                    return;
+                }
+
+                pTC.HighlightedPair = nextPairToPlay;
+
+                DetermineNextTime();
+
+                if (pTC.NotFitOnScreen(pTC.HighlightedPair))
+                {
+                    pTC.CurrentPair = pTC.HighlightedPair;
+                    pTC.PrepareScreen();
+                    pTC.RenderPairs();
+                }
+
+                pTC.UpdateFramesOnScreen(0);
+
+                pTC.Render();
+
+                UpdateStatusBar(true);
+                
+            }
+        }
+
+        private void DetermineNextTime()
+        {
+
+            nextTime = -1;
+            nextPairToPlay = -1;
+            
+            for (int i = pTC.HighlightedPair + 1; i < pTC.Number; i++)
+            {
+                if (pTC[i].AudioFileNumber != 0
+                    && pTC[i].AudioFileNumber != currentAudioFileNumber)
+                {
+                    if (pTC.hp.TimeEnd != 0)
+                        nextTime = pTC.hp.TimeEnd;
+                    nextPairToPlay = i;
+                    break;
+                }
+                if (pTC[i].TimeBeg != 0)
+                {
+                    nextTime = pTC[i].TimeBeg - timerHalfInterval;
+                    nextPairToPlay = i;
+                    break;
+                }
+            }
+
+            if (nextPairToPlay == -1 && pTC.hp.TimeEnd != 0)
+                nextTime = pTC.hp.TimeEnd;
+
+        }
+
+        private void StartPlayback(bool fromNextPair)
+        {
+            if (playbackTimer.Enabled)
+                StopPlayback();
+
+            if (!pTC.WithAudio() || pTC.EditMode)
+                return;
+
+            int pairToStart = pTC.HighlightedPair + (fromNextPair ? 1 : 0);
+
+            // Rewind forward until a pair with sound is found (if any)
+
+            while (pairToStart < pTC.Number && pTC[pairToStart].AudioFileNumber == 0)
+                pairToStart++;
+
+            if (pairToStart >= pTC.Number || pTC[pairToStart].AudioFileNumber == 0)
+                return;
+
+            if (pTC.HighlightedPair != pairToStart)
+                GotoPair(pairToStart, false, false, 0);
+            
+            TextPair hp = pTC.hp;
+
+            if (SetFileToAudioplayer(hp.AudioFileNumber))
+            {
+                DetermineNextTime();
+                player.PlayFromTo(hp.TimeBeg, 0);
+                playbackTimer.Enabled = true;
+            }
+
+        }
+
+        // Stops both single and countinuous playback
+        private void StopPlayback()
+        {
+            playbackTimer.Enabled = false;
+            player.Stop(true);
+        }
+
         private void MainForm_Resize(object sender, EventArgs e)
         {
             pTC.ResizeBufferedGraphic();
@@ -118,6 +245,7 @@ namespace AglonaReader
             if (load)
             {
                 pTC.PText.Load(f.FileName);
+                currentAudioFileNumber = -1;
                 UpdateWindowTitle();
             }
 
@@ -132,7 +260,7 @@ namespace AglonaReader
             SetEditMode(f.EditMode);
 
             pTC.SetLayoutMode();
-
+            
             pTC.SetSplitterPositionByRatio(f.SplitterRatio);
     
             pTC.Modified = false;
@@ -153,7 +281,7 @@ namespace AglonaReader
                 Recompute();
             }
 
-            UpdateStatusBar(true);
+            ProcessEditModeChange(true);
 
         }
 
@@ -180,6 +308,9 @@ namespace AglonaReader
 
             if (!IsNullOrWhiteSpace(pTC.PText.Lang1) && !IsNullOrWhiteSpace(pTC.PText.Lang2))
                 cpt += " [" + pTC.PText.Lang1 + "-" + pTC.PText.Lang2 + "]";
+
+            if (pTC.WithAudio())
+                cpt += " ♪";
 
             if (IsNullOrWhiteSpace(cpt))
                 Text = "Aglona Reader";
@@ -236,11 +367,9 @@ namespace AglonaReader
 
                         startedXMoving = true;
 
-                        TextPair p = pTC[pTC.HighlightedPair];
+                        TextPair p = pTC.hp;
 
                         bool forward = (distance > prevHorizontalDistance);
-
-                        //pTC.DebugString = distance.ToString() + " " + prevHorizontalDistance.ToString() + " " + forward;
 
                         prevHorizontalDistance = distance;
 
@@ -266,7 +395,7 @@ namespace AglonaReader
                             if (needToRender == 3)
                                 needToRender = 0;
 
-                            pTC.FindNaturalDividersScreen(needToRender);
+                            pTC.UpdateFramesOnScreen(needToRender);
                             pTC.Render();
                         }
                     }
@@ -340,9 +469,7 @@ namespace AglonaReader
                         pTC.Side1Set = false;
                         pTC.Side2Set = false;
 
-                        p = pTC[pTC.HighlightedPair];
-
-                        if (pTC.NotFitOnScreen(p))
+                        if (pTC.NotFitOnScreen(pTC.HighlightedPair))
                         {
                             pTC.CurrentPair = pTC.HighlightedPair;
                             pTC.PrepareScreen();
@@ -351,7 +478,7 @@ namespace AglonaReader
                         }
 
                         pTC.FindFirstNaturalDividers();
-                        pTC.FindNaturalDividersScreen(0);
+                        pTC.UpdateFramesOnScreen(0);
                         pTC.ProcessMousePosition(true, true);
 
                         justJumped = true;
@@ -362,7 +489,7 @@ namespace AglonaReader
                     pTC.horizontalStartingPosition = e.X;
                     pTC.verticalStartingPosition = e.Y;
 
-                    p = pTC[pTC.HighlightedPair];
+                    p = pTC.hp;
 
                     startedXMoving = false;
                     startedYMoving = false;
@@ -373,24 +500,29 @@ namespace AglonaReader
                 {
                     // In view mode mouse down begins selection
 
-                    if (pTC.mouse_text_word == null)
-                        return;
-
-                    if (pTC.SelectionFinished)
+                    if (CtrlPressed)
                     {
-                        pTC.SelectionFinished = false;
-                        pTC.SelectionSide = pTC.mouse_text_word.Side;
-                        pTC.Selection1Pair = pTC.mouse_text_word.PairIndex;
-                        pTC.Selection2Pair = pTC.mouse_text_word.PairIndex;
-                        pTC.Selection1Position = pTC.mouse_text_word.Pos;
-                        pTC.Selection2Position = pTC.mouse_text_word.Pos;
-                        pTC.SelectionFrame.Visible = true;
-                        pTC.SelectionFrame.Side = pTC.mouse_text_word.Side;
-                        pTC.SelectionFrame.Line1 = pTC.mouse_text_word.Line;
-                        pTC.SelectionFrame.Line2 = pTC.mouse_text_word.Line;
-                        pTC.SelectionFrame.X1 = pTC.mouse_text_word.FX1;
-                        pTC.SelectionFrame.X2 = pTC.mouse_text_word.FX2;
-                        pTC.Render();
+
+                        if (pTC.mouse_text_word == null)
+                            return;
+
+                        if (pTC.SelectionFinished)
+                        {
+                            pTC.SelectionFinished = false;
+                            pTC.SelectionSide = pTC.mouse_text_word.Side;
+                            pTC.Selection1Pair = pTC.mouse_text_word.PairIndex;
+                            pTC.Selection2Pair = pTC.mouse_text_word.PairIndex;
+                            pTC.Selection1Position = pTC.mouse_text_word.Pos;
+                            pTC.Selection2Position = pTC.mouse_text_word.Pos;
+                            pTC.SelectionFrame.Visible = true;
+                            pTC.SelectionFrame.Side = pTC.mouse_text_word.Side;
+                            pTC.SelectionFrame.Line1 = pTC.mouse_text_word.Line;
+                            pTC.SelectionFrame.Line2 = pTC.mouse_text_word.Line;
+                            pTC.SelectionFrame.X1 = pTC.mouse_text_word.FX1;
+                            pTC.SelectionFrame.X2 = pTC.mouse_text_word.FX2;
+                            pTC.Render();
+                        }
+
                     }
 
                 }
@@ -440,7 +572,34 @@ namespace AglonaReader
                 }
 
                 else
-                    pTC.SelectionFinished = true;
+                {
+                    if (CtrlPressed)
+                        pTC.SelectionFinished = true;
+                    else
+                    {
+                        if (pTC.WithAudio() && pTC.mouse_text_word != null)
+                        {
+                            // Move to this fragment
+                            if (pTC.mouse_text_word.PairIndex != pTC.HighlightedPair)
+                            {
+                                
+                                if (pTC.NotFitOnScreen(pTC.mouse_text_word.PairIndex))
+                                    GotoPair(pTC.mouse_text_word.PairIndex, false, false, 1);
+                                else
+                                {
+                                    pTC.HighlightedPair = pTC.mouse_text_word.PairIndex;
+                                    pTC.UpdateFramesOnScreen(0);
+                                    pTC.Render();
+                                    PlayCurrentPhrase();
+                                }
+
+                            }
+                            else
+                                PlayCurrentPhrase();
+
+                        }
+                    }
+                }
             }
         }
 
@@ -517,20 +676,29 @@ namespace AglonaReader
         {
             pTC.mouse_text_line = -1;
             pTC.MouseCurrentWord = null;
-            pTC.ProcessLayoutChange();
+            pTC.ProcessLayoutChange(true);
         }
 
         private void pTC_KeyDown(object sender, KeyEventArgs e)
         {
-
-            //pTC.DebugString = e.KeyData.ToString();
-            //pTC.Render();
+            if ((e.KeyData & Keys.ControlKey) == Keys.ControlKey)
+                CtrlPressed = true;
 
             if (e.KeyData == Keys.Down)
                 ProcessKeyDown();
 
             else if (e.KeyData == Keys.Up)
                 ProcessKeyUp();
+
+            else if (e.KeyData == Keys.Right)
+                StartPlayback(true);
+
+            else if (e.KeyData == Keys.Space)
+                // Start / stop playback
+                if (player.Playing)
+                    StopPlayback();
+                else
+                    StartPlayback(false);
 
             else if (e.KeyData == (Keys.Control | Keys.Up)
                 || e.KeyData == Keys.Z)
@@ -592,7 +760,7 @@ namespace AglonaReader
                 if (n == 0)
                     return;
                 if (pTC.HighlightedPair != n - 1)
-                    GotoPair(n - 1);
+                    GotoPair(n - 1, false, false, 1);
 
             }
 
@@ -602,7 +770,7 @@ namespace AglonaReader
                 if (n == 0)
                     return;
 
-                GotoPair(0);
+                GotoPair(0, false, true, 1);
             }
 
             else if (e.KeyData == Keys.PageUp)
@@ -628,6 +796,16 @@ namespace AglonaReader
             {
                 editModeToolStripMenuItem.Checked = !pTC.EditMode;
                 editModeToolStripMenuItem_Click(null, null);
+            }
+
+            else if (e.KeyData == Keys.Enter)
+            {
+                if (playbackTimer.Enabled)
+                    StopPlayback();
+                else if (player.Playing)
+                    player.Stop(true);
+                else
+                    PlayCurrentPhrase();
             }
             
         }
@@ -706,12 +884,12 @@ namespace AglonaReader
                 if (pTC.CurrentPair >= pTC.HighlightedPair)
                 {
                     pTC.PairChanged(pTC.HighlightedPair, false);
-                    GotoPair(pTC.HighlightedPair, true);
+                    GotoPair(pTC.HighlightedPair, false, true, 2);
                 }
                 else
                     pTC.PairChanged(pTC.HighlightedPair, true);
 
-                pTC[pTC.HighlightedPair].UpdateTotalSize();
+                pTC.hp.UpdateTotalSize();
                 pTC.PText.UpdateAggregates(pTC.HighlightedPair);
                 UpdateStatusBar(true);
                 pTC.Side1Set = false;
@@ -795,7 +973,7 @@ namespace AglonaReader
             {
                 int pairIndex = pTC.LastRenderedPair;
 
-                while (pairIndex > 0 && pTC.NotFitOnScreen(pTC[pairIndex]))
+                while (pairIndex > 0 && pTC.NotFitOnScreen(pairIndex))
                     pairIndex--;
 
                 pairIndex++;
@@ -803,7 +981,7 @@ namespace AglonaReader
                 if (pairIndex > pTC.Number - 1)
                     pairIndex = pTC.Number - 1;
 
-                GotoPair(pairIndex);
+                GotoPair(pairIndex, false, false, 1);
             }
         }
 
@@ -839,28 +1017,46 @@ namespace AglonaReader
                 newCurrentPair--;
 
             if (newCurrentPair != pTC.CurrentPair)
-                GotoPair(newCurrentPair);
+                GotoPair(newCurrentPair, false, false, 1);
 
         }
 
-        public void GotoPair(int newCurrentPair)
+        // playType
+        //  0: Stop playing (if playing sound)
+        //  1: play once
+        //  2: keep playing
+        //
+        public void GotoPair(int newCurrentPair, bool setCurrentPair, bool forced, byte playType)
         {
-            GotoPair(newCurrentPair, false);
-        }
-
-        public void GotoPair(int newCurrentPair, bool forced)
-        {
-            if (pTC.CurrentPair == newCurrentPair && !forced)
+            
+            if (pTC.HighlightedPair == newCurrentPair
+                && !forced
+                && !(setCurrentPair && pTC.CurrentPair != newCurrentPair))
                 return;
 
-            pTC.CurrentPair = newCurrentPair;
             pTC.HighlightedPair = newCurrentPair;
 
-            pTC.FindFirstNaturalDividers();
-
-            pTC.UpdateScreen();
+            if (setCurrentPair && pTC.CurrentPair != newCurrentPair
+                || pTC.NotFitOnScreen(pTC.HighlightedPair))
+            {
+                pTC.CurrentPair = newCurrentPair;
+                pTC.FindFirstNaturalDividers();
+                pTC.UpdateScreen();
+            }
+            else
+            {
+                pTC.UpdateFramesOnScreen(0);
+                pTC.ProcessMousePosition(true, false);
+                pTC.Render();
+            }
 
             UpdateStatusBar(true);
+
+
+            if (playType == 0)
+                StopPlayback();
+            else if (playType == 1)
+                PlayCurrentPhrase();
         }
 
         private void UpdateStatusBar(bool updateScrollBar)
@@ -960,9 +1156,67 @@ namespace AglonaReader
             if (updateScrollBar)
             {
                 vScrollBar.Maximum = (pTC.Number == 0 ? 0 : pTC.Number - 1);
-                vScrollBar.Value = pTC.CurrentPair;
+                vScrollBar.Value = pTC.HighlightedPair;
             }
 
+        }
+
+        private void PlayCurrentPhrase()
+        {
+            if (!pTC.EditMode && pTC.WithAudio())
+            {
+                if (playbackTimer.Enabled)
+                    StopPlayback();
+
+                TextPair tp = pTC.hp;
+
+                uint audioFileNumber = tp.AudioFileNumber;
+
+                if (audioFileNumber == 0)
+                    return;
+
+                uint beg = tp.TimeBeg;
+
+                uint end = tp.TimeEnd;
+
+                for (int _i = pTC.HighlightedPair + 1; end == 0 & _i < pTC.Number; _i++)
+                {
+                    TextPair _p = pTC[_i];
+                    if (_p.AudioFileNumber == 0)
+                        continue;
+                    if (_p.AudioFileNumber != audioFileNumber)
+                        break;
+                    if (_p.TimeBeg >= beg)
+                    {
+                        end = _p.TimeBeg;
+                        break;
+                    }
+
+                }
+
+                if(SetFileToAudioplayer(audioFileNumber))
+                    player.PlayFromTo(beg, end);
+                
+            }            
+        }
+
+        private bool SetFileToAudioplayer(uint audioFileNumber)
+        {
+            if (audioFileNumber != currentAudioFileNumber)
+            {
+                string folder = Path.GetDirectoryName(pTC.PText.FileName);
+                string fName = folder + @"\" + audioFileNumber.ToString() + ".mp3";
+
+                if (File.Exists(fName))
+                    player.Open(fName);
+                else
+                    return false;
+
+                currentAudioFileNumber = (int)audioFileNumber;
+
+            }
+
+            return true;
         }
 
         private void ProcessKeyUp()
@@ -970,37 +1224,42 @@ namespace AglonaReader
             if (pTC.HighlightedPair == 0)
                 return;
 
-            if (pTC.EditMode)
+            if (pTC.EditMode || pTC.WithAudio())
             {
 
-                pTC.Side1Set = false;
-                pTC.Side2Set = false;
-
-                TextPair prev_p = pTC[pTC.HighlightedPair];
+                TextPair prev_p = pTC.hp;
 
                 pTC.HighlightedPair--;
-                pTC.FindFirstNaturalDividers();
 
-                TextPair p = pTC[pTC.HighlightedPair];
+                if (pTC.EditMode)
+                {
+                    pTC.Side1Set = false;
+                    pTC.Side2Set = false;
+                    pTC.FindFirstNaturalDividers();
+                }
 
-                //if (prev_p.RenderedInfo1.Line1 == 0 && (prev_p.RenderedInfo1.X1 == 0 || p.Height > 0)
-                //    || prev_p.RenderedInfo2.Line1 == 0 && (prev_p.RenderedInfo2.X1 == 0 || p.Height > 0))
-                if (pTC.HighlightedPair < pTC.FirstRenderedPair
-                    || p.Height == -1 || !p.RenderedInfo1.Valid || p.RenderedInfo1.Line1 == -1 || p.RenderedInfo1.Line2 == -1)
+                if (pTC.NotFitOnScreen(pTC.HighlightedPair))
                 {
                     pTC.CurrentPair = pTC.HighlightedPair;
                     pTC.PrepareScreen();
                     pTC.RenderPairs();
                 }
 
-                pTC.FindNaturalDividersScreen(0);
+                pTC.UpdateFramesOnScreen(0);
+                
                 pTC.ProcessMousePosition(true, false);
+                
                 pTC.Render();
+                
                 UpdateStatusBar(true);
+
+                if (pTC.WithAudio())
+                    PlayCurrentPhrase();
+
             }
             else
             {
-                // View mode
+                // View mode (simple text)
                 int newCurrentPair = pTC.CurrentPair;
                 
                 TextPair processedPair;
@@ -1018,59 +1277,59 @@ namespace AglonaReader
                 }
 
                 if (newCurrentPair != pTC.CurrentPair)
-                    GotoPair(newCurrentPair);
+                    GotoPair(newCurrentPair, false, false, 1);
             }
         }
 
         public void ProcessKeyDown()
         {
-            if (pTC.HighlightedPair == pTC.Number - 1)
+            if (pTC.HighlightedPair >= pTC.Number - 1)
             {
                 if (pTC.CurrentPair != pTC.HighlightedPair)
-                    GotoPair(pTC.HighlightedPair);
+                    GotoPair(pTC.HighlightedPair, true, false, 2);
                 return;
             }
 
-            if (pTC.EditMode)
+            if (pTC.EditMode || pTC.WithAudio())
             {
-
-                pTC.Side1Set = false;
-                pTC.Side2Set = false;
-
                 pTC.HighlightedPair++;
-                pTC.FindFirstNaturalDividers();
 
-                TextPair p = pTC[pTC.HighlightedPair];
+                if (pTC.EditMode)
+                {
+                    pTC.Side1Set = false;
+                    pTC.Side2Set = false;
+                    pTC.FindFirstNaturalDividers();
+                }
 
-                if ((p.RenderedInfo1.Line2 == -1
-                    || p.RenderedInfo1.Line2 >= pTC.LastFullScreenLine
-                    || p.RenderedInfo2.Line2 == -1
-                    || p.RenderedInfo2.Line2 >= pTC.LastFullScreenLine)
-                    && !pTC[pTC.HighlightedPair].IsBig())
+                if (pTC.NotFitOnScreen(pTC.HighlightedPair))
                 {
                     pTC.CurrentPair = pTC.HighlightedPair;
                     pTC.PrepareScreen();
                     pTC.RenderPairs();
                 }
 
-                pTC.FindNaturalDividersScreen(0);
+                pTC.UpdateFramesOnScreen(0);
 
                 pTC.ProcessMousePosition(true, false);
 
                 pTC.Render();
 
                 UpdateStatusBar(true);
+
+                if (pTC.WithAudio())
+                    PlayCurrentPhrase();
             }
             else
             {
-                // View mode
+                // View mode (silent)
                 int pairIndex = pTC.CurrentPair;
+
                 while (pTC[pairIndex].Height == 0 && pairIndex < pTC.Number - 1)
                     pairIndex++;
                 if (pairIndex < pTC.Number - 1)
                     pairIndex++;
                 if (pairIndex != pTC.CurrentPair)
-                    GotoPair(pairIndex);
+                    GotoPair(pairIndex, true, false, 2);
             }
         }
 
@@ -1080,7 +1339,7 @@ namespace AglonaReader
             if (!pTC.EditMode)
                 return;
 
-            TextPair p = pTC[pTC.HighlightedPair];
+            TextPair p = pTC.hp;
 
             byte side;
 
@@ -1097,7 +1356,7 @@ namespace AglonaReader
                 if (pTC.NextRecommended(1, inc))
                 {
                     NeedToRender = true;
-                    pTC.FindNaturalDividersScreen(1);
+                    pTC.UpdateFramesOnScreen(1);
                     pTC.Side1Set = true;
                 }
 
@@ -1105,7 +1364,7 @@ namespace AglonaReader
                 if (pTC.NextRecommended(2, inc))
                 {
                     NeedToRender = true;
-                    pTC.FindNaturalDividersScreen(2);
+                    pTC.UpdateFramesOnScreen(2);
                     pTC.Side2Set = true;
                 }
 
@@ -1216,7 +1475,7 @@ namespace AglonaReader
 
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
-                openFileDialog.Filter = "Parallel Books (*.pbo)|*.pbo";
+                openFileDialog.Filter = "Parallel Books (*.pbo,*.pbs)|*.pbo;*.pbs";
                 openFileDialog.RestoreDirectory = true;
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
@@ -1231,6 +1490,8 @@ namespace AglonaReader
 
             pTC.PText.Load(fileName);
 
+            currentAudioFileNumber = -1;
+
             if (RetrieveToTheTop(fileName))
                 LoadSettingsFromFileUsageInfo(appSettings.FileUsages[0], false);
             else
@@ -1240,7 +1501,7 @@ namespace AglonaReader
                 SetEditMode(false);
             }
 
-            ProcessEditModeChange();
+            ProcessEditModeChange(true);
 
             pTC.stopwatchStarted = false;
 
@@ -1252,7 +1513,6 @@ namespace AglonaReader
 
             Recompute();
 
-            UpdateStatusBar(true);
             UpdateWindowTitle();
 
             return fileName;
@@ -1329,6 +1589,10 @@ namespace AglonaReader
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
+
+            player.Close();
+            playbackTimer.Enabled = false;
+
             if (AskToSaveModified(sender) == System.Windows.Forms.DialogResult.Cancel)
             {
                 e.Cancel = true;
@@ -1370,10 +1634,15 @@ namespace AglonaReader
             pTC.ComputeSideCoordinates();
             editModeToolStripMenuItem.Checked = true;
 
-            pTC.HighlightedFrame.SetInvisible();
-            pTC.NippingFrame.SetInvisible();
+            pTC.SetLayoutMode();
 
-            pTC.ProcessLayoutChange();
+            pTC.ProcessLayoutChange(false);
+
+            pTC.HighlightedFrame.SetVisibility(false);
+            pTC.NippingFrame.SetVisibility(false);
+            pTC.AudioSingleFrame.Visible = false;
+
+            ProcessEditModeChange(false);
 
             newBook = true;
         }
@@ -1392,7 +1661,7 @@ namespace AglonaReader
                 f.ShowDialog();
 
                 if (f.pairIndex != -1)
-                    GotoPair(f.pairIndex);
+                    GotoPair(f.pairIndex, true, false, 0);
             }
         }
 
@@ -1413,30 +1682,35 @@ namespace AglonaReader
 
             pTC.SetLayoutMode();
 
-            ProcessEditModeChange();
+            ProcessEditModeChange(false);
 
-            if (pTC.ReadingMode != FileUsageInfo.NormalMode)
-                Recompute();
-            else
-                pTC.UpdateScreen();
-            
         }
 
-        private void ProcessEditModeChange()
+        private void ProcessEditModeChange(bool updateStatusBar)
         {
             if (pTC.EditMode)
             {
                 pTC.SelectionSide = 0;
                 pTC.SelectionFrame.Visible = false;
+                pTC.HighlightedFrame.SetPen(pTC.HighlightedPen);
+                player.Stop(true);
             }
             else
             {
-                pTC.HighlightedFrame.SetInvisible();
-                pTC.NippingFrame.SetInvisible();
+                if (pTC.WithAudio())
+                    pTC.HighlightedFrame.SetPen(pTC.AudioPen);
+                else
+                    pTC.HighlightedFrame.SetVisibility(false);
+                pTC.NippingFrame.SetVisibility(false);
                 pTC.MouseCurrentWord = null;
             }
 
-            UpdateStatusBar(false);
+            if (pTC.ReadingMode != FileUsageInfo.NormalMode)
+                Recompute();
+            else
+                pTC.UpdateScreen();
+
+            UpdateStatusBar(updateStatusBar);
         }
 
         private void openRecentToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1479,13 +1753,13 @@ namespace AglonaReader
                 ProcessKeyDown();
             else if (e.Type == ScrollEventType.ThumbTrack)
             {
-                GotoPair(e.NewValue);
+                GotoPair(e.NewValue, false, false, 0);
                 statusStrip.Refresh();
             }
             else
                 return;
 
-            e.NewValue = pTC.CurrentPair;
+            e.NewValue = pTC.HighlightedPair;
 
             
         }
@@ -1499,8 +1773,6 @@ namespace AglonaReader
                 findForm.Top = (Height - findForm.Height) / 2;
                 findForm.pTC = pTC;
                 findForm.mainForm = this;
-                
-                
             }
 
             findForm.ShowDialog();
@@ -1554,8 +1826,6 @@ namespace AglonaReader
 
             }
 
-
-
         }
 
         private void exportRightTextToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1563,22 +1833,14 @@ namespace AglonaReader
             ExportText(false);
         }
 
-    }
-
-    public class CommonWordInfo : WordInfo
-    {
-        public TextPair TextPair { get; set; }
-        public byte side;
-
-        public CommonWordInfo(TextPair textPair, string word, int line, int wordX, int wordX2, int pos, bool eastern, byte side)
-            : base(word, line, wordX, wordX2, pos, eastern)
+        private void pTC_KeyUp(object sender, KeyEventArgs e)
         {
-            this.TextPair = textPair;
-            this.side = side;
+            if ((e.KeyData & Keys.ControlKey) == Keys.ControlKey)
+                CtrlPressed = false;
         }
-            
-    }
 
+    }
+        
     
     public class FileUsageInfo
     {
@@ -1610,7 +1872,7 @@ namespace AglonaReader
         {
             HighlightFragments = true;
             HighlightFirstWords = true;
-            Brightness = 0.96;
+            Brightness = 0.974;
             FontName = "Arial";
             FontSize = 18.0F;
             FileUsages = new Collection<FileUsageInfo>();

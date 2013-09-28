@@ -42,6 +42,7 @@
             this.saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
             this.exportLeftTextToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportRightTextToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.bookToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -69,7 +70,6 @@
             this.ssPositionPercent = new System.Windows.Forms.ToolStripStatusLabel();
             this.vScrollBar = new System.Windows.Forms.VScrollBar();
             this.pTC = new AglonaReader.ParallelTextControl();
-            this.exportRightTextToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mainMenu.SuspendLayout();
             this.statusStrip.SuspendLayout();
             this.SuspendLayout();
@@ -169,6 +169,13 @@
             this.exportLeftTextToolStripMenuItem.Size = new System.Drawing.Size(214, 22);
             this.exportLeftTextToolStripMenuItem.Text = "Export left text";
             this.exportLeftTextToolStripMenuItem.Click += new System.EventHandler(this.exportLeftTextToolStripMenuItem_Click);
+            // 
+            // exportRightTextToolStripMenuItem
+            // 
+            this.exportRightTextToolStripMenuItem.Name = "exportRightTextToolStripMenuItem";
+            this.exportRightTextToolStripMenuItem.Size = new System.Drawing.Size(214, 22);
+            this.exportRightTextToolStripMenuItem.Text = "Export right text";
+            this.exportRightTextToolStripMenuItem.Click += new System.EventHandler(this.exportRightTextToolStripMenuItem_Click);
             // 
             // toolStripSeparator5
             // 
@@ -425,6 +432,7 @@
             parallelText1.Lang2 = null;
             parallelText1.Title1 = null;
             parallelText1.Title2 = null;
+            parallelText1.WithAudio = false;
             this.pTC.PText = parallelText1;
             this.pTC.ReadingMode = 0;
             this.pTC.Reversed = false;
@@ -448,17 +456,11 @@
             this.pTC.VMargin = 3;
             this.pTC.KeyDown += new System.Windows.Forms.KeyEventHandler(this.pTC_KeyDown);
             this.pTC.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.pTC_KeyPress);
+            this.pTC.KeyUp += new System.Windows.Forms.KeyEventHandler(this.pTC_KeyUp);
             this.pTC.MouseDown += new System.Windows.Forms.MouseEventHandler(this.parallelTextControl_MouseDown);
             this.pTC.MouseLeave += new System.EventHandler(this.parallelTextControl_MouseLeave);
             this.pTC.MouseMove += new System.Windows.Forms.MouseEventHandler(this.parallelTextControl_MouseMove);
             this.pTC.MouseUp += new System.Windows.Forms.MouseEventHandler(this.parallelTextControl_MouseUp);
-            // 
-            // exportRightTextToolStripMenuItem
-            // 
-            this.exportRightTextToolStripMenuItem.Name = "exportRightTextToolStripMenuItem";
-            this.exportRightTextToolStripMenuItem.Size = new System.Drawing.Size(214, 22);
-            this.exportRightTextToolStripMenuItem.Text = "Export right text";
-            this.exportRightTextToolStripMenuItem.Click += new System.EventHandler(this.exportRightTextToolStripMenuItem_Click);
             // 
             // MainForm
             // 
