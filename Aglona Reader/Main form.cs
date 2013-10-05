@@ -49,9 +49,9 @@ namespace AglonaReader
         private void pTC_MouseWheel(object sender, System.Windows.Forms.MouseEventArgs e)
         {
             if (e.Delta > 0)
-                ProcessKeyUp();
+                ProcessKeyUp(true);
             else if (e.Delta < 0)
-                ProcessKeyDown();
+                ProcessKeyDown(true);
             
         }
 
@@ -104,7 +104,7 @@ namespace AglonaReader
                 {
                     pTC.CurrentPair = pTC.HighlightedPair;
                     pTC.PrepareScreen();
-                    pTC.RenderPairs();
+                    pTC.RenderPairs(false);
                 }
 
                 pTC.UpdateFramesOnScreen(0);
@@ -247,6 +247,7 @@ namespace AglonaReader
                 pTC.PText.Load(f.FileName);
                 currentAudioFileNumber = -1;
                 UpdateWindowTitle();
+                CtrlPressed = false;
             }
 
             if (f.SplitterRatio == 0)
@@ -256,6 +257,7 @@ namespace AglonaReader
             reverseToolStripMenuItem.Checked = pTC.Reversed;
 
             pTC.ReadingMode = f.ReadingMode;
+            pTC.AlternatingColorScheme = f.AlternatingColorScheme;
 
             SetEditMode(f.EditMode);
 
@@ -278,7 +280,7 @@ namespace AglonaReader
                     pTC.CurrentPair = f.TopPair;
 
                 pTC.FindFirstNaturalDividers();
-                Recompute();
+                //Recompute();
             }
 
             ProcessEditModeChange(true);
@@ -473,7 +475,7 @@ namespace AglonaReader
                         {
                             pTC.CurrentPair = pTC.HighlightedPair;
                             pTC.PrepareScreen();
-                            pTC.RenderPairs();
+                            pTC.RenderPairs(false);
                             
                         }
 
@@ -684,36 +686,38 @@ namespace AglonaReader
             if ((e.KeyData & Keys.ControlKey) == Keys.ControlKey)
                 CtrlPressed = true;
 
-            if (e.KeyData == Keys.Down)
-                ProcessKeyDown();
+            if (e.KeyData == Keys.Down
+                || e.KeyData == Keys.N)
+                ProcessKeyDown(true);
 
             else if (e.KeyData == Keys.Up)
-                ProcessKeyUp();
+                ProcessKeyUp(true);
 
-            else if (e.KeyData == Keys.Right)
+            else if (e.KeyData == (Keys.Control | Keys.Down)
+                && !pTC.EditMode)
                 StartPlayback(true);
 
-            else if (e.KeyData == Keys.Space)
-                // Start / stop playback
-                if (player.Playing)
-                    StopPlayback();
-                else
-                    StartPlayback(false);
+            else if ((e.KeyData == (Keys.Control | Keys.Space)
+                || e.KeyData == (Keys.Control | Keys.Enter))
+                && !pTC.EditMode)
+                StartPlayback(false);
 
-            else if (e.KeyData == (Keys.Control | Keys.Up)
+           else if (e.KeyData == (Keys.Control | Keys.Up)
                 || e.KeyData == Keys.Z)
                 MergeWithPrevious();
 
             else if (e.KeyData == (Keys.Control | Keys.Right)
                 || e.KeyData == Keys.E
                 || e.KeyData == Keys.D)
+            
                 ChangeNatural(1, true);
-
+            
             else if (e.KeyData == (Keys.Control | Keys.Left)
                 || e.KeyData == Keys.W
                 || e.KeyData == Keys.S)
+                
                 ChangeNatural(1, false);
-
+            
             else if (e.KeyData == (Keys.Alt | Keys.Right)
                 || e.KeyData == Keys.O
                 || e.KeyData == Keys.L)
@@ -747,12 +751,22 @@ namespace AglonaReader
             else if (e.KeyData == Keys.Right
                 || e.KeyData == Keys.Y
                 || e.KeyData == Keys.H)
-                ChangeNatural(0, true);
+            {
+                if (pTC.EditMode)
+                    ChangeNatural(0, true);
+                else
+                    ProcessKeyDown(false);
+            }
 
             else if (e.KeyData == Keys.Left
                 || e.KeyData == Keys.T
                 || e.KeyData == Keys.G)
-                ChangeNatural(0, false);
+            {
+                if (pTC.EditMode)
+                    ChangeNatural(0, false);
+                else
+                    ProcessKeyUp(false);
+            }
 
             else if (e.KeyData == (Keys.Control | Keys.End))
             {
@@ -798,7 +812,8 @@ namespace AglonaReader
                 editModeToolStripMenuItem_Click(null, null);
             }
 
-            else if (e.KeyData == Keys.Enter)
+            else if (e.KeyData == Keys.Enter
+                || e.KeyData == Keys.Space)
             {
                 if (playbackTimer.Enabled)
                     StopPlayback();
@@ -1026,7 +1041,7 @@ namespace AglonaReader
         //  1: play once
         //  2: keep playing
         //
-        public void GotoPair(int newCurrentPair, bool setCurrentPair, bool forced, byte playType)
+        public void GotoPair(int newCurrentPair, bool setCurrentPair, bool forced, int playType)
         {
             
             if (pTC.HighlightedPair == newCurrentPair
@@ -1219,7 +1234,7 @@ namespace AglonaReader
             return true;
         }
 
-        private void ProcessKeyUp()
+        private void ProcessKeyUp(bool withPlayback)
         {
             if (pTC.HighlightedPair == 0)
                 return;
@@ -1242,7 +1257,7 @@ namespace AglonaReader
                 {
                     pTC.CurrentPair = pTC.HighlightedPair;
                     pTC.PrepareScreen();
-                    pTC.RenderPairs();
+                    pTC.RenderPairs(false);
                 }
 
                 pTC.UpdateFramesOnScreen(0);
@@ -1254,7 +1269,10 @@ namespace AglonaReader
                 UpdateStatusBar(true);
 
                 if (pTC.WithAudio())
-                    PlayCurrentPhrase();
+                    if (withPlayback)
+                        PlayCurrentPhrase();
+                    else
+                        StopPlayback();
 
             }
             else
@@ -1281,12 +1299,12 @@ namespace AglonaReader
             }
         }
 
-        public void ProcessKeyDown()
+        public void ProcessKeyDown(bool withPlayback)
         {
             if (pTC.HighlightedPair >= pTC.Number - 1)
             {
                 if (pTC.CurrentPair != pTC.HighlightedPair)
-                    GotoPair(pTC.HighlightedPair, true, false, 2);
+                    GotoPair(pTC.HighlightedPair, true, false, (withPlayback ? 1 : 0));
                 return;
             }
 
@@ -1305,7 +1323,7 @@ namespace AglonaReader
                 {
                     pTC.CurrentPair = pTC.HighlightedPair;
                     pTC.PrepareScreen();
-                    pTC.RenderPairs();
+                    pTC.RenderPairs(false);
                 }
 
                 pTC.UpdateFramesOnScreen(0);
@@ -1317,7 +1335,11 @@ namespace AglonaReader
                 UpdateStatusBar(true);
 
                 if (pTC.WithAudio())
-                    PlayCurrentPhrase();
+                    if (withPlayback)
+                        PlayCurrentPhrase();
+                    else
+                        StopPlayback();
+    
             }
             else
             {
@@ -1490,6 +1512,8 @@ namespace AglonaReader
 
             pTC.PText.Load(fileName);
 
+            CtrlPressed = false;
+
             currentAudioFileNumber = -1;
 
             if (RetrieveToTheTop(fileName))
@@ -1530,6 +1554,7 @@ namespace AglonaReader
                 f.SplitterRatio = pTC.SplitterRatio;
                 f.EditMode = pTC.EditMode;
                 f.ReadingMode = pTC.ReadingMode;
+                f.AlternatingColorScheme = pTC.AlternatingColorScheme;
             }
 
             appSettings.HighlightFragments = pTC.HighlightFragments;
@@ -1567,7 +1592,7 @@ namespace AglonaReader
                 pTC.MouseCurrentWord = null;
             }
             else
-                ProcessKeyDown();
+                ProcessKeyDown(true);
         }
 
         private void editToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1748,9 +1773,9 @@ namespace AglonaReader
             else if (e.Type == ScrollEventType.LargeIncrement)
                 ProcessPageDown();
             else if (e.Type == ScrollEventType.SmallDecrement)
-                ProcessKeyUp();
+                ProcessKeyUp(true);
             else if (e.Type == ScrollEventType.SmallIncrement)
-                ProcessKeyDown();
+                ProcessKeyDown(true);
             else if (e.Type == ScrollEventType.ThumbTrack)
             {
                 GotoPair(e.NewValue, false, false, 0);
@@ -1848,6 +1873,10 @@ namespace AglonaReader
         public const int AlternatingMode = 1;
         public const int AdvancedMode = 2;
 
+        public const int AlternatingColorScheme_BlackGreen = 0;
+        public const int AlternatingColorScheme_GreenBlack = 1;
+        
+
 
         public string FileName { get; set; }
         public int Pair { get; set; }
@@ -1856,6 +1885,7 @@ namespace AglonaReader
         public float SplitterRatio { get; set; }
         public bool EditMode { get; set; }
         public int ReadingMode { get; set; }
+        public int AlternatingColorScheme { get; set; }
     }
 
     public class AppSettings

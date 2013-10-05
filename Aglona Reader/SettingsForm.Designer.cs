@@ -41,6 +41,8 @@ namespace AglonaReader
             this.highlightFragmentsCheckBox = new System.Windows.Forms.CheckBox();
             this.label2 = new System.Windows.Forms.Label();
             this.readingModeComboBox = new System.Windows.Forms.ComboBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.alternatingColorSchemeComboBox = new System.Windows.Forms.ComboBox();
             ((System.ComponentModel.ISupportInitialize)(this.fontSizeTrackBar)).BeginInit();
             this.fontGroupBox.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -168,11 +170,35 @@ namespace AglonaReader
             this.readingModeComboBox.TabIndex = 11;
             this.readingModeComboBox.SelectedIndexChanged += new System.EventHandler(this.readingModeComboBox_SelectedIndexChanged);
             // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(266, 204);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(126, 13);
+            this.label3.TabIndex = 12;
+            this.label3.Text = "Alternating Color Scheme";
+            // 
+            // alternatingColorSchemeComboBox
+            // 
+            this.alternatingColorSchemeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.alternatingColorSchemeComboBox.FormattingEnabled = true;
+            this.alternatingColorSchemeComboBox.Items.AddRange(new object[] {
+            "Black - Green (default)",
+            "Green - Black"});
+            this.alternatingColorSchemeComboBox.Location = new System.Drawing.Point(399, 200);
+            this.alternatingColorSchemeComboBox.Name = "alternatingColorSchemeComboBox";
+            this.alternatingColorSchemeComboBox.Size = new System.Drawing.Size(121, 21);
+            this.alternatingColorSchemeComboBox.TabIndex = 13;
+            this.alternatingColorSchemeComboBox.SelectedIndexChanged += new System.EventHandler(this.alternatingColorSchemeComboBox_SelectedIndexChanged);
+            // 
             // SettingsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(717, 278);
+            this.Controls.Add(this.alternatingColorSchemeComboBox);
+            this.Controls.Add(this.label3);
             this.Controls.Add(this.readingModeComboBox);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.groupBox1);
@@ -212,6 +238,8 @@ namespace AglonaReader
         private System.Windows.Forms.CheckBox highlightFragmentsCheckBox;
         private Label label2;
         private ComboBox readingModeComboBox;
+        private Label label3;
+        private ComboBox alternatingColorSchemeComboBox;
 
     }
 }

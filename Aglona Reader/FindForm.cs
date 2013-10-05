@@ -99,7 +99,7 @@ namespace AglonaReader
                     else
                     {
                         pTC.HighlightedPair = current - 1;
-                        mainForm.ProcessKeyDown();
+                        mainForm.ProcessKeyDown(true);
                     }
                     
                     return;

@@ -40,6 +40,8 @@ namespace AglonaReader
                     break;
             }
 
+            alternatingColorSchemeComboBox.SelectedIndex = pTC.AlternatingColorScheme;
+
             prevFont = pTC.textFont.Name;
             float currentFontSize = pTC.textFont.Size;
 
@@ -73,8 +75,7 @@ namespace AglonaReader
         private void brightnessBar_Scroll(object sender, EventArgs e)
         {
             pTC.Brightness = (float)(brightnessBar.Value) / 1000;
-            pTC.RenderPairs();
-            pTC.Render();
+            pTC.RenderPairs(true);
         }
 
         private void fontsComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -112,16 +113,14 @@ namespace AglonaReader
         {
             pTC.HighlightFirstWords = highlightFirstWordsCheckBox.Checked;
 
-            pTC.RenderPairs();
-            pTC.Render();
+            pTC.RenderPairs(true);
         }
 
         private void highlightFragmentsCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             pTC.HighlightFragments= highlightFragmentsCheckBox.Checked;
 
-            pTC.RenderPairs();
-            pTC.Render();
+            pTC.RenderPairs(true);
         }
 
         private void SettingsForm_KeyPress(object sender, KeyPressEventArgs e)
@@ -161,6 +160,21 @@ namespace AglonaReader
             
             pTC.ProcessLayoutChange(true);
 
+        }
+
+        private void alternatingColorSchemeComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            switch (alternatingColorSchemeComboBox.SelectedIndex)
+            {
+                case 0:
+                    pTC.AlternatingColorScheme = FileUsageInfo.AlternatingColorScheme_BlackGreen;
+                    break;
+                case 1:
+                    pTC.AlternatingColorScheme = FileUsageInfo.AlternatingColorScheme_GreenBlack;
+                    break;
+            }
+
+            pTC.RenderPairs(true);
         }
 
     }

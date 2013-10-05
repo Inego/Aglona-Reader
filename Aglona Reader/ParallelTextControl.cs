@@ -81,6 +81,8 @@ namespace AglonaReader
         public TextPair hp {
             get
             {
+                if (PText.Number() == 0)
+                    return null;
                 return PText[HighlightedPair];
             }
         }
@@ -1419,11 +1421,11 @@ namespace AglonaReader
         static extern uint SetTextColor(IntPtr hdc, int crColor);
 
 
-        public bool NotFitOnScreen(int pairIndex)
+        public bool NotFitOnScreenBase(int pairIndex)
         {
             if (pairIndex < CurrentPair)
                 return true;
-                
+
             TextPair p = PText[pairIndex];
 
             if (LayoutMode == LayoutMode_Advanced)
@@ -1455,6 +1457,14 @@ namespace AglonaReader
                         || p.RenderedInfo2.Line1 == -1;
         }
 
+        public bool NotFitOnScreen(int pairIndex)
+        {
+            if (LastRenderedPair != 1 && pairIndex > LastRenderedPair)
+                return true;
+
+            return NotFitOnScreenBase(pairIndex);
+        }
+
         private void RenderText(Graphics g, int pairIndex, ref int offset, ref int cLine, byte side)
         {
 
@@ -1467,10 +1477,32 @@ namespace AglonaReader
 
             int newColor;
 
-            // In view mode, show text in gray if it is not complete
-            newColor = !EditMode && (NotFitOnScreen(pairIndex)) ?
-                       2 :
-                       ((LayoutMode == LayoutMode_Alternating) && Reversed == (side == 2) ? 3 : 1);
+            if (!EditMode && (NotFitOnScreenBase(pairIndex)))
+                newColor = 2;
+            else if ((LayoutMode == LayoutMode_Alternating))
+            {
+                switch (AlternatingColorScheme)
+                {
+                    case FileUsageInfo.AlternatingColorScheme_GreenBlack:
+                        if (Reversed == (side == 2))
+                            newColor = 3;
+                        else
+                            newColor = 1;
+                        break;
+                    case FileUsageInfo.AlternatingColorScheme_BlackGreen:
+                        if (Reversed == (side == 2))
+                            newColor = 1;
+                        else
+                            newColor = 3;
+                        break;
+                    default:
+                        newColor = 1;
+                        break;
+                }
+
+            }
+            else
+                newColor = 1;
 
             if (newColor != currentTextColor)
             {
@@ -1578,9 +1610,6 @@ namespace AglonaReader
         [DllImport("gdi32.dll")]
         public static extern bool DeleteObject(IntPtr objectHandle);
 
-        //[DllImport("gdi32.dll")]
-        //static extern uint SetTextColor(IntPtr hdc, int crColor);
-
         /// <summary>
         /// Renders a newSide
         /// </summary>
@@ -1631,7 +1660,7 @@ namespace AglonaReader
         }
 
 
-        public void RenderPairs()
+        public void RenderPairs(bool instantRender)
         {
             Advanced_HighlightedPair = -2;
 
@@ -1678,6 +1707,9 @@ namespace AglonaReader
 
                 RenderBackgroundSide(side, startPair, negHeight);
                 RenderPairText(side, startPair, negHeight);
+
+                if (instantRender)
+                    Render();
 
                 return;
                 
@@ -1728,6 +1760,9 @@ namespace AglonaReader
 
             RenderPairText(1, startPair, negHeight);
             RenderPairText(2, startPair, negHeight);
+
+            if (instantRender)
+                Render();
 
         }
 
@@ -2261,7 +2296,7 @@ namespace AglonaReader
                     stopWatch.Start();
 
             PrepareScreen();
-            RenderPairs();
+            RenderPairs(false);
 
             FindFirstNaturalDividers();
 
@@ -2270,7 +2305,7 @@ namespace AglonaReader
             {
                 CurrentPair = HighlightedPair;
                 PrepareScreen();
-                RenderPairs();
+                RenderPairs(false);
             }
 
             UpdateFramesOnScreen(0);
@@ -2583,7 +2618,7 @@ namespace AglonaReader
         public void UpdateScreen()
         {
             PrepareScreen();
-            RenderPairs();
+            RenderPairs(false);
             UpdateFramesOnScreen(0);
             ProcessMousePosition(true, false);
             Render();
@@ -3057,6 +3092,8 @@ namespace AglonaReader
         }
 
         public int ReadingMode { get; set; }
+
+        public int AlternatingColorScheme { get; set; }
 
         public void SetLayoutMode()
         {
