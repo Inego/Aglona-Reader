@@ -320,7 +320,6 @@ namespace AglonaReader
                             state = 3;
                         else if (state == 2)
                         {
-                            /////
                             if (forward)
                             {
                                 if (currentWordStart > startingPos)
@@ -333,7 +332,6 @@ namespace AglonaReader
                             }
 
                             prevNatural = currentWordStart;
-                            /////
 
                             state = 3;
                         }
@@ -359,9 +357,10 @@ namespace AglonaReader
                         else
                             if (state == 0)
                                 state = 1;
+                            else if (state == 3 && currentWordStart != pos)
+                                state = 1;
                             else if (state == 2 || state == 3)
                             {
-                                /////
                                 if (forward)
                                 {
                                     if (currentWordStart > startingPos)
@@ -374,7 +373,6 @@ namespace AglonaReader
                                 }
 
                                 prevNatural = currentWordStart;
-                                /////
 
 
                                 state = 1;
@@ -438,7 +436,6 @@ namespace AglonaReader
                             state = 3;
                         else if (state == 2)
                         {
-                            /////
                             if (forward)
                             {
                                 if (currentWordStart > startingPos)
@@ -451,7 +448,6 @@ namespace AglonaReader
                             }
 
                             prevNatural = currentWordStart;
-                            /////
 
                             state = 3;
                         }
@@ -477,9 +473,10 @@ namespace AglonaReader
                         else
                             if (state == 0)
                                 state = 1;
+                            else if (state == 3 && currentWordStart != pos)
+                                state = 1;
                             else if (state == 2 || state == 3)
                             {
-                                /////
                                 if (forward)
                                 {
                                     if (currentWordStart > startingPos)
@@ -492,7 +489,6 @@ namespace AglonaReader
                                 }
 
                                 prevNatural = currentWordStart;
-                                /////
 
 
                                 state = 1;

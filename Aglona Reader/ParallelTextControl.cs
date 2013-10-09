@@ -2590,7 +2590,6 @@ namespace AglonaReader
                 _p = PText.TextPairs[i];
                 _p.ClearComputedWords();
             }
-
             while (!_p.StartParagraph1 || !_p.StartParagraph2);
 
             // Truncate all following pairs until end or true-true

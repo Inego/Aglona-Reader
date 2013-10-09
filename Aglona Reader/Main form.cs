@@ -49,9 +49,9 @@ namespace AglonaReader
         private void pTC_MouseWheel(object sender, System.Windows.Forms.MouseEventArgs e)
         {
             if (e.Delta > 0)
-                ProcessKeyUp(true);
+                ProcessUpArrow(true);
             else if (e.Delta < 0)
-                ProcessKeyDown(true);
+                ProcessDownArrow(true);
             
         }
 
@@ -688,10 +688,10 @@ namespace AglonaReader
 
             if (e.KeyData == Keys.Down
                 || e.KeyData == Keys.N)
-                ProcessKeyDown(true);
+                ProcessDownArrow(true);
 
             else if (e.KeyData == Keys.Up)
-                ProcessKeyUp(true);
+                ProcessUpArrow(true);
 
             else if (e.KeyData == (Keys.Control | Keys.Down)
                 && !pTC.EditMode)
@@ -755,7 +755,7 @@ namespace AglonaReader
                 if (pTC.EditMode)
                     ChangeNatural(0, true);
                 else
-                    ProcessKeyDown(false);
+                    ProcessDownArrow(false);
             }
 
             else if (e.KeyData == Keys.Left
@@ -765,7 +765,7 @@ namespace AglonaReader
                 if (pTC.EditMode)
                     ChangeNatural(0, false);
                 else
-                    ProcessKeyUp(false);
+                    ProcessUpArrow(false);
             }
 
             else if (e.KeyData == (Keys.Control | Keys.End))
@@ -895,15 +895,13 @@ namespace AglonaReader
             {
                 pTC.MergePairs(pTC.HighlightedPair - 1);
                 pTC.HighlightedPair--;
-                
-                if (pTC.CurrentPair >= pTC.HighlightedPair)
-                {
-                    pTC.PairChanged(pTC.HighlightedPair, false);
-                    GotoPair(pTC.HighlightedPair, false, true, 2);
-                }
-                else
-                    pTC.PairChanged(pTC.HighlightedPair, true);
 
+                if (pTC.CurrentPair > pTC.HighlightedPair)
+                    pTC.CurrentPair = pTC.HighlightedPair;
+                
+                pTC.PairChanged(pTC.HighlightedPair, true);
+                GotoPair(pTC.HighlightedPair, false, true, 2);
+                
                 pTC.hp.UpdateTotalSize();
                 pTC.PText.UpdateAggregates(pTC.HighlightedPair);
                 UpdateStatusBar(true);
@@ -1051,11 +1049,12 @@ namespace AglonaReader
 
             pTC.HighlightedPair = newCurrentPair;
 
+            pTC.FindFirstNaturalDividers();
+
             if (setCurrentPair && pTC.CurrentPair != newCurrentPair
                 || pTC.NotFitOnScreen(pTC.HighlightedPair))
             {
                 pTC.CurrentPair = newCurrentPair;
-                pTC.FindFirstNaturalDividers();
                 pTC.UpdateScreen();
             }
             else
@@ -1234,7 +1233,7 @@ namespace AglonaReader
             return true;
         }
 
-        private void ProcessKeyUp(bool withPlayback)
+        private void ProcessUpArrow(bool withPlayback)
         {
             if (pTC.HighlightedPair == 0)
                 return;
@@ -1299,7 +1298,7 @@ namespace AglonaReader
             }
         }
 
-        public void ProcessKeyDown(bool withPlayback)
+        public void ProcessDownArrow(bool withPlayback)
         {
             if (pTC.HighlightedPair >= pTC.Number - 1)
             {
@@ -1592,7 +1591,7 @@ namespace AglonaReader
                 pTC.MouseCurrentWord = null;
             }
             else
-                ProcessKeyDown(true);
+                ProcessDownArrow(true);
         }
 
         private void editToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1773,9 +1772,9 @@ namespace AglonaReader
             else if (e.Type == ScrollEventType.LargeIncrement)
                 ProcessPageDown();
             else if (e.Type == ScrollEventType.SmallDecrement)
-                ProcessKeyUp(true);
+                ProcessUpArrow(true);
             else if (e.Type == ScrollEventType.SmallIncrement)
-                ProcessKeyDown(true);
+                ProcessDownArrow(true);
             else if (e.Type == ScrollEventType.ThumbTrack)
             {
                 GotoPair(e.NewValue, false, false, 0);
