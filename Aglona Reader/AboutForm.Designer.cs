@@ -60,7 +60,7 @@
             this.programVersionLabel.Name = "programVersionLabel";
             this.programVersionLabel.Size = new System.Drawing.Size(47, 13);
             this.programVersionLabel.TabIndex = 2;
-            this.programVersionLabel.Text = "1.5.1.1";
+            this.programVersionLabel.Text = "1.5.1.2";
             // 
             // releaseDateLabel
             // 
@@ -70,7 +70,7 @@
             this.releaseDateLabel.Name = "releaseDateLabel";
             this.releaseDateLabel.Size = new System.Drawing.Size(61, 13);
             this.releaseDateLabel.TabIndex = 3;
-            this.releaseDateLabel.Text = "2013-10-08";
+            this.releaseDateLabel.Text = "2013-10-13";
             this.releaseDateLabel.Click += new System.EventHandler(this.releaseDateLabel_Click);
             // 
             // AboutForm

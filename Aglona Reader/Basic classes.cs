@@ -351,7 +351,7 @@ namespace AglonaReader
                             currentWordStart = pos;
 
                         if ((c == '\'' || c == '\"' || c == '«' || c == '»' || c == '‹' || c == '›'
-                            || c == '“' || c == '”') && state != 2)
+                            || c == '“' || c == '”') && state != 2 && currentWordStart != pos)
                             // do nothing
                             ;
                         else
@@ -467,7 +467,7 @@ namespace AglonaReader
                             currentWordStart = pos;
 
                         if ((c == '\'' || c == '\"' || c == '«' || c == '»' || c == '‹' || c == '›'
-                            || c == '“' || c == '”') && state != 2)
+                            || c == '“' || c == '”') && state != 2 && currentWordStart != pos)
                             // do nothing
                             ;
                         else
