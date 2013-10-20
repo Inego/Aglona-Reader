@@ -3097,7 +3097,7 @@ namespace AglonaReader
                 LayoutMode = LayoutMode_Advanced;
 
             AudioSingleFrame.Visible = (WithAudio() && !EditMode && LayoutMode != LayoutMode_Normal);
-            HighlightedFrame.SetVisibility(!AudioSingleFrame.Visible);
+            HighlightedFrame.SetVisibility(EditMode);
 
             ComputeIndent();
 

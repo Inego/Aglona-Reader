@@ -575,8 +575,11 @@ namespace AglonaReader
 
                 else
                 {
-                    if (CtrlPressed)
+                    if (!pTC.SelectionFinished)
+                    {
                         pTC.SelectionFinished = true;
+                        CopyToClipboard();
+                    }
                     else
                     {
                         if (pTC.WithAudio() && pTC.mouse_text_word != null)
@@ -584,7 +587,7 @@ namespace AglonaReader
                             // Move to this fragment
                             if (pTC.mouse_text_word.PairIndex != pTC.HighlightedPair)
                             {
-                                
+
                                 if (pTC.NotFitOnScreen(pTC.mouse_text_word.PairIndex))
                                     GotoPair(pTC.mouse_text_word.PairIndex, false, false, 1);
                                 else
