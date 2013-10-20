@@ -45,6 +45,23 @@ namespace AglonaReader
     public class TextPair
     {
 
+        public string Text1 { get; set; }
+        public string Text2 { get; set; }
+
+        // Used if texts are large (typically in aligning mode for the "big block")
+        public StringBuilder SB1 { get; set; }
+        public StringBuilder SB2 { get; set; }
+
+        /// <summary>
+        /// Indicates that Text1 begins a paragraph
+        /// </summary>
+        public bool StartParagraph1 { get; set; }
+        /// <summary>
+        /// Indicates that Text2 begins a paragraph
+        /// </summary>
+        public bool StartParagraph2 { get; set; }
+
+
         public int aggregateSize = 0;
         public int totalTextSize = 0;
 
@@ -94,22 +111,7 @@ namespace AglonaReader
         public uint TimeEnd { get; set; }
         
 
-        public string Text1 { get; set; }
-        public string Text2 { get; set; }        
-
-        // Used if texts are large (typically in aligning mode for the "big block")
-        public StringBuilder SB1 { get; set; }
-        public StringBuilder SB2 { get; set; }
-
-        /// <summary>
-        /// Indicates that Text1 begins a paragraph
-        /// </summary>
-        public bool StartParagraph1 { get; set; }
-        /// <summary>
-        /// Indicates that Text2 begins a paragraph
-        /// </summary>
-        public bool StartParagraph2 { get; set; }
-
+        
         /// <summary>
         /// Current position for processing in text 1
         /// </summary>
@@ -197,13 +199,13 @@ namespace AglonaReader
             : this()
         {
             if (text1 != null)
-                if (text1.Length >= 1000)//ParallelTextControl.BigTextSize)
+                if (text1.Length >= ParallelTextControl.BigTextSize)
                     this.SB1 = new StringBuilder(text1);
                 else
                     this.Text1 = text1;
 
             if (text2 != null)
-                if (text2.Length >= 1000)//ParallelTextControl.BigTextSize)
+                if (text2.Length >= ParallelTextControl.BigTextSize)
                     this.SB2 = new StringBuilder(text2);
                 else
                     this.Text2 = text2;
@@ -1099,6 +1101,48 @@ namespace AglonaReader
 
             }
 
+
+
+        }
+
+        // Physically reverses book contents
+        internal void ReverseContents()
+        {
+            string tmp;
+
+            tmp = Author1;
+            Author1 = Author2;
+            Author2 = tmp;
+
+            tmp = Title1;
+            Title1 = Title2;
+            Title2 = tmp;
+
+            tmp = Info1;
+            Info1 = Info2;
+            Info2 = tmp;
+
+            tmp = Lang1;
+            Lang1 = Lang2;
+            Lang2 = tmp;
+
+            StringBuilder tmp_sb;
+            bool tmp_bool;
+
+            foreach (TextPair tp in TextPairs)
+            {
+                tmp_sb = tp.SB1;
+                tp.SB1 = tp.SB2;
+                tp.SB2 = tmp_sb;
+
+                tmp = tp.Text1;
+                tp.Text1 = tp.Text2;
+                tp.Text2 = tmp;
+
+                tmp_bool = tp.StartParagraph1;
+                tp.StartParagraph1 = tp.StartParagraph2;
+                tp.StartParagraph2 = tmp_bool;
+            }
 
 
         }

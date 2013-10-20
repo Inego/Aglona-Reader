@@ -56,6 +56,7 @@
             this.findToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
             this.editModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.reverseContentsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pairToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.importToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -195,6 +196,7 @@
             this.informationToolStripMenuItem,
             this.toolStripSeparator1,
             this.reverseToolStripMenuItem,
+            this.reverseContentsToolStripMenuItem,
             this.toolStripSeparator2,
             this.structureleftToolStripMenuItem,
             this.structurerightToolStripMenuItem,
@@ -276,6 +278,13 @@
             this.editModeToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
             this.editModeToolStripMenuItem.Text = "Edit mode";
             this.editModeToolStripMenuItem.Click += new System.EventHandler(this.editModeToolStripMenuItem_Click);
+            // 
+            // reverseContentsToolStripMenuItem
+            // 
+            this.reverseContentsToolStripMenuItem.Name = "reverseContentsToolStripMenuItem";
+            this.reverseContentsToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
+            this.reverseContentsToolStripMenuItem.Text = "Reverse contents";
+            this.reverseContentsToolStripMenuItem.Click += new System.EventHandler(this.reverseContentsToolStripMenuItem_Click);
             // 
             // pairToolStripMenuItem
             // 
@@ -386,6 +395,7 @@
             // 
             // pTC
             // 
+            this.pTC.AlternatingColorScheme = 0;
             this.pTC.BackColor = System.Drawing.SystemColors.InactiveBorder;
             this.pTC.Brightness = 0.97D;
             this.pTC.CurrentPair = 0;
@@ -529,6 +539,7 @@
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem2;
         private System.Windows.Forms.ToolStripMenuItem exportLeftTextToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exportRightTextToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem reverseContentsToolStripMenuItem;
 
     }
 }

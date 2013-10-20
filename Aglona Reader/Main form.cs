@@ -670,7 +670,6 @@ namespace AglonaReader
             pTC.Reversed = reverseToolStripMenuItem.Checked;
             pTC.SetSplitterPositionByRatio(1 - pTC.SplitterRatio);
             pTC.SetLayoutMode();
-            //pTC.ComputeSideCoordinates();
             Recompute();
         }
 
@@ -1861,6 +1860,24 @@ namespace AglonaReader
         {
             if ((e.KeyData & Keys.ControlKey) == Keys.ControlKey)
                 CtrlPressed = false;
+        }
+
+        private void reverseContentsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Really reverse book contents?"
+                + "\r\nThis will physically reverse the two texts in the file."
+                + "\r\nPlease don't forget to change the file name as well.",
+                "Reverse book contents",
+                MessageBoxButtons.YesNo) == System.Windows.Forms.DialogResult.No)
+            {
+
+                return;
+            }
+
+            pTC.PText.ReverseContents();
+            Recompute();
+            UpdateWindowTitle();
+
         }
 
     }
