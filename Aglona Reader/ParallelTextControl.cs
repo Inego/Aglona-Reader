@@ -555,23 +555,16 @@ namespace AglonaReader
         {
             colorTableH = new List<double>();
 
-            // CLASSIC (RAINBOW)
 
-            //colorTableH.Add(0.162); // Yellow
-            //colorTableH.Add(0.34);  // Green
-            //colorTableH.Add(0.492); // Cyan
-            //colorTableH.Add(0.68);  // Blue
-            //colorTableH.Add(0.83);  // Pink
-            //colorTableH.Add(0);     // Red
-            ////colorTableH.Add(0.11); // Orange? Too close to yellow. Disable for now
+            double c = 0;
 
-            colorTableH.Add(0.162); // Yellow
-            colorTableH.Add(0.83);  // Pink
-            colorTableH.Add(0.34);  // Green
-            colorTableH.Add(0.492); // Cyan
-            colorTableH.Add(0);     // Red
-            colorTableH.Add(0.68);  // Blue
-            
+            for (int i = 1; i < 13; i++)
+            {
+                colorTableH.Add(c);
+                c += 5.0 / 12;
+                if (c >= 1.0) c -= 1;
+            }
+
             NumberofColors = (byte)colorTableH.Count;
 
             brushTable = new List<SolidBrush>();
@@ -585,10 +578,7 @@ namespace AglonaReader
         public void DrawSecondary()
         {
             Graphics g = SecondaryBG.Graphics;
-
             g.Clear(Color.White);
-
-            //graphics.FillRectangle(splitterBrush, splitterPosition, VMargin, splitterWidth, Height - 2 * VMargin);
         }
 
         public void DrawFrame(Frame frame)

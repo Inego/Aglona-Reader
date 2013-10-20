@@ -28,10 +28,12 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AboutForm));
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.programVersionLabel = new System.Windows.Forms.Label();
             this.releaseDateLabel = new System.Windows.Forms.Label();
+            this.colorLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // label1
@@ -72,21 +74,34 @@
             this.releaseDateLabel.TabIndex = 3;
             this.releaseDateLabel.Text = "2013-10-20";
             // 
+            // colorLabel
+            // 
+            this.colorLabel.AutoSize = true;
+            this.colorLabel.Location = new System.Drawing.Point(967, 9);
+            this.colorLabel.Name = "colorLabel";
+            this.colorLabel.Size = new System.Drawing.Size(0, 13);
+            this.colorLabel.TabIndex = 4;
+            // 
             // AboutForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(195, 57);
+            this.ClientSize = new System.Drawing.Size(1022, 92);
+            this.Controls.Add(this.colorLabel);
             this.Controls.Add(this.releaseDateLabel);
             this.Controls.Add(this.programVersionLabel);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
+            this.DoubleBuffered = true;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "AboutForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "About Aglona Reader";
+            this.Paint += new System.Windows.Forms.PaintEventHandler(this.AboutForm_Paint);
+            this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.AboutForm_MouseMove);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -98,6 +113,7 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label programVersionLabel;
         private System.Windows.Forms.Label releaseDateLabel;
+        private System.Windows.Forms.Label colorLabel;
 
     }
 }
