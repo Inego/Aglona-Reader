@@ -2551,12 +2551,12 @@ namespace AglonaReader
 
         }
 
-        public void EditCurrentPair()
+        public bool EditCurrentPair()
         {
             if (!EditMode || PText.Number() == 0)
-                return;
+                return false;
 
-            EditPair(HighlightedPair);
+            return EditPair(HighlightedPair, false);
 
         }
 
@@ -2868,7 +2868,7 @@ namespace AglonaReader
         }
 
 
-        private void EditPair(int pairIndex)
+        public bool EditPair(int pairIndex, bool newPair)
         {
             TextPair p = PText.TextPairs[pairIndex];
 
@@ -2876,17 +2876,26 @@ namespace AglonaReader
             {
                 EditWhenNipped = !EditWhenNipped;
                 Render();
-                return;
+                return false;
             }
 
             PrepareEditForm();
 
             editPairForm.ParallelTextControl = this;
             editPairForm.PairIndex = pairIndex;
+            if (newPair)
+                editPairForm.setFocusNewPair();
             editPairForm.ShowDialog();
 
             if (editPairForm.Result)
             {
+                if (pairIndex == 0)
+                {
+                    PText[pairIndex].StartParagraph1 = true;
+                    PText[pairIndex].StartParagraph2 = true;
+                }
+
+
                 if (PText[pairIndex].StructureLevel > 0
                     && pairIndex < PText.Number() - 1
                     && !(PText[pairIndex + 1].StartParagraph1 && PText[pairIndex + 1].StartParagraph2))
@@ -2899,7 +2908,10 @@ namespace AglonaReader
                 PText[pairIndex].UpdateTotalSize();
                 PText.UpdateAggregates(pairIndex);
                 Modified = true;
+                return true;
             }
+
+            return false;
         }
 
         private void PrepareEditForm()

@@ -900,16 +900,25 @@ namespace AglonaReader
 
                 if (pTC.CurrentPair > pTC.HighlightedPair)
                     pTC.CurrentPair = pTC.HighlightedPair;
-                
-                pTC.PairChanged(pTC.HighlightedPair, true);
-                GotoPair(pTC.HighlightedPair, false, true, 2);
-                
-                pTC.hp.UpdateTotalSize();
-                pTC.PText.UpdateAggregates(pTC.HighlightedPair);
-                UpdateStatusBar(true);
-                pTC.Side1Set = false;
-                pTC.Side2Set = false;
+
+                GotoChangedPair();
             }
+        }
+
+        private void GotoChangedPair()
+        {
+
+            if (pTC.HighlightedPair >= pTC.Number)
+                pTC.HighlightedPair = pTC.Number - 1;
+
+            pTC.PairChanged(pTC.HighlightedPair, true);
+            GotoPair(pTC.HighlightedPair, false, true, 2);
+
+            pTC.hp.UpdateTotalSize();
+            pTC.PText.UpdateAggregates(pTC.HighlightedPair);
+            UpdateStatusBar(true);
+            pTC.Side1Set = false;
+            pTC.Side2Set = false;
         }
 
         private void CopyToClipboard()
@@ -1598,8 +1607,8 @@ namespace AglonaReader
 
         private void editToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            pTC.EditCurrentPair();
-            UpdateStatusBar(false);
+            if (pTC.EditCurrentPair())
+                UpdateStatusBar(false);
         }
 
         private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1881,6 +1890,81 @@ namespace AglonaReader
             Recompute();
             UpdateWindowTitle();
 
+        }
+
+        private void aglonaReaderSiteToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenSite("https://sites.google.com/site/aglonareader/");
+        }
+
+        private void OpenSite(string p)
+        {
+            System.Diagnostics.Process.Start(p);
+        }
+
+        private void paraBooksMakerSiteToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenSite("https://sites.google.com/site/parabooksmaker/");
+        }
+
+        private void deletePairToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            DeletePair(true);
+        }
+
+        private void DeletePair(bool ask)
+        {
+            if (!pTC.EditMode || pTC.Number == 0)
+                return;
+
+            if (ask)
+            {
+                if (MessageBox.Show("Really delete this pair?\nThis cannot be undone.", "Delete Pair", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2)
+                    == System.Windows.Forms.DialogResult.No)
+                {
+                    return;
+                }
+            }
+
+            pTC.PText.DeletePair(pTC.HighlightedPair);
+            pTC.Modified = true;
+            GotoChangedPair();
+        }
+
+        private void insertPairToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            InsertPair(true);
+        }
+
+        private void InsertPair(bool insertAfter)
+        {
+            if (!pTC.EditMode)
+                return;
+
+            int newIndex;
+
+            if (pTC.Number == 0)
+                newIndex = 0;
+            else if (insertAfter)
+                newIndex = pTC.HighlightedPair + 1;
+            else
+                newIndex = pTC.HighlightedPair;
+
+            TextPair newTp = new TextPair("", "", true, true);
+
+            pTC.PText.TextPairs.Insert(newIndex, newTp);
+
+            if (pTC.EditPair(newIndex, true))
+            {
+                GotoPair(newIndex, false, false, 2);
+            }
+            else
+                pTC.PText.DeletePair(newIndex);
+        }
+
+        private void insertBeforeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            InsertPair(false);
         }
 
     }

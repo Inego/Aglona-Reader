@@ -1146,6 +1146,19 @@ namespace AglonaReader
 
 
         }
+
+        internal void DeletePair(int p)
+        {
+            TextPairs.RemoveAt(p);
+
+            if (p == 0 && TextPairs.Count > 0)
+            {
+                TextPair tp0 = TextPairs[0];
+                tp0.StartParagraph1 = true;
+                tp0.StartParagraph2 = true;
+            }
+
+        }
     }
 
     public class CommonWordInfo : WordInfo

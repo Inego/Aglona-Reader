@@ -154,6 +154,11 @@ namespace AglonaReader
             InputLanguage.CurrentInputLanguage = InputLanguage.FromCulture(new CultureInfo(cult));
 
         }
-        
+
+
+        internal void setFocusNewPair()
+        {
+            ActiveControl = textBox1;
+        }
     }
 }

@@ -49,6 +49,7 @@
             this.informationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.reverseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.reverseContentsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.structureleftToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.structurerightToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -56,21 +57,27 @@
             this.findToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
             this.editModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.reverseContentsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pairToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.importToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripSeparator();
+            this.deletePairToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.startpauseStopwatchToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.resetStopwatchToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.aglonaReaderSiteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.paraBooksMakerSiteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripSeparator();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.ssPosition = new System.Windows.Forms.ToolStripStatusLabel();
             this.ssPositionPercent = new System.Windows.Forms.ToolStripStatusLabel();
             this.vScrollBar = new System.Windows.Forms.VScrollBar();
+            this.insertPairToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pTC = new AglonaReader.ParallelTextControl();
+            this.insertBeforeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mainMenu.SuspendLayout();
             this.statusStrip.SuspendLayout();
             this.SuspendLayout();
@@ -231,6 +238,13 @@
             this.reverseToolStripMenuItem.Text = "Reverse";
             this.reverseToolStripMenuItem.Click += new System.EventHandler(this.reverseToolStripMenuItem_Click);
             // 
+            // reverseContentsToolStripMenuItem
+            // 
+            this.reverseContentsToolStripMenuItem.Name = "reverseContentsToolStripMenuItem";
+            this.reverseContentsToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
+            this.reverseContentsToolStripMenuItem.Text = "Reverse contents";
+            this.reverseContentsToolStripMenuItem.Click += new System.EventHandler(this.reverseContentsToolStripMenuItem_Click);
+            // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
@@ -279,18 +293,15 @@
             this.editModeToolStripMenuItem.Text = "Edit mode";
             this.editModeToolStripMenuItem.Click += new System.EventHandler(this.editModeToolStripMenuItem_Click);
             // 
-            // reverseContentsToolStripMenuItem
-            // 
-            this.reverseContentsToolStripMenuItem.Name = "reverseContentsToolStripMenuItem";
-            this.reverseContentsToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
-            this.reverseContentsToolStripMenuItem.Text = "Reverse contents";
-            this.reverseContentsToolStripMenuItem.Click += new System.EventHandler(this.reverseContentsToolStripMenuItem_Click);
-            // 
             // pairToolStripMenuItem
             // 
             this.pairToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.importToolStripMenuItem,
-            this.editToolStripMenuItem});
+            this.editToolStripMenuItem,
+            this.toolStripMenuItem4,
+            this.insertBeforeToolStripMenuItem,
+            this.insertPairToolStripMenuItem,
+            this.deletePairToolStripMenuItem});
             this.pairToolStripMenuItem.Name = "pairToolStripMenuItem";
             this.pairToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
             this.pairToolStripMenuItem.Text = "Pair";
@@ -299,7 +310,7 @@
             // 
             this.importToolStripMenuItem.Name = "importToolStripMenuItem";
             this.importToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.I)));
-            this.importToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.importToolStripMenuItem.Size = new System.Drawing.Size(194, 22);
             this.importToolStripMenuItem.Text = "Import...";
             this.importToolStripMenuItem.Click += new System.EventHandler(this.importToolStripMenuItem_Click);
             // 
@@ -307,9 +318,22 @@
             // 
             this.editToolStripMenuItem.Name = "editToolStripMenuItem";
             this.editToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F2;
-            this.editToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.editToolStripMenuItem.Size = new System.Drawing.Size(194, 22);
             this.editToolStripMenuItem.Text = "Edit";
             this.editToolStripMenuItem.Click += new System.EventHandler(this.editToolStripMenuItem_Click);
+            // 
+            // toolStripMenuItem4
+            // 
+            this.toolStripMenuItem4.Name = "toolStripMenuItem4";
+            this.toolStripMenuItem4.Size = new System.Drawing.Size(191, 6);
+            // 
+            // deletePairToolStripMenuItem
+            // 
+            this.deletePairToolStripMenuItem.Name = "deletePairToolStripMenuItem";
+            this.deletePairToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Delete;
+            this.deletePairToolStripMenuItem.Size = new System.Drawing.Size(194, 22);
+            this.deletePairToolStripMenuItem.Text = "Delete";
+            this.deletePairToolStripMenuItem.Click += new System.EventHandler(this.deletePairToolStripMenuItem_Click);
             // 
             // statsToolStripMenuItem
             // 
@@ -348,15 +372,37 @@
             // helpToolStripMenuItem
             // 
             this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.aglonaReaderSiteToolStripMenuItem,
+            this.paraBooksMakerSiteToolStripMenuItem,
+            this.toolStripMenuItem3,
             this.aboutToolStripMenuItem});
             this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
             this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this.helpToolStripMenuItem.Text = "Help";
             // 
+            // aglonaReaderSiteToolStripMenuItem
+            // 
+            this.aglonaReaderSiteToolStripMenuItem.Name = "aglonaReaderSiteToolStripMenuItem";
+            this.aglonaReaderSiteToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
+            this.aglonaReaderSiteToolStripMenuItem.Text = "Aglona Reader site";
+            this.aglonaReaderSiteToolStripMenuItem.Click += new System.EventHandler(this.aglonaReaderSiteToolStripMenuItem_Click);
+            // 
+            // paraBooksMakerSiteToolStripMenuItem
+            // 
+            this.paraBooksMakerSiteToolStripMenuItem.Name = "paraBooksMakerSiteToolStripMenuItem";
+            this.paraBooksMakerSiteToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
+            this.paraBooksMakerSiteToolStripMenuItem.Text = "ParaBooksMaker site";
+            this.paraBooksMakerSiteToolStripMenuItem.Click += new System.EventHandler(this.paraBooksMakerSiteToolStripMenuItem_Click);
+            // 
+            // toolStripMenuItem3
+            // 
+            this.toolStripMenuItem3.Name = "toolStripMenuItem3";
+            this.toolStripMenuItem3.Size = new System.Drawing.Size(180, 6);
+            // 
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
             this.aboutToolStripMenuItem.Text = "About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
@@ -392,6 +438,14 @@
             this.vScrollBar.Size = new System.Drawing.Size(18, 218);
             this.vScrollBar.TabIndex = 5;
             this.vScrollBar.Scroll += new System.Windows.Forms.ScrollEventHandler(this.vScrollBar_Scroll);
+            // 
+            // insertPairToolStripMenuItem
+            // 
+            this.insertPairToolStripMenuItem.Name = "insertPairToolStripMenuItem";
+            this.insertPairToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Insert;
+            this.insertPairToolStripMenuItem.Size = new System.Drawing.Size(194, 22);
+            this.insertPairToolStripMenuItem.Text = "Insert after";
+            this.insertPairToolStripMenuItem.Click += new System.EventHandler(this.insertPairToolStripMenuItem_Click);
             // 
             // pTC
             // 
@@ -472,6 +526,14 @@
             this.pTC.MouseMove += new System.Windows.Forms.MouseEventHandler(this.parallelTextControl_MouseMove);
             this.pTC.MouseUp += new System.Windows.Forms.MouseEventHandler(this.parallelTextControl_MouseUp);
             // 
+            // insertBeforeToolStripMenuItem
+            // 
+            this.insertBeforeToolStripMenuItem.Name = "insertBeforeToolStripMenuItem";
+            this.insertBeforeToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.Insert)));
+            this.insertBeforeToolStripMenuItem.Size = new System.Drawing.Size(194, 22);
+            this.insertBeforeToolStripMenuItem.Text = "Insert before";
+            this.insertBeforeToolStripMenuItem.Click += new System.EventHandler(this.insertBeforeToolStripMenuItem_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -540,6 +602,13 @@
         private System.Windows.Forms.ToolStripMenuItem exportLeftTextToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exportRightTextToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem reverseContentsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem aglonaReaderSiteToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem paraBooksMakerSiteToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem3;
+        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem4;
+        private System.Windows.Forms.ToolStripMenuItem deletePairToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem insertPairToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem insertBeforeToolStripMenuItem;
 
     }
 }
