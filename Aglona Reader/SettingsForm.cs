@@ -131,35 +131,7 @@ namespace AglonaReader
 
         private void readingModeComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            switch (readingModeComboBox.SelectedIndex)
-            {
-                case 0:
-                    pTC.ReadingMode = FileUsageInfo.NormalMode;
-                    break;
-                case 1:
-                    pTC.ReadingMode = FileUsageInfo.AlternatingMode;
-                    break;
-                case 2:
-                    pTC.ReadingMode = FileUsageInfo.AdvancedMode;
-                    break;
-            }
-
-            pTC.SetLayoutMode();
-            
-            if (pTC.EditMode)
-            {
-                pTC.SelectionSide = 0;
-                pTC.SelectionFrame.Visible = false;
-            }
-            else
-            {
-                pTC.HighlightedFrame.SetVisibility(false);
-                pTC.NippingFrame.SetVisibility(false);
-                pTC.MouseCurrentWord = null;
-            }
-            
-            pTC.ProcessLayoutChange(true);
-
+            pTC.ChangeReadingMode(readingModeComboBox.SelectedIndex);
         }
 
         private void alternatingColorSchemeComboBox_SelectedIndexChanged(object sender, EventArgs e)

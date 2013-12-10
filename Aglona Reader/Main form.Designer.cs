@@ -61,11 +61,18 @@
             this.importToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripSeparator();
+            this.insertBeforeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.insertPairToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.deletePairToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.startpauseStopwatchToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.resetStopwatchToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.normalModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.alternatingModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.advancedModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripSeparator();
+            this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aglonaReaderSiteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.paraBooksMakerSiteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -75,9 +82,7 @@
             this.ssPosition = new System.Windows.Forms.ToolStripStatusLabel();
             this.ssPositionPercent = new System.Windows.Forms.ToolStripStatusLabel();
             this.vScrollBar = new System.Windows.Forms.VScrollBar();
-            this.insertPairToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pTC = new AglonaReader.ParallelTextControl();
-            this.insertBeforeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mainMenu.SuspendLayout();
             this.statusStrip.SuspendLayout();
             this.SuspendLayout();
@@ -327,6 +332,22 @@
             this.toolStripMenuItem4.Name = "toolStripMenuItem4";
             this.toolStripMenuItem4.Size = new System.Drawing.Size(191, 6);
             // 
+            // insertBeforeToolStripMenuItem
+            // 
+            this.insertBeforeToolStripMenuItem.Name = "insertBeforeToolStripMenuItem";
+            this.insertBeforeToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.Insert)));
+            this.insertBeforeToolStripMenuItem.Size = new System.Drawing.Size(194, 22);
+            this.insertBeforeToolStripMenuItem.Text = "Insert before";
+            this.insertBeforeToolStripMenuItem.Click += new System.EventHandler(this.insertBeforeToolStripMenuItem_Click);
+            // 
+            // insertPairToolStripMenuItem
+            // 
+            this.insertPairToolStripMenuItem.Name = "insertPairToolStripMenuItem";
+            this.insertPairToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Insert;
+            this.insertPairToolStripMenuItem.Size = new System.Drawing.Size(194, 22);
+            this.insertPairToolStripMenuItem.Text = "Insert after";
+            this.insertPairToolStripMenuItem.Click += new System.EventHandler(this.insertPairToolStripMenuItem_Click);
+            // 
             // deletePairToolStripMenuItem
             // 
             this.deletePairToolStripMenuItem.Name = "deletePairToolStripMenuItem";
@@ -362,12 +383,53 @@
             // 
             // settingsToolStripMenuItem
             // 
+            this.settingsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.normalModeToolStripMenuItem,
+            this.alternatingModeToolStripMenuItem,
+            this.advancedModeToolStripMenuItem,
+            this.toolStripMenuItem5,
+            this.optionsToolStripMenuItem});
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
             this.settingsToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.F10)));
             this.settingsToolStripMenuItem.ShowShortcutKeys = false;
             this.settingsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
             this.settingsToolStripMenuItem.Text = "Settings";
-            this.settingsToolStripMenuItem.Click += new System.EventHandler(this.settingsToolStripMenuItem_Click);
+            // 
+            // normalModeToolStripMenuItem
+            // 
+            this.normalModeToolStripMenuItem.Name = "normalModeToolStripMenuItem";
+            this.normalModeToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D1)));
+            this.normalModeToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
+            this.normalModeToolStripMenuItem.Text = "Normal mode";
+            this.normalModeToolStripMenuItem.Click += new System.EventHandler(this.normalModeToolStripMenuItem_Click);
+            // 
+            // alternatingModeToolStripMenuItem
+            // 
+            this.alternatingModeToolStripMenuItem.Name = "alternatingModeToolStripMenuItem";
+            this.alternatingModeToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D2)));
+            this.alternatingModeToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
+            this.alternatingModeToolStripMenuItem.Text = "Alternating mode";
+            this.alternatingModeToolStripMenuItem.Click += new System.EventHandler(this.alternatingModeToolStripMenuItem_Click);
+            // 
+            // advancedModeToolStripMenuItem
+            // 
+            this.advancedModeToolStripMenuItem.Name = "advancedModeToolStripMenuItem";
+            this.advancedModeToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D3)));
+            this.advancedModeToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
+            this.advancedModeToolStripMenuItem.Text = "Advanced mode";
+            this.advancedModeToolStripMenuItem.Click += new System.EventHandler(this.advancedModeToolStripMenuItem_Click);
+            // 
+            // toolStripMenuItem5
+            // 
+            this.toolStripMenuItem5.Name = "toolStripMenuItem5";
+            this.toolStripMenuItem5.Size = new System.Drawing.Size(204, 6);
+            // 
+            // optionsToolStripMenuItem
+            // 
+            this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
+            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
+            this.optionsToolStripMenuItem.Text = "Options";
+            this.optionsToolStripMenuItem.Click += new System.EventHandler(this.settingsToolStripMenuItem_Click);
             // 
             // helpToolStripMenuItem
             // 
@@ -438,14 +500,6 @@
             this.vScrollBar.Size = new System.Drawing.Size(18, 218);
             this.vScrollBar.TabIndex = 5;
             this.vScrollBar.Scroll += new System.Windows.Forms.ScrollEventHandler(this.vScrollBar_Scroll);
-            // 
-            // insertPairToolStripMenuItem
-            // 
-            this.insertPairToolStripMenuItem.Name = "insertPairToolStripMenuItem";
-            this.insertPairToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Insert;
-            this.insertPairToolStripMenuItem.Size = new System.Drawing.Size(194, 22);
-            this.insertPairToolStripMenuItem.Text = "Insert after";
-            this.insertPairToolStripMenuItem.Click += new System.EventHandler(this.insertPairToolStripMenuItem_Click);
             // 
             // pTC
             // 
@@ -526,14 +580,6 @@
             this.pTC.MouseMove += new System.Windows.Forms.MouseEventHandler(this.parallelTextControl_MouseMove);
             this.pTC.MouseUp += new System.Windows.Forms.MouseEventHandler(this.parallelTextControl_MouseUp);
             // 
-            // insertBeforeToolStripMenuItem
-            // 
-            this.insertBeforeToolStripMenuItem.Name = "insertBeforeToolStripMenuItem";
-            this.insertBeforeToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.Insert)));
-            this.insertBeforeToolStripMenuItem.Size = new System.Drawing.Size(194, 22);
-            this.insertBeforeToolStripMenuItem.Text = "Insert before";
-            this.insertBeforeToolStripMenuItem.Click += new System.EventHandler(this.insertBeforeToolStripMenuItem_Click);
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -609,6 +655,11 @@
         private System.Windows.Forms.ToolStripMenuItem deletePairToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem insertPairToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem insertBeforeToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem optionsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem normalModeToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem alternatingModeToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem advancedModeToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem5;
 
     }
 }

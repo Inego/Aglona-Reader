@@ -69,6 +69,9 @@ namespace AglonaReader
             return base.IsInputKey(keyData);
         }
 
+
+
+
         
         #region Component Designer generated code
 

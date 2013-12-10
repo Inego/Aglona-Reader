@@ -3217,6 +3217,48 @@ namespace AglonaReader
         {
             return PText.WithAudio;
         }
+
+        public void ChangeReadingMode(int modeIndex)
+        {
+
+            int newReadingMode = 0;
+
+            switch (modeIndex)
+            {
+                case 0:
+                    newReadingMode = FileUsageInfo.NormalMode;
+                    break;
+                case 1:
+                    newReadingMode = FileUsageInfo.AlternatingMode;
+                    break;
+                case 2:
+                    newReadingMode = FileUsageInfo.AdvancedMode;
+                    break;
+            }
+
+            if (newReadingMode == ReadingMode)
+                return;
+
+            ReadingMode = newReadingMode;
+
+            SetLayoutMode();
+            
+            if (EditMode)
+            {
+                SelectionSide = 0;
+                SelectionFrame.Visible = false;
+            }
+            else
+            {
+                HighlightedFrame.SetVisibility(false);
+                NippingFrame.SetVisibility(false);
+                MouseCurrentWord = null;
+            }
+            
+            ProcessLayoutChange(true);
+
+        }
+
     }
 
     public class ScreenWord

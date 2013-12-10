@@ -231,6 +231,8 @@ namespace AglonaReader
                 SetEditMode(true);
             }
 
+            
+
         }
 
         private void SetEditMode(bool p)
@@ -1962,9 +1964,28 @@ namespace AglonaReader
                 pTC.PText.DeletePair(newIndex);
         }
 
+
         private void insertBeforeToolStripMenuItem_Click(object sender, EventArgs e)
         {
             InsertPair(false);
+        }
+
+
+        private void normalModeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            pTC.ChangeReadingMode(FileUsageInfo.NormalMode);
+        }
+
+
+        private void alternatingModeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            pTC.ChangeReadingMode(FileUsageInfo.AlternatingMode);
+        }
+
+
+        private void advancedModeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            pTC.ChangeReadingMode(FileUsageInfo.AdvancedMode);
         }
 
     }
