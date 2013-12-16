@@ -219,9 +219,16 @@ namespace AglonaReader
                 new Font(appSettings.FontName, appSettings.FontSize),
                 new Font(appSettings.FontName, appSettings.FontSize, FontStyle.Italic));
 
+
+            
+
+            String[] args = Environment.GetCommandLineArgs();
+
+            bool outerLoad = (args.Length > 1);
+
             if (appSettings.FileUsages.Count > 0)
             {
-                LoadSettingsFromFileUsageInfo(appSettings.FileUsages[0], true);
+                LoadSettingsFromFileUsageInfo(appSettings.FileUsages[0], !outerLoad);
                 newBook = false;
             }
             else
@@ -231,8 +238,9 @@ namespace AglonaReader
                 SetEditMode(true);
             }
 
+            if (outerLoad)
+                LoadFromFile(args[1]);
             
-
         }
 
         private void SetEditMode(bool p)
@@ -1505,24 +1513,22 @@ namespace AglonaReader
             if (AskToSaveModified(sender) == System.Windows.Forms.DialogResult.Cancel)
                 return;
 
-            string fileName;
-
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
                 openFileDialog.Filter = "Parallel Books (*.pbo,*.pbs)|*.pbo;*.pbs";
                 openFileDialog.RestoreDirectory = true;
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
-                    fileName = LoadFromFile(openFileDialog.FileName);
+                    LoadFromFile(openFileDialog.FileName);
             }
         }
 
-        private string LoadFromFile(string fileName)
+        private bool LoadFromFile(string fileName)
         {
             pTC.PText = new ParallelText();
             pTC.mouse_text_line = -1;
 
-            pTC.PText.Load(fileName);
+            bool result = pTC.PText.Load(fileName);
 
             CtrlPressed = false;
 
@@ -1551,7 +1557,7 @@ namespace AglonaReader
 
             UpdateWindowTitle();
 
-            return fileName;
+            return result;
         }
 
         private void SaveAppSettings()

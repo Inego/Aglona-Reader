@@ -62,7 +62,7 @@
             this.programVersionLabel.Name = "programVersionLabel";
             this.programVersionLabel.Size = new System.Drawing.Size(36, 13);
             this.programVersionLabel.TabIndex = 2;
-            this.programVersionLabel.Text = "1.5.3";
+            this.programVersionLabel.Text = "1.5.4";
             // 
             // releaseDateLabel
             // 
@@ -72,7 +72,7 @@
             this.releaseDateLabel.Name = "releaseDateLabel";
             this.releaseDateLabel.Size = new System.Drawing.Size(61, 13);
             this.releaseDateLabel.TabIndex = 3;
-            this.releaseDateLabel.Text = "2013-10-26";
+            this.releaseDateLabel.Text = "2013-12-14";
             // 
             // colorLabel
             // 
