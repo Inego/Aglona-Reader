@@ -123,7 +123,12 @@ namespace AglonaReader
             if (ParallelTextControl.Reversed)
                 side = 3 - side;
 
-            string langCode = (side == 1 ? ParallelTextControl.PText.Lang1 : ParallelTextControl.PText.Lang2).Trim().ToUpper();
+            string langCode = (side == 1 ? ParallelTextControl.PText.Lang1 : ParallelTextControl.PText.Lang2);
+            
+            if (langCode == null)
+                return;
+            
+            langCode = langCode.Trim().ToUpper();
 
             string cult;
 
@@ -146,6 +151,19 @@ namespace AglonaReader
                     break;
                 case "FR":
                     cult = "fr-FR";
+                    break;
+                case "PL":
+                    cult = "pl-PL";
+                    break;
+                case "EL":
+                case "GR":
+                    cult = "el-GR";
+                    break;
+                case "TR":
+                    cult = "tr-TR";
+                    break;
+                case "LV":
+                    cult = "lv-LV";
                     break;
                 default:
                     return;
