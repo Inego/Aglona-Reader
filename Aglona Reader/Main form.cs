@@ -38,6 +38,9 @@ namespace AglonaReader
         private bool CtrlPressed;
         private int currentAudioFileNumber;
 
+        private bool dragging;
+        private int mouseYBeforeDragging;
+
         protected override bool ProcessDialogKey(Keys keyData)
         {
             if (keyData == (Keys.Alt | Keys.RButton | Keys.ShiftKey))
@@ -347,9 +350,26 @@ namespace AglonaReader
             pTC.LastMouseX = e.X;
             pTC.LastMouseY = e.Y;
 
-            if (XonSplitter(pTC.LastMouseX) || opState == 1)
-                Cursor = Cursors.VSplit;
+            if (dragging)
+            {
+                if (Math.Abs(mouseYBeforeDragging - e.Y) > pTC.lineHeight)
+                {
+                    var deltaY = mouseYBeforeDragging - e.Y;
+                    var linesToScroll = deltaY / pTC.lineHeight;
+                    var rest = deltaY % pTC.lineHeight;
+                    mouseYBeforeDragging = e.Y - rest;
 
+                    for (int i = 0; i < Math.Abs(linesToScroll); ++i)
+                    {
+                        if (linesToScroll > 0)
+                            ProcessDownArrow(true);
+                        else
+                            ProcessUpArrow(true);
+                    }
+                }
+            }
+            else if (XonSplitter(pTC.LastMouseX) || opState == 1)
+                Cursor = Cursors.VSplit;
             else if (pTC.MousePressed && pTC.EditMode)
             {
 
@@ -536,6 +556,13 @@ namespace AglonaReader
                         }
 
                     }
+                    else
+                    {
+                        dragging = true;
+                        pTC.Capture = true;
+                        pTC.Cursor = Cursors.SizeNS;
+                        mouseYBeforeDragging = e.Y;
+                    }
 
                 }
 
@@ -556,6 +583,14 @@ namespace AglonaReader
                         pTC.SwitchAdvancedShowPopups();
                 }
 
+                return;
+            }
+
+            if (dragging)
+            {
+                dragging = false;
+                pTC.Capture = false;
+                pTC.Cursor = Cursors.Default;
                 return;
             }
 
