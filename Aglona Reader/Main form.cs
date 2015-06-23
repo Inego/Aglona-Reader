@@ -7,6 +7,7 @@ using System.Text;
 using System.Diagnostics;
 using System.IO;
 using AglonaReader.Mp3Player;
+using System.Text.RegularExpressions;
 
 [assembly: CLSCompliant(true)]
 namespace AglonaReader
@@ -41,6 +42,11 @@ namespace AglonaReader
         private bool dragging;
         private int mouseYBeforeDragging;
 
+        // Set to true if at least text was dragged at least for one line
+        private bool draggingPerformed;
+
+        private bool googleTranslatorEnabled;
+
         protected override bool ProcessDialogKey(Keys keyData)
         {
             if (keyData == (Keys.Alt | Keys.RButton | Keys.ShiftKey))
@@ -72,7 +78,7 @@ namespace AglonaReader
             playbackTimer.Tick += playbackTimer_Tick;
 
             currentAudioFileNumber = -1;
-            
+            splitContainer.Panel2Collapsed = true;
         }
 
         void playbackTimer_Tick(object sender, EventArgs e)
@@ -352,6 +358,11 @@ namespace AglonaReader
 
             if (dragging)
             {
+                if (pTC.Cursor != Cursors.SizeNS)
+                {
+                    pTC.Cursor = Cursors.SizeNS;
+                }
+
                 if (Math.Abs(mouseYBeforeDragging - e.Y) > pTC.lineHeight)
                 {
                     var deltaY = mouseYBeforeDragging - e.Y;
@@ -366,6 +377,8 @@ namespace AglonaReader
                         else
                             ProcessUpArrow(true);
                     }
+
+                    draggingPerformed = true;
                 }
             }
             else if (XonSplitter(pTC.LastMouseX) || opState == 1)
@@ -559,8 +572,8 @@ namespace AglonaReader
                     else
                     {
                         dragging = true;
+                        draggingPerformed = false;
                         pTC.Capture = true;
-                        pTC.Cursor = Cursors.SizeNS;
                         mouseYBeforeDragging = e.Y;
                     }
 
@@ -591,6 +604,17 @@ namespace AglonaReader
                 dragging = false;
                 pTC.Capture = false;
                 pTC.Cursor = Cursors.Default;
+
+                if (!draggingPerformed && googleTranslatorEnabled)
+                {
+                    var word = pTC.GetWordAtPosition(e.X, e.Y);
+
+                    if (word != null)
+                    {
+                        TranslateWord(word.Word);
+                    }
+                }
+
                 return;
             }
 
@@ -651,6 +675,24 @@ namespace AglonaReader
                     }
                 }
             }
+        }
+
+        private void TranslateWord(string word)
+        {
+            var urlString = webBrowser.Url != null ? webBrowser.Url.ToString() : string.Empty;
+
+            var match = Regex.Match(urlString, @"https://translate.google.com/#([a-z0-9]+?)/([a-z0-9]+?)/.*");
+
+            var srcLang = "auto";
+            var destLang = "en";
+
+            if (match.Groups.Count == 3)
+            {
+                srcLang = match.Groups[1].Value;
+                destLang = match.Groups[2].Value;
+            }
+
+            webBrowser.Navigate(string.Format(@"https://translate.google.com/#{0}/{1}/{2}", srcLang, destLang, word));
         }
 
         private void MouseUpInEditMode()
@@ -1758,10 +1800,31 @@ namespace AglonaReader
             
             pTC.EditMode = editModeToolStripMenuItem.Checked;
 
+            showGoogleTranslatorToolStripMenuItem.Enabled = !pTC.EditMode;
+            SetGoogleTranslatorEnabled(!pTC.EditMode && showGoogleTranslatorToolStripMenuItem.Checked);
+
             pTC.SetLayoutMode();
 
             ProcessEditModeChange(false);
 
+        }
+
+        private void SetGoogleTranslatorEnabled(bool enabled)
+        {
+            if (googleTranslatorEnabled != enabled)
+            {
+                googleTranslatorEnabled = enabled;
+                splitContainer.Panel2Collapsed = !enabled;
+
+                pTC.ResizeBufferedGraphic();
+                pTC.SetSplitterPositionByRatio();
+                Recompute();
+
+                if (enabled && webBrowser.Url == null)
+                {
+                    webBrowser.Navigate("https://translate.google.com/");
+                }
+            }
         }
 
         private void ProcessEditModeChange(bool updateStatusBar)
@@ -2027,6 +2090,19 @@ namespace AglonaReader
         private void advancedModeToolStripMenuItem_Click(object sender, EventArgs e)
         {
             pTC.ChangeReadingMode(FileUsageInfo.AdvancedMode);
+        }
+
+        private void splitContainer_SplitterMoved(object sender, SplitterEventArgs e)
+        {
+            pTC.ResizeBufferedGraphic();
+            pTC.SetSplitterPositionByRatio();
+            Recompute();
+        }
+
+        private void showGoogleTranslatorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (!pTC.EditMode)
+                SetGoogleTranslatorEnabled(showGoogleTranslatorToolStripMenuItem.Checked);
         }
 
     }

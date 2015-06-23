@@ -2185,29 +2185,6 @@ namespace AglonaReader
             }
         }
 
-        public ScreenWord WordAfterCursor(int line, int cursorX, int side)
-        {
-            List<ScreenWord> listOfWords;
-
-            ScreenWord lastWord = null;
-
-            if (wordsOnScreen.TryGetValue(line, out listOfWords))
-            {
-                // let's see...
-
-                foreach (ScreenWord s in listOfWords)
-                {
-                    if (side != -1 && s.Side != side)
-                        continue;
-                    if (cursorX >= s.X1 &&(lastWord == null || lastWord.X1 < s.X1))
-                        lastWord = s;
-                }
-            }
-
-            return lastWord;
-        }
-
-
         internal bool NipHighlightedPair()
         {
             if (NaturalDividerPosition1W == null
@@ -2619,31 +2596,47 @@ namespace AglonaReader
             Render();
         }
 
+        private int GetLineNumberAtPosition(int y)
+        {
+            return (y - VMargin) / lineHeight;
+        }
+
+        public ScreenWord GetWordAtPosition(int x, int y)
+        {
+            // When selection started in one side, look always for words on that side
+            int side = (!EditMode && !SelectionFinished) ? SelectionSide : -1;
+            
+            // Let's see what we've got on this Line
+            List<ScreenWord> listOfWords;
+
+            ScreenWord lastWord = null;
+
+            if (wordsOnScreen.TryGetValue(GetLineNumberAtPosition(y), out listOfWords))
+            {
+                // let's see...
+
+                foreach (ScreenWord s in listOfWords)
+                {
+                    if (side != -1 && s.Side != side)
+                        continue;
+                    if (x >= s.X1 && (lastWord == null || lastWord.X1 < s.X1))
+                        lastWord = s;
+                }
+            }
+
+            return lastWord;
+        }
+
         public void ProcessMousePosition(bool forced, bool renderRequired)
         {
             // Let's check whether the cursor points to a Word
 
-            // Compute current Line
-
-            int side;
-
             bool needToRender = false;
 
-
-            if (!EditMode && !SelectionFinished)
-                // When selection started in one side, look always for words on that side
-                side = SelectionSide;
-            else
-                side = -1;
-
-
-            int line = (LastMouseY - VMargin) / lineHeight;
-
-            // Let's see what we've got on this Line
-
             int word_x = -1;
+            int line = GetLineNumberAtPosition(LastMouseY);
 
-            ScreenWord found_word = WordAfterCursor(line, LastMouseX, side);
+            ScreenWord found_word = GetWordAtPosition(LastMouseX, LastMouseY);
 
             if (found_word != null)
                 word_x = found_word.X1;
