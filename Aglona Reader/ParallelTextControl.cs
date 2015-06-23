@@ -541,7 +541,11 @@ namespace AglonaReader
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
-            RegisterTouchWindow(Handle, 0);
+
+            if (Environment.OSVersion.Version.CompareTo(new Version(6, 1)) >= 0)
+            {
+                RegisterTouchWindow(Handle, 0);
+            }
         }
 
         public void CreateNewParallelBook()
