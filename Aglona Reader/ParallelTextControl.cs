@@ -538,6 +538,12 @@ namespace AglonaReader
 
         }
 
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+            RegisterTouchWindow(Handle, 0);
+        }
+
         public void CreateNewParallelBook()
         {
             PText = new ParallelText();
@@ -3259,6 +3265,9 @@ namespace AglonaReader
 
         }
 
+        [DllImport("user32")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool RegisterTouchWindow(IntPtr hWnd, uint ulFlags);
     }
 
     public class ScreenWord
