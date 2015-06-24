@@ -230,9 +230,6 @@ namespace AglonaReader
                 new Font(appSettings.FontName, appSettings.FontSize),
                 new Font(appSettings.FontName, appSettings.FontSize, FontStyle.Italic));
 
-            SetGoogleTranslatorEnabled(appSettings.ShowGoogleTranslator);
-            showGoogleTranslatorToolStripMenuItem.Checked = appSettings.ShowGoogleTranslator;
-
             String[] args = Environment.GetCommandLineArgs();
 
             bool outerLoad = (args.Length > 1);
@@ -251,7 +248,9 @@ namespace AglonaReader
 
             if (outerLoad)
                 LoadFromFile(args[1]);
-            
+
+            SetGoogleTranslatorEnabled(appSettings.ShowGoogleTranslator);
+            showGoogleTranslatorToolStripMenuItem.Checked = appSettings.ShowGoogleTranslator;
         }
 
         private void SetEditMode(bool editMode)
