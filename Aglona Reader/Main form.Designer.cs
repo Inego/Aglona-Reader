@@ -85,8 +85,8 @@
             this.ssPositionPercent = new System.Windows.Forms.ToolStripStatusLabel();
             this.vScrollBar = new System.Windows.Forms.VScrollBar();
             this.splitContainer = new System.Windows.Forms.SplitContainer();
-            this.webBrowser = new System.Windows.Forms.WebBrowser();
             this.pTC = new AglonaReader.ParallelTextControl();
+            this.webBrowser = new System.Windows.Forms.WebBrowser();
             this.mainMenu.SuspendLayout();
             this.statusStrip.SuspendLayout();
             this.splitContainer.Panel1.SuspendLayout();
@@ -520,12 +520,11 @@
             // 
             // vScrollBar
             // 
-            this.vScrollBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.vScrollBar.Dock = System.Windows.Forms.DockStyle.Right;
             this.vScrollBar.LargeChange = 1;
-            this.vScrollBar.Location = new System.Drawing.Point(597, 0);
+            this.vScrollBar.Location = new System.Drawing.Point(443, 0);
             this.vScrollBar.Name = "vScrollBar";
-            this.vScrollBar.Size = new System.Drawing.Size(18, 266);
+            this.vScrollBar.Size = new System.Drawing.Size(18, 216);
             this.vScrollBar.TabIndex = 5;
             this.vScrollBar.Scroll += new System.Windows.Forms.ScrollEventHandler(this.vScrollBar_Scroll);
             // 
@@ -534,44 +533,32 @@
             this.splitContainer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.splitContainer.Location = new System.Drawing.Point(0, 31);
+            this.splitContainer.Location = new System.Drawing.Point(0, 25);
+            this.splitContainer.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.splitContainer.Name = "splitContainer";
             // 
             // splitContainer.Panel1
             // 
-            this.splitContainer.Panel1.Controls.Add(this.vScrollBar);
             this.splitContainer.Panel1.Controls.Add(this.pTC);
+            this.splitContainer.Panel1.Controls.Add(this.vScrollBar);
             // 
             // splitContainer.Panel2
             // 
             this.splitContainer.Panel2.Controls.Add(this.webBrowser);
-            this.splitContainer.Size = new System.Drawing.Size(917, 266);
-            this.splitContainer.SplitterDistance = 615;
-            this.splitContainer.SplitterWidth = 10;
+            this.splitContainer.Size = new System.Drawing.Size(688, 216);
+            this.splitContainer.SplitterDistance = 461;
+            this.splitContainer.SplitterWidth = 8;
             this.splitContainer.TabIndex = 6;
             this.splitContainer.SplitterMoved += new System.Windows.Forms.SplitterEventHandler(this.splitContainer_SplitterMoved);
-            // 
-            // webBrowser
-            // 
-            this.webBrowser.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.webBrowser.Location = new System.Drawing.Point(0, 0);
-            this.webBrowser.MinimumSize = new System.Drawing.Size(20, 20);
-            this.webBrowser.Name = "webBrowser";
-            this.webBrowser.ScriptErrorsSuppressed = true;
-            this.webBrowser.Size = new System.Drawing.Size(292, 266);
-            this.webBrowser.TabIndex = 0;
-            this.webBrowser.WebBrowserShortcutsEnabled = false;
             // 
             // pTC
             // 
             this.pTC.AlternatingColorScheme = 0;
-            this.pTC.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.pTC.BackColor = System.Drawing.SystemColors.InactiveBorder;
             this.pTC.Brightness = 0.97D;
             this.pTC.CurrentPair = 0;
             this.pTC.DebugString = null;
+            this.pTC.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pTC.EditMode = false;
             this.pTC.EditWhenNipped = false;
             this.pTC.FirstRenderedPair = 0;
@@ -590,8 +577,8 @@
             this.pTC.LastMouseY = -1;
             this.pTC.LastRenderedPair = 0;
             this.pTC.Location = new System.Drawing.Point(0, 0);
-            this.pTC.Margin = new System.Windows.Forms.Padding(5);
-            this.pTC.MinimumSize = new System.Drawing.Size(13, 12);
+            this.pTC.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.pTC.MinimumSize = new System.Drawing.Size(10, 10);
             this.pTC.Modified = false;
             this.pTC.MouseCurrentWord = null;
             this.pTC.MousePressed = false;
@@ -628,7 +615,7 @@
             this.pTC.SelectionSide = ((byte)(0));
             this.pTC.Side1Set = false;
             this.pTC.Side2Set = false;
-            this.pTC.Size = new System.Drawing.Size(592, 266);
+            this.pTC.Size = new System.Drawing.Size(443, 216);
             this.pTC.SpaceLength = 6;
             this.pTC.SplitterMoveOffset = 0;
             this.pTC.SplitterPosition = 445;
@@ -644,18 +631,29 @@
             this.pTC.MouseMove += new System.Windows.Forms.MouseEventHandler(this.parallelTextControl_MouseMove);
             this.pTC.MouseUp += new System.Windows.Forms.MouseEventHandler(this.parallelTextControl_MouseUp);
             // 
+            // webBrowser
+            // 
+            this.webBrowser.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.webBrowser.Location = new System.Drawing.Point(0, 0);
+            this.webBrowser.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.webBrowser.MinimumSize = new System.Drawing.Size(15, 16);
+            this.webBrowser.Name = "webBrowser";
+            this.webBrowser.ScriptErrorsSuppressed = true;
+            this.webBrowser.Size = new System.Drawing.Size(219, 216);
+            this.webBrowser.TabIndex = 0;
+            this.webBrowser.WebBrowserShortcutsEnabled = false;
+            // 
             // MainForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(917, 325);
+            this.ClientSize = new System.Drawing.Size(688, 264);
             this.Controls.Add(this.mainMenu);
             this.Controls.Add(this.statusStrip);
             this.Controls.Add(this.splitContainer);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.KeyPreview = true;
             this.MainMenuStrip = this.mainMenu;
-            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "MainForm";
             this.Text = "Aglona Reader";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
