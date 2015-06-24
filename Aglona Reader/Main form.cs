@@ -620,7 +620,7 @@ namespace AglonaReader
 
                     if (word != null)
                     {
-                        TranslateWord(word.Word);
+                        TranslateText(word.Word);
                     }
                 }
 
@@ -656,7 +656,17 @@ namespace AglonaReader
                     if (!pTC.SelectionFinished)
                     {
                         pTC.SelectionFinished = true;
-                        CopyToClipboard();
+
+                        var selectedText = GetSelectedText();
+                        if (!string.IsNullOrEmpty(selectedText))
+                        {
+                            Clipboard.SetText(selectedText);
+
+                            if (googleTranslatorEnabled)
+                            {
+                                TranslateText(selectedText);
+                            }
+                        }
                     }
                     else
                     {
@@ -686,7 +696,7 @@ namespace AglonaReader
             }
         }
 
-        private void TranslateWord(string word)
+        private void TranslateText(string text)
         {
             var urlString = webBrowser.Url != null ? webBrowser.Url.ToString() : string.Empty;
 
@@ -701,7 +711,7 @@ namespace AglonaReader
                 destLang = match.Groups[2].Value;
             }
 
-            webBrowser.Navigate(string.Format(@"https://translate.google.com/#{0}/{1}/{2}", srcLang, destLang, word));
+            webBrowser.Navigate(string.Format(@"https://translate.google.com/#{0}/{1}/{2}", srcLang, destLang, text));
         }
 
         private void MouseUpInEditMode()
@@ -1017,12 +1027,10 @@ namespace AglonaReader
             pTC.Side2Set = false;
         }
 
-        private void CopyToClipboard()
+        private string GetSelectedText()
         {
             if (pTC.SelectionSide != 0 && pTC.SelectionFinished)
             {
-                //System.Windows.Forms.Clipboard.SetText("abc");
-
                 StringBuilder selectedText = new StringBuilder();
 
                 int Y1;
@@ -1078,10 +1086,19 @@ namespace AglonaReader
                 // Append the last word starting in Y2 from X2 
                 selectedText.Append(ParallelTextControl.GetWord(pTC[Y2], pTC.SelectionSide, X2));
 
+                return selectedText.ToString();
+            }
 
-                Clipboard.SetText(selectedText.ToString());
-                
-                
+            return null;
+        }
+
+        private void CopyToClipboard()
+        {
+            var seletedText = GetSelectedText();
+
+            if (!string.IsNullOrEmpty(seletedText))
+            {
+                Clipboard.SetText(seletedText);
             }
         }
 
