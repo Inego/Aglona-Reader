@@ -41,8 +41,10 @@
             this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
+            this.exportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportLeftTextToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportRightTextToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.hTMLToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.bookToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -113,8 +115,7 @@
             this.saveToolStripMenuItem,
             this.saveAsToolStripMenuItem,
             this.toolStripMenuItem2,
-            this.exportLeftTextToolStripMenuItem,
-            this.exportRightTextToolStripMenuItem,
+            this.exportToolStripMenuItem,
             this.toolStripSeparator5,
             this.exitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
@@ -176,19 +177,36 @@
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
             this.toolStripMenuItem2.Size = new System.Drawing.Size(211, 6);
             // 
+            // exportToolStripMenuItem
+            // 
+            this.exportToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.exportLeftTextToolStripMenuItem,
+            this.exportRightTextToolStripMenuItem,
+            this.hTMLToolStripMenuItem});
+            this.exportToolStripMenuItem.Name = "exportToolStripMenuItem";
+            this.exportToolStripMenuItem.Size = new System.Drawing.Size(214, 22);
+            this.exportToolStripMenuItem.Text = "Export";
+            // 
             // exportLeftTextToolStripMenuItem
             // 
             this.exportLeftTextToolStripMenuItem.Name = "exportLeftTextToolStripMenuItem";
-            this.exportLeftTextToolStripMenuItem.Size = new System.Drawing.Size(214, 22);
-            this.exportLeftTextToolStripMenuItem.Text = "Export left text";
+            this.exportLeftTextToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
+            this.exportLeftTextToolStripMenuItem.Text = "Left text to TXT";
             this.exportLeftTextToolStripMenuItem.Click += new System.EventHandler(this.exportLeftTextToolStripMenuItem_Click);
             // 
             // exportRightTextToolStripMenuItem
             // 
             this.exportRightTextToolStripMenuItem.Name = "exportRightTextToolStripMenuItem";
-            this.exportRightTextToolStripMenuItem.Size = new System.Drawing.Size(214, 22);
-            this.exportRightTextToolStripMenuItem.Text = "Export right text";
+            this.exportRightTextToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
+            this.exportRightTextToolStripMenuItem.Text = "Right text to TXT";
             this.exportRightTextToolStripMenuItem.Click += new System.EventHandler(this.exportRightTextToolStripMenuItem_Click);
+            // 
+            // hTMLToolStripMenuItem
+            // 
+            this.hTMLToolStripMenuItem.Name = "hTMLToolStripMenuItem";
+            this.hTMLToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
+            this.hTMLToolStripMenuItem.Text = "Book to HTML";
+            this.hTMLToolStripMenuItem.Click += new System.EventHandler(this.hTMLToolStripMenuItem_Click);
             // 
             // toolStripSeparator5
             // 
@@ -645,8 +663,6 @@
         private System.Windows.Forms.ToolStripMenuItem startpauseStopwatchToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem resetStopwatchToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem2;
-        private System.Windows.Forms.ToolStripMenuItem exportLeftTextToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem exportRightTextToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem reverseContentsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem aglonaReaderSiteToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem paraBooksMakerSiteToolStripMenuItem;
@@ -660,6 +676,10 @@
         private System.Windows.Forms.ToolStripMenuItem alternatingModeToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem advancedModeToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem5;
+        private System.Windows.Forms.ToolStripMenuItem exportToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem hTMLToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem exportLeftTextToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem exportRightTextToolStripMenuItem;
 
     }
 }

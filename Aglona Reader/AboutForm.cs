@@ -24,6 +24,8 @@ namespace AglonaReader
 
         private void AboutForm_Paint(object sender, PaintEventArgs e)
         {
+            return;
+
             System.Drawing.Graphics formGraphics = e.Graphics;
             System.Drawing.Pen myPen;
 

@@ -1994,6 +1994,12 @@ namespace AglonaReader
             pTC.ChangeReadingMode(FileUsageInfo.AdvancedMode);
         }
 
+        private void hTMLToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ExportHTMLForm exportHTMLForm = new ExportHTMLForm(pTC);
+            exportHTMLForm.ShowDialog();
+        }
+
     }
         
     

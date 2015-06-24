@@ -60,9 +60,9 @@
             this.programVersionLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.programVersionLabel.Location = new System.Drawing.Point(104, 9);
             this.programVersionLabel.Name = "programVersionLabel";
-            this.programVersionLabel.Size = new System.Drawing.Size(47, 13);
+            this.programVersionLabel.Size = new System.Drawing.Size(36, 13);
             this.programVersionLabel.TabIndex = 2;
-            this.programVersionLabel.Text = "1.5.4.1";
+            this.programVersionLabel.Text = "1.5.5";
             // 
             // releaseDateLabel
             // 
@@ -72,7 +72,7 @@
             this.releaseDateLabel.Name = "releaseDateLabel";
             this.releaseDateLabel.Size = new System.Drawing.Size(61, 13);
             this.releaseDateLabel.TabIndex = 3;
-            this.releaseDateLabel.Text = "2014-03-17";
+            this.releaseDateLabel.Text = "2014-10-08";
             // 
             // colorLabel
             // 
@@ -86,7 +86,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1022, 92);
+            this.ClientSize = new System.Drawing.Size(194, 58);
             this.Controls.Add(this.colorLabel);
             this.Controls.Add(this.releaseDateLabel);
             this.Controls.Add(this.programVersionLabel);

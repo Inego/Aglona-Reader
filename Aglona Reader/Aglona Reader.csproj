@@ -117,6 +117,12 @@
     <Compile Include="AboutForm.Designer.cs">
       <DependentUpon>AboutForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="ExportHTMLForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ExportHTMLForm.Designer.cs">
+      <DependentUpon>ExportHTMLForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="FindForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -236,6 +242,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="EditPairForm.resx">
       <DependentUpon>EditPairForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ExportHTMLForm.resx">
+      <DependentUpon>ExportHTMLForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FindForm.resx">
       <DependentUpon>FindForm.cs</DependentUpon>
