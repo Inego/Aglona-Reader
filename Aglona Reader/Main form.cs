@@ -222,6 +222,8 @@ namespace AglonaReader
                     appSettings.FontSize = 18.0F;
             }
 
+            splitContainer.SplitterDistance = (int)(splitContainer.Width * appSettings.WindowSplitterDistance);
+
             pTC.HighlightFragments = appSettings.HighlightFragments;
             pTC.HighlightFirstWords = appSettings.HighlightFirstWords;
             pTC.Brightness = appSettings.Brightness;
@@ -1698,6 +1700,8 @@ namespace AglonaReader
 
             appSettings.ShowGoogleTranslator = googleTranslatorEnabled;
 
+            appSettings.WindowSplitterDistance = splitContainer.SplitterDistance / (float)splitContainer.Width;
+
             Properties.Settings.Default.AppSettings = appSettings;
             Properties.Settings.Default.Save();
         }
@@ -2175,6 +2179,7 @@ namespace AglonaReader
         public string FontName { get; set; }
         public float FontSize { get; set; }
         public bool ShowGoogleTranslator { get; set; }
+        public float WindowSplitterDistance { get; set; }
 
         public Collection<FileUsageInfo> FileUsages { get; set; }
 
@@ -2187,6 +2192,7 @@ namespace AglonaReader
             FontSize = 18.0F;
             FileUsages = new Collection<FileUsageInfo>();
             ShowGoogleTranslator = false;
+            WindowSplitterDistance = 0.66f;
         }
 
     }
