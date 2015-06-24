@@ -46,6 +46,8 @@ namespace AglonaReader
         private bool draggingPerformed;
 
         private bool googleTranslatorEnabled;
+        private string defaultTranslationSourceLanguage = "auto";
+        private string defaultTranslationDestinationLanguage = "en";
 
         protected override bool ProcessDialogKey(Keys keyData)
         {
@@ -228,8 +230,8 @@ namespace AglonaReader
                 new Font(appSettings.FontName, appSettings.FontSize),
                 new Font(appSettings.FontName, appSettings.FontSize, FontStyle.Italic));
 
-
-            
+            SetGoogleTranslatorEnabled(appSettings.ShowGoogleTranslator);
+            showGoogleTranslatorToolStripMenuItem.Checked = appSettings.ShowGoogleTranslator;
 
             String[] args = Environment.GetCommandLineArgs();
 
@@ -252,10 +254,12 @@ namespace AglonaReader
             
         }
 
-        private void SetEditMode(bool p)
+        private void SetEditMode(bool editMode)
         {
-            pTC.EditMode = p;
-            editModeToolStripMenuItem.Checked = p;
+            pTC.EditMode = editMode;
+            showGoogleTranslatorToolStripMenuItem.Enabled = !editMode;
+            SetGoogleTranslatorEnabled(!editMode && showGoogleTranslatorToolStripMenuItem.Checked);
+            editModeToolStripMenuItem.Checked = editMode;
         }
 
         private void LoadSettingsFromFileUsageInfo(FileUsageInfo f, bool load)
@@ -263,7 +267,12 @@ namespace AglonaReader
 
             if (load)
             {
-                pTC.PText.Load(f.FileName);
+               if (pTC.PText.Load(f.FileName))
+               {
+                  defaultTranslationSourceLanguage = pTC.PText.Lang1 ?? "auto";
+                  defaultTranslationDestinationLanguage = pTC.PText.Lang2 ?? "en";
+               }
+
                 currentAudioFileNumber = -1;
                 UpdateWindowTitle();
                 CtrlPressed = false;
@@ -683,8 +692,8 @@ namespace AglonaReader
 
             var match = Regex.Match(urlString, @"https://translate.google.com/#([a-z0-9]+?)/([a-z0-9]+?)/.*");
 
-            var srcLang = "auto";
-            var destLang = "en";
+            var srcLang = defaultTranslationSourceLanguage;
+            var destLang = defaultTranslationDestinationLanguage;
 
             if (match.Groups.Count == 3)
             {
@@ -1607,6 +1616,17 @@ namespace AglonaReader
 
             bool result = pTC.PText.Load(fileName);
 
+            if (result)
+            {
+               defaultTranslationSourceLanguage = pTC.PText.Lang1 ?? "auto";
+               defaultTranslationDestinationLanguage = pTC.PText.Lang2 ?? "en";
+               if (webBrowser.Url != null)
+               {
+                  webBrowser.Navigate(string.Format(@"https://translate.google.com/#{0}/{1}/", defaultTranslationSourceLanguage, defaultTranslationDestinationLanguage));
+                  webBrowser.Refresh();
+               }
+            }
+
             CtrlPressed = false;
 
             currentAudioFileNumber = -1;
@@ -1659,6 +1679,8 @@ namespace AglonaReader
 
             appSettings.FontName = pTC.textFont.Name;
             appSettings.FontSize = pTC.textFont.Size;
+
+            appSettings.ShowGoogleTranslator = googleTranslatorEnabled;
 
             Properties.Settings.Default.AppSettings = appSettings;
             Properties.Settings.Default.Save();
@@ -1752,7 +1774,6 @@ namespace AglonaReader
 
             reverseToolStripMenuItem.Checked = false;
             pTC.ComputeSideCoordinates();
-            editModeToolStripMenuItem.Checked = true;
 
             pTC.SetLayoutMode();
 
@@ -1762,6 +1783,7 @@ namespace AglonaReader
             pTC.NippingFrame.SetVisibility(false);
             pTC.AudioSingleFrame.Visible = false;
 
+            SetEditMode(true);
             ProcessEditModeChange(false);
 
             newBook = true;
@@ -1822,7 +1844,7 @@ namespace AglonaReader
 
                 if (enabled && webBrowser.Url == null)
                 {
-                    webBrowser.Navigate("https://translate.google.com/");
+                    webBrowser.Navigate(string.Format(@"https://translate.google.com/#{0}/{1}/", defaultTranslationSourceLanguage, defaultTranslationDestinationLanguage));
                 }
             }
         }
@@ -2136,6 +2158,7 @@ namespace AglonaReader
         public double Brightness { get; set; }
         public string FontName { get; set; }
         public float FontSize { get; set; }
+        public bool ShowGoogleTranslator { get; set; }
 
         public Collection<FileUsageInfo> FileUsages { get; set; }
 
@@ -2147,6 +2170,7 @@ namespace AglonaReader
             FontName = "Arial";
             FontSize = 18.0F;
             FileUsages = new Collection<FileUsageInfo>();
+            ShowGoogleTranslator = false;
         }
 
     }
