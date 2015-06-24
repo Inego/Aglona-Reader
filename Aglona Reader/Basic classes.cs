@@ -5,6 +5,7 @@ using System.Xml;
 using System.ComponentModel;
 using System.IO;
 using System;
+using System.Web;
 
 
 
@@ -1024,7 +1025,107 @@ namespace AglonaReader
             }
         }
 
+        private string EscapeForHtml(string src)
+        {
+            StringBuilder sb = new StringBuilder(src);
 
+            sb.Replace("&", "&amp;");
+            sb.Replace("<", "&lt;");
+            sb.Replace(">", "&gt;");
+            sb.Replace("\r\n", "<br>");
+            sb.Replace("\n\r", "<br>");
+            sb.Replace("\r", "<br>");
+            sb.Replace("\n", "<br>");
+
+            return sb.ToString();
+
+
+        }
+
+
+        private void WriteHTMLRow(StreamWriter outfile, int leftNumber, string c1, string c2)
+        {
+
+            outfile.WriteLine("<tr>");
+            outfile.WriteLine("<td>");
+            outfile.WriteLine("<sup>" + leftNumber.ToString() + "</sup>");
+            outfile.WriteLine("</td>");
+            outfile.WriteLine("<td>");
+            outfile.WriteLine(c1);
+            outfile.WriteLine("</td>");
+            outfile.WriteLine("<td>");
+            outfile.WriteLine(c2);
+            outfile.WriteLine("</td>");
+            outfile.WriteLine("</tr>");
+
+        }
+
+        internal void ExportHTML(string fileName)
+        {
+
+            using (StreamWriter outfile = new StreamWriter(fileName, false, Encoding.UTF8))
+            {
+
+                TextPair p = null;
+
+                outfile.WriteLine("<!DOCTYPE html><html><body>");
+                outfile.WriteLine("<style type=\"text/css\">");
+                outfile.WriteLine(".tg  {border-collapse:collapse;border-spacing:0;}");
+                outfile.WriteLine(".tg td{border-style:solid;border-width:1px;vertical-align:top;}");
+                outfile.WriteLine(".tg td:first-child{border-style:solid;border-width:0px;text-align:right;}");
+                outfile.WriteLine("</style>");
+                
+                outfile.WriteLine("<table  class=\"tg\">");
+
+                string c1 = "";
+                string c2 = "";
+
+                int leftNumber = 0;
+                
+                for (int i = 0; i < Number(); i++)
+                {
+
+                    p = this[i];
+
+                    if (p.StartParagraph1 || p.StartParagraph2)
+                    {
+                        if (leftNumber > 0)
+                            WriteHTMLRow(outfile, leftNumber, c1, c2);
+
+                        c1 = EscapeForHtml(p.Text1);
+                        c2 = EscapeForHtml(p.Text2);
+
+                        if (p.StructureLevel > 0)
+                        {
+                            c1 = "<h" + p.StructureLevel + ">" + c1 + "</h" + p.StructureLevel + ">";
+                            c2 = "<h" + p.StructureLevel + ">" + c2 + "</h" + p.StructureLevel + ">";
+                        }
+
+                        leftNumber = i + 1;
+                        
+                    }
+
+                    if (leftNumber < i + 1)
+                    {
+                        string q = " <sup>" + ((i + 1) % 100).ToString() + "</sup> ";
+                        c1 += (p.StartParagraph1 ? "<br>" : " ") + q + EscapeForHtml(p.Text1);
+                        c2 += (p.StartParagraph2 ? "<br>" : " ") + q + EscapeForHtml(p.Text2);
+                    }
+
+                }
+
+                if (leftNumber > 0)
+                    WriteHTMLRow(outfile, leftNumber, c1, c2);
+
+                outfile.WriteLine("</table>");
+                outfile.WriteLine("</body>");
+                outfile.WriteLine("</html>");
+                
+                outfile.Close();
+
+            }
+
+        }
 
         internal void ExportText(string fileName, int sideToExport)
         {
