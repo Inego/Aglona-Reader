@@ -222,7 +222,11 @@ namespace AglonaReader
                     appSettings.FontSize = 18.0F;
             }
 
-            splitContainer.SplitterDistance = (int)(splitContainer.Width * appSettings.WindowSplitterDistance);
+            splitScreenVerticallyToolStripMenuItem.Checked = appSettings.SplitScreenVertically;
+            splitContainer.Orientation = appSettings.SplitScreenVertically ? Orientation.Vertical : Orientation.Horizontal;
+
+            int splitSideLength = appSettings.SplitScreenVertically ? splitContainer.Width : splitContainer.Height;
+            splitContainer.SplitterDistance = (int)(splitSideLength * appSettings.WindowSplitterDistance);
 
             pTC.HighlightFragments = appSettings.HighlightFragments;
             pTC.HighlightFirstWords = appSettings.HighlightFirstWords;
@@ -1715,7 +1719,10 @@ namespace AglonaReader
             appSettings.FontName = pTC.textFont.Name;
             appSettings.FontSize = pTC.textFont.Size;
 
-            appSettings.WindowSplitterDistance = splitContainer.SplitterDistance / (float)splitContainer.Width;
+            appSettings.SplitScreenVertically = splitScreenVerticallyToolStripMenuItem.Checked;
+            
+            int splitSideLength = appSettings.SplitScreenVertically ? splitContainer.Width : splitContainer.Height;
+            appSettings.WindowSplitterDistance = splitContainer.SplitterDistance / (float)splitSideLength;
 
             Properties.Settings.Default.AppSettings = appSettings;
             Properties.Settings.Default.Save();
@@ -2172,6 +2179,18 @@ namespace AglonaReader
                 SetGoogleTranslatorEnabled(showGoogleTranslatorToolStripMenuItem.Checked);
         }
 
+        private void splitScreenVerticallyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var distanceCoef = splitContainer.Orientation == Orientation.Vertical ?
+                splitContainer.Height / (float)splitContainer.Width :
+                splitContainer.Width / (float)splitContainer.Height;
+            var newSplitterDistance = (int)(splitContainer.SplitterDistance * distanceCoef);
+
+            splitContainer.Orientation = 
+                splitScreenVerticallyToolStripMenuItem.Checked ? Orientation.Vertical : Orientation.Horizontal;
+            splitContainer.SplitterDistance = newSplitterDistance;
+        }
+
     }
         
     
@@ -2205,6 +2224,7 @@ namespace AglonaReader
         public string FontName { get; set; }
         public float FontSize { get; set; }
         public float WindowSplitterDistance { get; set; }
+        public bool SplitScreenVertically { get; set; }
 
         public Collection<FileUsageInfo> FileUsages { get; set; }
 
@@ -2217,6 +2237,7 @@ namespace AglonaReader
             FontSize = 18.0F;
             FileUsages = new Collection<FileUsageInfo>();
             WindowSplitterDistance = 0.66f;
+            SplitScreenVertically = true;
         }
 
     }

@@ -87,8 +87,9 @@
             this.ssPositionPercent = new System.Windows.Forms.ToolStripStatusLabel();
             this.vScrollBar = new System.Windows.Forms.VScrollBar();
             this.splitContainer = new System.Windows.Forms.SplitContainer();
-            this.pTC = new AglonaReader.ParallelTextControl();
             this.webBrowser = new System.Windows.Forms.WebBrowser();
+            this.splitScreenVerticallyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.pTC = new AglonaReader.ParallelTextControl();
             this.mainMenu.SuspendLayout();
             this.statusStrip.SuspendLayout();
             this.splitContainer.Panel1.SuspendLayout();
@@ -108,7 +109,7 @@
             this.helpToolStripMenuItem});
             this.mainMenu.Location = new System.Drawing.Point(0, 0);
             this.mainMenu.Name = "mainMenu";
-            this.mainMenu.Padding = new System.Windows.Forms.Padding(8, 2, 0, 2);
+            this.mainMenu.Padding = new System.Windows.Forms.Padding(11, 2, 0, 2);
             this.mainMenu.Size = new System.Drawing.Size(917, 28);
             this.mainMenu.TabIndex = 0;
             this.mainMenu.Text = "menuStrip1";
@@ -193,27 +194,27 @@
             this.exportRightTextToolStripMenuItem,
             this.hTMLToolStripMenuItem});
             this.exportToolStripMenuItem.Name = "exportToolStripMenuItem";
-            this.exportToolStripMenuItem.Size = new System.Drawing.Size(214, 22);
+            this.exportToolStripMenuItem.Size = new System.Drawing.Size(252, 24);
             this.exportToolStripMenuItem.Text = "Export";
             // 
             // exportLeftTextToolStripMenuItem
             // 
             this.exportLeftTextToolStripMenuItem.Name = "exportLeftTextToolStripMenuItem";
-            this.exportLeftTextToolStripMenuItem.Size = new System.Drawing.Size(162, 24);
+            this.exportLeftTextToolStripMenuItem.Size = new System.Drawing.Size(189, 24);
             this.exportLeftTextToolStripMenuItem.Text = "Left text to TXT";
             this.exportLeftTextToolStripMenuItem.Click += new System.EventHandler(this.exportLeftTextToolStripMenuItem_Click);
             // 
             // exportRightTextToolStripMenuItem
             // 
             this.exportRightTextToolStripMenuItem.Name = "exportRightTextToolStripMenuItem";
-            this.exportRightTextToolStripMenuItem.Size = new System.Drawing.Size(162, 24);
+            this.exportRightTextToolStripMenuItem.Size = new System.Drawing.Size(189, 24);
             this.exportRightTextToolStripMenuItem.Text = "Right text to TXT";
             this.exportRightTextToolStripMenuItem.Click += new System.EventHandler(this.exportRightTextToolStripMenuItem_Click);
             // 
             // hTMLToolStripMenuItem
             // 
             this.hTMLToolStripMenuItem.Name = "hTMLToolStripMenuItem";
-            this.hTMLToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
+            this.hTMLToolStripMenuItem.Size = new System.Drawing.Size(189, 24);
             this.hTMLToolStripMenuItem.Text = "Book to HTML";
             this.hTMLToolStripMenuItem.Click += new System.EventHandler(this.hTMLToolStripMenuItem_Click);
             // 
@@ -416,6 +417,7 @@
             this.advancedModeToolStripMenuItem,
             this.toolStripMenuItem5,
             this.showGoogleTranslatorToolStripMenuItem,
+            this.splitScreenVerticallyToolStripMenuItem,
             this.toolStripMenuItem6,
             this.optionsToolStripMenuItem});
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
@@ -519,7 +521,7 @@
             this.ssPositionPercent});
             this.statusStrip.Location = new System.Drawing.Point(0, 300);
             this.statusStrip.Name = "statusStrip";
-            this.statusStrip.Padding = new System.Windows.Forms.Padding(1, 0, 19, 0);
+            this.statusStrip.Padding = new System.Windows.Forms.Padding(1, 0, 25, 0);
             this.statusStrip.Size = new System.Drawing.Size(917, 25);
             this.statusStrip.TabIndex = 4;
             this.statusStrip.Text = "statusStrip1";
@@ -540,9 +542,9 @@
             // 
             this.vScrollBar.Dock = System.Windows.Forms.DockStyle.Right;
             this.vScrollBar.LargeChange = 1;
-            this.vScrollBar.Location = new System.Drawing.Point(443, 0);
+            this.vScrollBar.Location = new System.Drawing.Point(899, 0);
             this.vScrollBar.Name = "vScrollBar";
-            this.vScrollBar.Size = new System.Drawing.Size(18, 216);
+            this.vScrollBar.Size = new System.Drawing.Size(18, 230);
             this.vScrollBar.TabIndex = 5;
             this.vScrollBar.Scroll += new System.Windows.Forms.ScrollEventHandler(this.vScrollBar_Scroll);
             // 
@@ -551,9 +553,10 @@
             this.splitContainer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.splitContainer.Location = new System.Drawing.Point(0, 25);
-            this.splitContainer.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.splitContainer.Location = new System.Drawing.Point(0, 31);
+            this.splitContainer.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.splitContainer.Name = "splitContainer";
+            this.splitContainer.Orientation = System.Windows.Forms.Orientation.Horizontal;
             // 
             // splitContainer.Panel1
             // 
@@ -563,11 +566,31 @@
             // splitContainer.Panel2
             // 
             this.splitContainer.Panel2.Controls.Add(this.webBrowser);
-            this.splitContainer.Size = new System.Drawing.Size(688, 216);
-            this.splitContainer.SplitterDistance = 461;
-            this.splitContainer.SplitterWidth = 8;
+            this.splitContainer.Size = new System.Drawing.Size(917, 266);
+            this.splitContainer.SplitterDistance = 230;
+            this.splitContainer.SplitterWidth = 11;
             this.splitContainer.TabIndex = 6;
             this.splitContainer.SplitterMoved += new System.Windows.Forms.SplitterEventHandler(this.splitContainer_SplitterMoved);
+            // 
+            // webBrowser
+            // 
+            this.webBrowser.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.webBrowser.Location = new System.Drawing.Point(0, 0);
+            this.webBrowser.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.webBrowser.MinimumSize = new System.Drawing.Size(20, 20);
+            this.webBrowser.Name = "webBrowser";
+            this.webBrowser.ScriptErrorsSuppressed = true;
+            this.webBrowser.Size = new System.Drawing.Size(917, 25);
+            this.webBrowser.TabIndex = 0;
+            this.webBrowser.WebBrowserShortcutsEnabled = false;
+            // 
+            // splitScreenVerticallyToolStripMenuItem
+            // 
+            this.splitScreenVerticallyToolStripMenuItem.CheckOnClick = true;
+            this.splitScreenVerticallyToolStripMenuItem.Name = "splitScreenVerticallyToolStripMenuItem";
+            this.splitScreenVerticallyToolStripMenuItem.Size = new System.Drawing.Size(289, 24);
+            this.splitScreenVerticallyToolStripMenuItem.Text = "Split screen vertically";
+            this.splitScreenVerticallyToolStripMenuItem.Click += new System.EventHandler(this.splitScreenVerticallyToolStripMenuItem_Click);
             // 
             // pTC
             // 
@@ -595,8 +618,8 @@
             this.pTC.LastMouseY = -1;
             this.pTC.LastRenderedPair = 0;
             this.pTC.Location = new System.Drawing.Point(0, 0);
-            this.pTC.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.pTC.MinimumSize = new System.Drawing.Size(10, 10);
+            this.pTC.Margin = new System.Windows.Forms.Padding(5);
+            this.pTC.MinimumSize = new System.Drawing.Size(13, 12);
             this.pTC.Modified = false;
             this.pTC.MouseCurrentWord = null;
             this.pTC.MousePressed = false;
@@ -633,7 +656,7 @@
             this.pTC.SelectionSide = ((byte)(0));
             this.pTC.Side1Set = false;
             this.pTC.Side2Set = false;
-            this.pTC.Size = new System.Drawing.Size(443, 216);
+            this.pTC.Size = new System.Drawing.Size(899, 230);
             this.pTC.SpaceLength = 6;
             this.pTC.SplitterMoveOffset = 0;
             this.pTC.SplitterPosition = 445;
@@ -649,29 +672,18 @@
             this.pTC.MouseMove += new System.Windows.Forms.MouseEventHandler(this.parallelTextControl_MouseMove);
             this.pTC.MouseUp += new System.Windows.Forms.MouseEventHandler(this.parallelTextControl_MouseUp);
             // 
-            // webBrowser
-            // 
-            this.webBrowser.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.webBrowser.Location = new System.Drawing.Point(0, 0);
-            this.webBrowser.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
-            this.webBrowser.MinimumSize = new System.Drawing.Size(15, 16);
-            this.webBrowser.Name = "webBrowser";
-            this.webBrowser.ScriptErrorsSuppressed = true;
-            this.webBrowser.Size = new System.Drawing.Size(219, 216);
-            this.webBrowser.TabIndex = 0;
-            this.webBrowser.WebBrowserShortcutsEnabled = false;
-            // 
             // MainForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(688, 264);
+            this.ClientSize = new System.Drawing.Size(917, 325);
             this.Controls.Add(this.mainMenu);
             this.Controls.Add(this.statusStrip);
             this.Controls.Add(this.splitContainer);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.KeyPreview = true;
             this.MainMenuStrip = this.mainMenu;
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "MainForm";
             this.Text = "Aglona Reader";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
@@ -749,6 +761,7 @@
         private System.Windows.Forms.ToolStripMenuItem showGoogleTranslatorToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem6;
         private System.Windows.Forms.WebBrowser webBrowser;
+        private System.Windows.Forms.ToolStripMenuItem splitScreenVerticallyToolStripMenuItem;
 
     }
 }
