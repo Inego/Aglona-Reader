@@ -595,7 +595,6 @@ namespace AglonaReader
 
         private void parallelTextControl_MouseUp(object sender, MouseEventArgs e)
         {
-
             if (e.Button == System.Windows.Forms.MouseButtons.Right)
             {
                 if (pTC.EditMode)
@@ -608,6 +607,11 @@ namespace AglonaReader
 
                 return;
             }
+
+            if (!pTC.MousePressed)
+                return;
+
+            pTC.MousePressed = false;
 
             if (dragging)
             {
@@ -627,12 +631,6 @@ namespace AglonaReader
 
                 return;
             }
-
-            if (!pTC.MousePressed)
-                return;
-
-            pTC.MousePressed = false;
-
 
             if (opState == 1)
                 opState = 0;
