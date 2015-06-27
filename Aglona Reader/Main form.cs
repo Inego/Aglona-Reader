@@ -15,6 +15,8 @@ namespace AglonaReader
     
     public partial class MainForm : Form
     {
+        private const string DefaultTranslationSourceLanguage = "auto";
+        private const string DefaultTranslationDestinationLanguage = "en";
 
         private const int timerInterval = 100;
         private const int timerHalfInterval = timerInterval / 2;
@@ -46,8 +48,6 @@ namespace AglonaReader
         private bool draggingPerformed;
 
         private bool googleTranslatorEnabled;
-        private string defaultTranslationSourceLanguage = "auto";
-        private string defaultTranslationDestinationLanguage = "en";
 
         protected override bool ProcessDialogKey(Keys keyData)
         {
@@ -268,12 +268,7 @@ namespace AglonaReader
 
             if (load)
             {
-               if (pTC.PText.Load(f.FileName))
-               {
-                  defaultTranslationSourceLanguage = pTC.PText.Lang1 ?? "auto";
-                  defaultTranslationDestinationLanguage = pTC.PText.Lang2 ?? "en";
-               }
-
+                pTC.PText.Load(f.FileName);
                 currentAudioFileNumber = -1;
                 UpdateWindowTitle();
                 CtrlPressed = false;
@@ -625,7 +620,7 @@ namespace AglonaReader
 
                     if (word != null)
                     {
-                        TranslateText(word.Word);
+                        TranslateText(word.Word, word.Side);
                     }
                 }
 
@@ -663,7 +658,7 @@ namespace AglonaReader
 
                             if (googleTranslatorEnabled)
                             {
-                                TranslateText(selectedText);
+                                TranslateText(selectedText, pTC.SelectionSide);
                             }
                         }
                     }
@@ -695,19 +690,47 @@ namespace AglonaReader
             }
         }
 
-        private void TranslateText(string text)
+        private void TranslateText(string text, int textSide)
         {
+            var srcLang = DefaultTranslationSourceLanguage;
+            var destLang = DefaultTranslationDestinationLanguage;
+
+            if (pTC.PText != null)
+            {
+                if (!string.IsNullOrEmpty(pTC.PText.Lang1))
+                {
+                    if (textSide == 1)
+                        srcLang = pTC.PText.Lang1;
+                    else
+                        destLang = pTC.PText.Lang1;
+                }
+
+                if (!string.IsNullOrEmpty(pTC.PText.Lang2))
+                {
+                    if (textSide == 2)
+                        srcLang = pTC.PText.Lang2;
+                    else
+                        destLang = pTC.PText.Lang2;
+                }
+            }
+
             var urlString = webBrowser.Url != null ? webBrowser.Url.ToString() : string.Empty;
-
             var match = Regex.Match(urlString, @"https://translate.google.com/#([a-z0-9]+?)/([a-z0-9]+?)/.*");
-
-            var srcLang = defaultTranslationSourceLanguage;
-            var destLang = defaultTranslationDestinationLanguage;
+            var currentSrcLang = srcLang;
+            var currentDestLang = destLang;
 
             if (match.Groups.Count == 3)
             {
-                srcLang = match.Groups[1].Value;
-                destLang = match.Groups[2].Value;
+                currentSrcLang = match.Groups[1].Value;
+                currentDestLang = match.Groups[2].Value;
+            }
+
+            // preserve current destination language if it differs from source language
+            // Use case: user reads book in English and German, but actually is Russian-speaking,
+            // so Russian language will be permanent destination language
+            if (srcLang != currentDestLang)
+            {
+                destLang = currentDestLang;
             }
 
             webBrowser.Navigate(string.Format(@"https://translate.google.com/#{0}/{1}/{2}", srcLang, destLang, text));
@@ -1632,17 +1655,6 @@ namespace AglonaReader
 
             bool result = pTC.PText.Load(fileName);
 
-            if (result)
-            {
-               defaultTranslationSourceLanguage = pTC.PText.Lang1 ?? "auto";
-               defaultTranslationDestinationLanguage = pTC.PText.Lang2 ?? "en";
-               if (webBrowser.Url != null)
-               {
-                  webBrowser.Navigate(string.Format(@"https://translate.google.com/#{0}/{1}/", defaultTranslationSourceLanguage, defaultTranslationDestinationLanguage));
-                  webBrowser.Refresh();
-               }
-            }
-
             CtrlPressed = false;
 
             currentAudioFileNumber = -1;
@@ -1669,6 +1681,12 @@ namespace AglonaReader
             Recompute();
 
             UpdateWindowTitle();
+
+            if (webBrowser.Url != null)
+            {
+                webBrowser.Navigate("https://translate.google.com/");
+                webBrowser.Refresh();
+            }
 
             return result;
         }
@@ -1859,10 +1877,10 @@ namespace AglonaReader
                 pTC.ResizeBufferedGraphic();
                 pTC.SetSplitterPositionByRatio();
                 Recompute();
-
-                if (enabled && webBrowser.Url == null)
+                
+                if (enabled)
                 {
-                    webBrowser.Navigate(string.Format(@"https://translate.google.com/#{0}/{1}/", defaultTranslationSourceLanguage, defaultTranslationDestinationLanguage));
+                    webBrowser.Navigate("https://translate.google.com/");
                 }
             }
         }
