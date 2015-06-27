@@ -251,8 +251,6 @@ namespace AglonaReader
             if (outerLoad)
                 LoadFromFile(args[1]);
 
-            SetGoogleTranslatorEnabled(appSettings.ShowGoogleTranslator);
-            showGoogleTranslatorToolStripMenuItem.Checked = appSettings.ShowGoogleTranslator;
         }
 
         private void SetEditMode(bool editMode)
@@ -309,6 +307,8 @@ namespace AglonaReader
 
             ProcessEditModeChange(true);
 
+            SetGoogleTranslatorEnabled(f.ShowGoogleTranslator);
+            showGoogleTranslatorToolStripMenuItem.Checked = f.ShowGoogleTranslator;
         }
 
         bool IsNullOrWhiteSpace(string value)
@@ -1704,6 +1704,7 @@ namespace AglonaReader
                 f.EditMode = pTC.EditMode;
                 f.ReadingMode = pTC.ReadingMode;
                 f.AlternatingColorScheme = pTC.AlternatingColorScheme;
+                f.ShowGoogleTranslator = googleTranslatorEnabled;
             }
 
             appSettings.HighlightFragments = pTC.HighlightFragments;
@@ -1713,8 +1714,6 @@ namespace AglonaReader
 
             appSettings.FontName = pTC.textFont.Name;
             appSettings.FontSize = pTC.textFont.Size;
-
-            appSettings.ShowGoogleTranslator = googleTranslatorEnabled;
 
             appSettings.WindowSplitterDistance = splitContainer.SplitterDistance / (float)splitContainer.Width;
 
@@ -1821,6 +1820,9 @@ namespace AglonaReader
 
             SetEditMode(true);
             ProcessEditModeChange(false);
+
+            showGoogleTranslatorToolStripMenuItem.Checked = false;
+            SetGoogleTranslatorEnabled(false);
 
             newBook = true;
         }
@@ -2192,6 +2194,7 @@ namespace AglonaReader
         public bool EditMode { get; set; }
         public int ReadingMode { get; set; }
         public int AlternatingColorScheme { get; set; }
+        public bool ShowGoogleTranslator { get; set; }
     }
 
     public class AppSettings
@@ -2201,7 +2204,6 @@ namespace AglonaReader
         public double Brightness { get; set; }
         public string FontName { get; set; }
         public float FontSize { get; set; }
-        public bool ShowGoogleTranslator { get; set; }
         public float WindowSplitterDistance { get; set; }
 
         public Collection<FileUsageInfo> FileUsages { get; set; }
@@ -2214,7 +2216,6 @@ namespace AglonaReader
             FontName = "Arial";
             FontSize = 18.0F;
             FileUsages = new Collection<FileUsageInfo>();
-            ShowGoogleTranslator = false;
             WindowSplitterDistance = 0.66f;
         }
 
