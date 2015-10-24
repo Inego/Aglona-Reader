@@ -20,8 +20,6 @@ namespace AglonaReader
         public int startingNumberOfFrags = 0;
         public bool stopwatchStarted = false;
         public Stopwatch stopWatch;
-        
-
 
         public const int LayoutMode_Normal = 0;
         public const int LayoutMode_Alternating = 1;
@@ -51,7 +49,6 @@ namespace AglonaReader
 
         public Frame AdvancedHighlightFrame;
         private PopUpInfo popUpInfo;
-
 
         public int mouse_text_line = -1;
         private int mouse_text_x = -1;
@@ -86,6 +83,8 @@ namespace AglonaReader
                 return PText[HighlightedPair];
             }
         }
+
+        public bool DayMode = false;
 
         private double brightness;
         public double Brightness
@@ -122,15 +121,18 @@ namespace AglonaReader
             Color lightColor;
             Color darkColor;
 
+            double realBrightness1 = DayMode ? brightness : 1 - brightness;
+            double realBrightness2 = realBrightness1 + (DayMode ? -1 : 1) * 0.1;
+
             for (byte i = 0; i < NumberofColors; i++)
             {
 
-                lightColor = ColorRGB.HSL2RGB(colorTableH[i], 1, brightness);
+                lightColor = ColorRGB.HSL2RGB(colorTableH[i], 1, realBrightness1);
                 lightColorTable.Add(lightColor);
 
                 brushTable.Add(new SolidBrush(lightColor));
 
-                darkColor = ColorRGB.HSL2RGB(colorTableH[i], 1, brightness - 0.1);
+                darkColor = ColorRGB.HSL2RGB(colorTableH[i], 1, realBrightness2);
 
                 penTable.Add(new Pen(darkColor));
                 darkColorTable.Add(darkColor);
@@ -588,7 +590,8 @@ namespace AglonaReader
         public void DrawSecondary()
         {
             Graphics g = SecondaryBG.Graphics;
-            g.Clear(Color.White);
+            g.Clear(DayMode ? Color.White : Color.Black);
+            
         }
 
         public void DrawFrame(Frame frame)
@@ -1511,13 +1514,13 @@ namespace AglonaReader
                 switch(newColor)
                 {
                     case 1:
-                        SetTextColor(secondaryHDC, ColorTranslator.ToWin32(Color.Black));
+                        SetTextColor(secondaryHDC, ColorTranslator.ToWin32(DayMode ? Color.Black : Color.Gray));
                         break;
                     case 2:
-                        SetTextColor(secondaryHDC, ColorTranslator.ToWin32(Color.Gray));
+                        SetTextColor(secondaryHDC, ColorTranslator.ToWin32(DayMode ? Color.Gray : Color.DimGray));
                         break;
                     case 3:
-                        SetTextColor(secondaryHDC, ColorTranslator.ToWin32(Color.ForestGreen));
+                        SetTextColor(secondaryHDC, ColorTranslator.ToWin32(DayMode ? Color.ForestGreen : Color.FromArgb(11, 74, 15)));
                         break;
                 }
                 
