@@ -121,7 +121,7 @@ namespace AglonaReader
             Color lightColor;
             Color darkColor;
 
-            double realBrightness1 = DayMode ? brightness : 1 - brightness;
+            double realBrightness1 = DayMode ? brightness : Math.Max(0, brightness - 0.5);
             double realBrightness2 = realBrightness1 + (DayMode ? -1 : 1) * 0.1;
 
             for (byte i = 0; i < NumberofColors; i++)
@@ -1407,7 +1407,8 @@ namespace AglonaReader
                 using (LinearGradientBrush brush = new LinearGradientBrush(
                     wordRect,
                     big ? grayColor : darkColorTable[pairIndex % NumberofColors],
-                    HighlightFragments && !big ? lightColorTable[pairIndex % NumberofColors] : Color.White,
+                    HighlightFragments && !big ? lightColorTable[pairIndex % NumberofColors] : 
+                        (DayMode ? Color.White : Color.Black),
                     LinearGradientMode.Horizontal))
 
                     g.FillRectangle(brush, wordRect);
@@ -1514,13 +1515,13 @@ namespace AglonaReader
                 switch(newColor)
                 {
                     case 1:
-                        SetTextColor(secondaryHDC, ColorTranslator.ToWin32(DayMode ? Color.Black : Color.Gray));
+                        SetTextColor(secondaryHDC, ColorTranslator.ToWin32(DayMode ? Color.Black : Color.LightGray));
                         break;
                     case 2:
-                        SetTextColor(secondaryHDC, ColorTranslator.ToWin32(DayMode ? Color.Gray : Color.DimGray));
+                        SetTextColor(secondaryHDC, ColorTranslator.ToWin32(DayMode ? Color.Gray : Color.LightGray));
                         break;
                     case 3:
-                        SetTextColor(secondaryHDC, ColorTranslator.ToWin32(DayMode ? Color.ForestGreen : Color.FromArgb(11, 74, 15)));
+                        SetTextColor(secondaryHDC, ColorTranslator.ToWin32(DayMode ? Color.ForestGreen : Color.Green));
                         break;
                 }
                 
