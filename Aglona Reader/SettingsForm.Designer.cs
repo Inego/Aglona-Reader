@@ -43,6 +43,7 @@ namespace AglonaReader
             this.readingModeComboBox = new System.Windows.Forms.ComboBox();
             this.label3 = new System.Windows.Forms.Label();
             this.alternatingColorSchemeComboBox = new System.Windows.Forms.ComboBox();
+            this.nightModeCheckBox = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.fontSizeTrackBar)).BeginInit();
             this.fontGroupBox.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -192,11 +193,23 @@ namespace AglonaReader
             this.alternatingColorSchemeComboBox.TabIndex = 13;
             this.alternatingColorSchemeComboBox.SelectedIndexChanged += new System.EventHandler(this.alternatingColorSchemeComboBox_SelectedIndexChanged);
             // 
+            // nightModeCheckBox
+            // 
+            this.nightModeCheckBox.AutoSize = true;
+            this.nightModeCheckBox.Location = new System.Drawing.Point(99, 228);
+            this.nightModeCheckBox.Name = "nightModeCheckBox";
+            this.nightModeCheckBox.Size = new System.Drawing.Size(81, 17);
+            this.nightModeCheckBox.TabIndex = 14;
+            this.nightModeCheckBox.Text = "Night Mode";
+            this.nightModeCheckBox.UseVisualStyleBackColor = true;
+            this.nightModeCheckBox.CheckedChanged += new System.EventHandler(this.nightModeCheckBox_CheckedChanged);
+            // 
             // SettingsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(717, 278);
+            this.Controls.Add(this.nightModeCheckBox);
             this.Controls.Add(this.alternatingColorSchemeComboBox);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.readingModeComboBox);
@@ -240,6 +253,6 @@ namespace AglonaReader
         private ComboBox readingModeComboBox;
         private Label label3;
         private ComboBox alternatingColorSchemeComboBox;
-
+        private CheckBox nightModeCheckBox;
     }
 }

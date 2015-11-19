@@ -230,6 +230,7 @@ namespace AglonaReader
 
             pTC.HighlightFragments = appSettings.HighlightFragments;
             pTC.HighlightFirstWords = appSettings.HighlightFirstWords;
+            pTC.DayMode = appSettings.DayMode;
             pTC.Brightness = appSettings.Brightness;
             
             pTC.SetFont(
@@ -1719,6 +1720,8 @@ namespace AglonaReader
             appSettings.FontName = pTC.textFont.Name;
             appSettings.FontSize = pTC.textFont.Size;
 
+            appSettings.DayMode = pTC.DayMode;
+
             appSettings.SplitScreenVertically = splitScreenVerticallyToolStripMenuItem.Checked;
             
             int splitSideLength = appSettings.SplitScreenVertically ? splitContainer.Width : splitContainer.Height;
@@ -2221,6 +2224,7 @@ namespace AglonaReader
         public bool HighlightFragments { get; set; }
         public bool HighlightFirstWords { get; set; }
         public double Brightness { get; set; }
+        public bool DayMode { get; set; }
         public string FontName { get; set; }
         public float FontSize { get; set; }
         public float WindowSplitterDistance { get; set; }
@@ -2235,6 +2239,7 @@ namespace AglonaReader
             Brightness = 0.974;
             FontName = "Arial";
             FontSize = 18.0F;
+            DayMode = true;
             FileUsages = new Collection<FileUsageInfo>();
             WindowSplitterDistance = 0.66f;
             SplitScreenVertically = true;

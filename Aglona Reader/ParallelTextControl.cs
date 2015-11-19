@@ -98,7 +98,7 @@ namespace AglonaReader
 
         }
 
-        private void SetColorsByBrightness()
+        public void SetColorsByBrightness()
         {
 
             if (brushTable.Count > 0)

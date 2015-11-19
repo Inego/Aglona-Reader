@@ -26,6 +26,7 @@ namespace AglonaReader
         {
             highlightFirstWordsCheckBox.Checked = pTC.HighlightFirstWords;
             highlightFragmentsCheckBox.Checked = pTC.HighlightFragments;
+            nightModeCheckBox.Checked = !pTC.DayMode;
 
             switch (pTC.ReadingMode)
             {
@@ -149,5 +150,11 @@ namespace AglonaReader
             pTC.RenderPairs(true);
         }
 
+        private void nightModeCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            pTC.DayMode = !nightModeCheckBox.Checked;
+            pTC.SetColorsByBrightness();
+            pTC.RenderPairs(true);
+        }
     }
 }
