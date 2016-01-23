@@ -1515,10 +1515,10 @@ namespace AglonaReader
                 switch(newColor)
                 {
                     case 1:
-                        SetTextColor(secondaryHDC, ColorTranslator.ToWin32(DayMode ? Color.Black : Color.LightGray));
+                        SetTextColor(secondaryHDC, ColorTranslator.ToWin32(DayMode ? Color.Black : Color.DimGray));
                         break;
                     case 2:
-                        SetTextColor(secondaryHDC, ColorTranslator.ToWin32(DayMode ? Color.Gray : Color.LightGray));
+                        SetTextColor(secondaryHDC, ColorTranslator.ToWin32(DayMode ? Color.Gray : Color.DimGray));
                         break;
                     case 3:
                         SetTextColor(secondaryHDC, ColorTranslator.ToWin32(DayMode ? Color.ForestGreen : Color.Green));
