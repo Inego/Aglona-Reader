@@ -86,7 +86,7 @@ namespace AglonaReader
                 if (SB1 == null)
                     return Text1.Substring(startPosition);
                 else
-                    return SB1.ToString(startPosition, SB1.Length = startPosition);
+                    return SB1.ToString(startPosition, SB1.Length - startPosition);
             else
                 if (SB2 == null)
                     return Text2.Substring(startPosition);
