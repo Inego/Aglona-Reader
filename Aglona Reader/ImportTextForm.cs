@@ -49,8 +49,27 @@ namespace AglonaReader
 
         private void importButton_Click(object sender, EventArgs e)
         {
-            string t1 = File.ReadAllText(fileName1.Text);
-            string t2 = File.ReadAllText(fileName2.Text);
+            string t1;
+            try
+            {
+                t1 = File.ReadAllText(fileName1.Text);
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show("Source file cannot be read!" + Environment.NewLine + Environment.NewLine + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            string t2;
+            try
+            {
+                t2 = File.ReadAllText(fileName2.Text);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Translation file cannot be read!" + Environment.NewLine + Environment.NewLine + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
 
             PText.AddPair(t1, t2);
             PText[PText.Number() - 1].UpdateTotalSize();
