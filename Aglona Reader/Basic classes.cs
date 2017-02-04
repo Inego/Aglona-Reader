@@ -18,16 +18,16 @@ namespace AglonaReader
         public int Line { get; set; }
         public int X1 { get; set; }
         public int X2 { get; set; }
-        public int Pos { get; set; }
+        public int Position { get; set; }
         public bool Eastern { get; set; }
 
-        public WordInfo(string word, int line, int wordX, int wordX2, int pos, bool eastern)
+        public WordInfo(string word, int line, int wordX, int wordX2, int position, bool eastern)
         {
             this.Word = word;
             this.Line = line;
             this.X1 = wordX;
             this.X2 = wordX2;
-            this.Pos = pos;
+            this.Position = position;
             this.Eastern = eastern;
         }
 
@@ -86,7 +86,7 @@ namespace AglonaReader
                 if (SB1 == null)
                     return Text1.Substring(startPosition);
                 else
-                    return SB1.ToString(startPosition, SB1.Length = startPosition);
+                    return SB1.ToString(startPosition, SB1.Length - startPosition);
             else
                 if (SB2 == null)
                     return Text2.Substring(startPosition);
@@ -713,7 +713,7 @@ namespace AglonaReader
                     l = prev_p.ComputedWords(r.side, true);
                 }
 
-                l.Add(new WordInfo(r.Word, r.Line, r.X1 + bias, r.X2 + bias, r.Pos, r.Eastern));
+                l.Add(new WordInfo(r.Word, r.Line, r.X1 + bias, r.X2 + bias, r.Position, r.Eastern));
 
                 previousWord = r;
             }

@@ -30,6 +30,7 @@ namespace AglonaReader
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SettingsForm));
             this.fontNameLabel = new System.Windows.Forms.Label();
             this.fontsComboBox = new System.Windows.Forms.ComboBox();
             this.fontSizeTrackBar = new System.Windows.Forms.TrackBar();
@@ -51,31 +52,23 @@ namespace AglonaReader
             // 
             // fontNameLabel
             // 
-            this.fontNameLabel.AutoSize = true;
-            this.fontNameLabel.Location = new System.Drawing.Point(236, 20);
+            resources.ApplyResources(this.fontNameLabel, "fontNameLabel");
             this.fontNameLabel.Name = "fontNameLabel";
-            this.fontNameLabel.Size = new System.Drawing.Size(35, 13);
-            this.fontNameLabel.TabIndex = 2;
-            this.fontNameLabel.Text = "Name";
             // 
             // fontsComboBox
             // 
             this.fontsComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.fontsComboBox.FormattingEnabled = true;
-            this.fontsComboBox.Location = new System.Drawing.Point(15, 17);
+            resources.ApplyResources(this.fontsComboBox, "fontsComboBox");
             this.fontsComboBox.Name = "fontsComboBox";
-            this.fontsComboBox.Size = new System.Drawing.Size(215, 21);
-            this.fontsComboBox.TabIndex = 5;
             this.fontsComboBox.SelectedIndexChanged += new System.EventHandler(this.fontsComboBox_SelectedIndexChanged);
             // 
             // fontSizeTrackBar
             // 
             this.fontSizeTrackBar.LargeChange = 100;
-            this.fontSizeTrackBar.Location = new System.Drawing.Point(6, 44);
+            resources.ApplyResources(this.fontSizeTrackBar, "fontSizeTrackBar");
             this.fontSizeTrackBar.Maximum = 1000;
             this.fontSizeTrackBar.Name = "fontSizeTrackBar";
-            this.fontSizeTrackBar.Size = new System.Drawing.Size(678, 45);
-            this.fontSizeTrackBar.TabIndex = 6;
             this.fontSizeTrackBar.TickFrequency = 10;
             this.fontSizeTrackBar.Scroll += new System.EventHandler(this.fontSizeTrackBar_Scroll);
             // 
@@ -84,21 +77,14 @@ namespace AglonaReader
             this.fontGroupBox.Controls.Add(this.fontsComboBox);
             this.fontGroupBox.Controls.Add(this.fontSizeTrackBar);
             this.fontGroupBox.Controls.Add(this.fontNameLabel);
-            this.fontGroupBox.Location = new System.Drawing.Point(12, 92);
+            resources.ApplyResources(this.fontGroupBox, "fontGroupBox");
             this.fontGroupBox.Name = "fontGroupBox";
-            this.fontGroupBox.Size = new System.Drawing.Size(693, 100);
-            this.fontGroupBox.TabIndex = 7;
             this.fontGroupBox.TabStop = false;
-            this.fontGroupBox.Text = "Font";
             // 
             // highlightFirstWordsCheckBox
             // 
-            this.highlightFirstWordsCheckBox.AutoSize = true;
-            this.highlightFirstWordsCheckBox.Location = new System.Drawing.Point(9, 19);
+            resources.ApplyResources(this.highlightFirstWordsCheckBox, "highlightFirstWordsCheckBox");
             this.highlightFirstWordsCheckBox.Name = "highlightFirstWordsCheckBox";
-            this.highlightFirstWordsCheckBox.Size = new System.Drawing.Size(79, 17);
-            this.highlightFirstWordsCheckBox.TabIndex = 8;
-            this.highlightFirstWordsCheckBox.Text = "First Words";
             this.highlightFirstWordsCheckBox.UseVisualStyleBackColor = true;
             this.highlightFirstWordsCheckBox.CheckedChanged += new System.EventHandler(this.highlightFirstWordsCheckBox_CheckedChanged);
             // 
@@ -108,95 +94,69 @@ namespace AglonaReader
             this.groupBox1.Controls.Add(this.brightnessBar);
             this.groupBox1.Controls.Add(this.highlightFragmentsCheckBox);
             this.groupBox1.Controls.Add(this.highlightFirstWordsCheckBox);
-            this.groupBox1.Location = new System.Drawing.Point(12, 12);
+            resources.ApplyResources(this.groupBox1, "groupBox1");
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(693, 74);
-            this.groupBox1.TabIndex = 9;
             this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Color Highlighting";
             // 
             // label1
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(111, 15);
+            resources.ApplyResources(this.label1, "label1");
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(56, 13);
-            this.label1.TabIndex = 10;
-            this.label1.Text = "Brightness";
             // 
             // brightnessBar
             // 
-            this.brightnessBar.Location = new System.Drawing.Point(105, 26);
+            resources.ApplyResources(this.brightnessBar, "brightnessBar");
             this.brightnessBar.Maximum = 1000;
             this.brightnessBar.Minimum = 600;
             this.brightnessBar.Name = "brightnessBar";
-            this.brightnessBar.Size = new System.Drawing.Size(576, 45);
-            this.brightnessBar.TabIndex = 3;
             this.brightnessBar.TickFrequency = 3;
             this.brightnessBar.Value = 950;
             this.brightnessBar.Scroll += new System.EventHandler(this.brightnessBar_Scroll);
             // 
             // highlightFragmentsCheckBox
             // 
-            this.highlightFragmentsCheckBox.AutoSize = true;
-            this.highlightFragmentsCheckBox.Location = new System.Drawing.Point(9, 42);
+            resources.ApplyResources(this.highlightFragmentsCheckBox, "highlightFragmentsCheckBox");
             this.highlightFragmentsCheckBox.Name = "highlightFragmentsCheckBox";
-            this.highlightFragmentsCheckBox.Size = new System.Drawing.Size(75, 17);
-            this.highlightFragmentsCheckBox.TabIndex = 9;
-            this.highlightFragmentsCheckBox.Text = "Fragments";
             this.highlightFragmentsCheckBox.UseVisualStyleBackColor = true;
             this.highlightFragmentsCheckBox.CheckedChanged += new System.EventHandler(this.highlightFragmentsCheckBox_CheckedChanged);
             // 
             // label2
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(15, 204);
+            resources.ApplyResources(this.label2, "label2");
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(77, 13);
-            this.label2.TabIndex = 10;
-            this.label2.Text = "Reading Mode";
             // 
             // readingModeComboBox
             // 
             this.readingModeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.readingModeComboBox.FormattingEnabled = true;
             this.readingModeComboBox.Items.AddRange(new object[] {
-            "Normal",
-            "Alternating",
-            "Advanced"});
-            this.readingModeComboBox.Location = new System.Drawing.Point(98, 201);
+            resources.GetString("readingModeComboBox.Items"),
+            resources.GetString("readingModeComboBox.Items1"),
+            resources.GetString("readingModeComboBox.Items2")});
+            resources.ApplyResources(this.readingModeComboBox, "readingModeComboBox");
             this.readingModeComboBox.Name = "readingModeComboBox";
-            this.readingModeComboBox.Size = new System.Drawing.Size(140, 21);
-            this.readingModeComboBox.TabIndex = 11;
             this.readingModeComboBox.SelectedIndexChanged += new System.EventHandler(this.readingModeComboBox_SelectedIndexChanged);
             // 
             // label3
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(266, 204);
+            resources.ApplyResources(this.label3, "label3");
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(126, 13);
-            this.label3.TabIndex = 12;
-            this.label3.Text = "Alternating Color Scheme";
             // 
             // alternatingColorSchemeComboBox
             // 
             this.alternatingColorSchemeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.alternatingColorSchemeComboBox.FormattingEnabled = true;
             this.alternatingColorSchemeComboBox.Items.AddRange(new object[] {
-            "Black - Green (default)",
-            "Green - Black"});
-            this.alternatingColorSchemeComboBox.Location = new System.Drawing.Point(399, 200);
+            resources.GetString("alternatingColorSchemeComboBox.Items"),
+            resources.GetString("alternatingColorSchemeComboBox.Items1")});
+            resources.ApplyResources(this.alternatingColorSchemeComboBox, "alternatingColorSchemeComboBox");
             this.alternatingColorSchemeComboBox.Name = "alternatingColorSchemeComboBox";
-            this.alternatingColorSchemeComboBox.Size = new System.Drawing.Size(121, 21);
-            this.alternatingColorSchemeComboBox.TabIndex = 13;
             this.alternatingColorSchemeComboBox.SelectedIndexChanged += new System.EventHandler(this.alternatingColorSchemeComboBox_SelectedIndexChanged);
             // 
             // SettingsForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(717, 278);
             this.Controls.Add(this.alternatingColorSchemeComboBox);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.readingModeComboBox);
@@ -210,8 +170,6 @@ namespace AglonaReader
             this.Name = "SettingsForm";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Settings";
             this.Shown += new System.EventHandler(this.SettingsForm_Shown);
             this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.SettingsForm_KeyPress);
             ((System.ComponentModel.ISupportInitialize)(this.fontSizeTrackBar)).EndInit();

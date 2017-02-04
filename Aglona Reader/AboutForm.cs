@@ -52,6 +52,5 @@ namespace AglonaReader
                 colorLabel.Text = x.ToString();
             
         }
-
     }
 }
