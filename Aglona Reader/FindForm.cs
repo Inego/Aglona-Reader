@@ -8,11 +8,11 @@ using System.Windows.Forms;
 
 namespace AglonaReader
 {
-    public partial class FindForm : Form
+    internal partial class FindForm : Form
     {
 
         public ParallelTextControl pTC;
-        public MainForm mainForm;
+        internal MainForm mainForm;
 
         public FindForm()
         {
@@ -61,8 +61,6 @@ namespace AglonaReader
             int current = start;
 
             TextPair p;
-            bool found;
-
             
             while (true)
             {
@@ -87,8 +85,6 @@ namespace AglonaReader
                 }
 
                 p = pTC[current];
-
-                found = false;
 
                 if (checkLeft && (p.SB1 == null ? p.Text1 : p.SB1.ToString()).Contains(textToFind)
                     || checkRight && (p.SB2 == null ? p.Text2 : p.SB2.ToString()).Contains(textToFind))

@@ -11,8 +11,34 @@ namespace AglonaReader
     public partial class OpenRecentForm : Form
     {
 
-        public AppSettings appSettings;
-        public string result;
+        private AppSettings appSettings;
+        private string result;
+
+        public AppSettings AppSettings
+        {
+            get
+            {
+                return appSettings;
+            }
+
+            set
+            {
+                appSettings = value;
+            }
+        }
+
+        public string Result
+        {
+            get
+            {
+                return result;
+            }
+
+            set
+            {
+                result = value;
+            }
+        }
 
         public OpenRecentForm()
         {
@@ -22,20 +48,20 @@ namespace AglonaReader
         private void OpenRecentForm_Shown(object sender, EventArgs e)
         {
 
-            foreach (FileUsageInfo fileUsageInfo in appSettings.FileUsages)
+            foreach (FileUsageInfo fileUsageInfo in AppSettings.FileUsages)
                 listBox.Items.Add(fileUsageInfo.FileName);
 
             if (listBox.Items.Count > 0)
                 listBox.SelectedIndex = 0;
 
-            result = "";
+            Result = "";
 
         }
 
         private void formOKButton_Click(object sender, EventArgs e)
         {
             if (listBox.SelectedIndex != -1)
-                result = (string) listBox.Items[listBox.SelectedIndex];
+                Result = (string) listBox.Items[listBox.SelectedIndex];
 
             Close();
         }
@@ -54,7 +80,7 @@ namespace AglonaReader
             // Ask the user
 
             DialogResult r = MessageBox.Show(
-                    "Really remove this file from the list?", "Removing a recent file record", MessageBoxButtons.YesNoCancel);
+                    Properties.Resources.RECENT_FILE_REMOVE_CONFIRM_TEXT, "Removing a recent file record", MessageBoxButtons.YesNoCancel);
 
             if (r == System.Windows.Forms.DialogResult.Yes)
             {
@@ -64,10 +90,10 @@ namespace AglonaReader
 
                 string fileName = (string)listBox.Items[prevIndex];
 
-                foreach (FileUsageInfo fileUsageInfo in appSettings.FileUsages)
+                foreach (FileUsageInfo fileUsageInfo in AppSettings.FileUsages)
                     if (fileUsageInfo.FileName == fileName)
                     {
-                        appSettings.FileUsages.Remove(fileUsageInfo);
+                        AppSettings.FileUsages.Remove(fileUsageInfo);
                         break;
                     }
 
@@ -93,7 +119,7 @@ namespace AglonaReader
 
             if (r == System.Windows.Forms.DialogResult.Yes)
             {
-                appSettings.FileUsages.Clear();
+                AppSettings.FileUsages.Clear();
                 listBox.Items.Clear();
             }
 

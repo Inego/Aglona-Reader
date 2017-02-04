@@ -206,9 +206,7 @@
     <Compile Include="NAudio\WaveOutCapabilities.cs" />
     <Compile Include="NAudio\WaveOutSupport.cs" />
     <Compile Include="NAudio\WaveStream.cs" />
-    <Compile Include="NAudio\WaveWindow.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="NAudio\WaveWindow.cs" />
     <Compile Include="NAudio\XingHeader.cs" />
     <Compile Include="OpenRecentForm.cs">
       <SubType>Form</SubType>
@@ -312,7 +310,9 @@
   <ItemGroup>
     <Content Include="Icon.ico" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <CodeAnalysisDictionary Include="CustomDictionary.xml" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

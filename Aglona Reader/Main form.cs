@@ -9,11 +9,10 @@ using System.IO;
 using AglonaReader.Mp3Player;
 using System.Text.RegularExpressions;
 
-[assembly: CLSCompliant(true)]
 namespace AglonaReader
 {
     
-    public partial class MainForm : Form
+    internal partial class MainForm : Form
     {
         private const string DefaultTranslationSourceLanguage = "auto";
         private const string DefaultTranslationDestinationLanguage = "en";
@@ -1929,10 +1928,10 @@ namespace AglonaReader
 
             using (OpenRecentForm f = new OpenRecentForm())
             {
-                f.appSettings = appSettings;
+                f.AppSettings = appSettings;
                 f.ShowDialog();
-                if (!string.IsNullOrEmpty(f.result))
-                    LoadFromFile(f.result);
+                if (!string.IsNullOrEmpty(f.Result))
+                    LoadFromFile(f.Result);
             }
 
         }

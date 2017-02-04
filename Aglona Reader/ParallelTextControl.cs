@@ -1587,7 +1587,7 @@ namespace AglonaReader
                     TextOut(secondaryHDC, x, VMargin + y * lineHeight, wrd, wrd.Length);
 
                     s.PairIndex = pairIndex;
-                    s.Pos = r.Pos;
+                    s.Pos = r.Position;
                     s.Side = side;
                     s.X1 = x;
                     s.FX2 = r.X2;
