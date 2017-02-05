@@ -2030,10 +2030,15 @@ namespace AglonaReader
                 if (dialogResult != DialogResult.OK)
                     return;
 
-                pTC.ExportText(d.FileName, leftSide);
-
+                try
+                {
+                    pTC.ExportText(d.FileName, leftSide);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error while export!" + Environment.NewLine + Environment.NewLine + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
-
         }
 
         private void exportRightTextToolStripMenuItem_Click(object sender, EventArgs e)

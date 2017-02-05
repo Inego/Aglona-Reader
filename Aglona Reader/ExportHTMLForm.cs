@@ -45,14 +45,30 @@ namespace AglonaReader
                 return;
             }
 
+            bool exportedSuccessfully = false;
+            try
+            {
+                pTC.PText.ExportHTML(exportFileName.Text);
+                exportedSuccessfully = true;
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show("Error while export!" + Environment.NewLine + Environment.NewLine + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
             Close();
 
-            pTC.PText.ExportHTML(exportFileName.Text);
-
-            //MessageBox.Show("Done.");
-
-            System.Diagnostics.Process.Start(exportFileName.Text);
-
+            if (exportedSuccessfully)
+            {
+                try
+                {
+                    System.Diagnostics.Process.Start(exportFileName.Text);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error while open exported file!" + Environment.NewLine + Environment.NewLine + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
         }
     }
 }
