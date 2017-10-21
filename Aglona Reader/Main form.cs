@@ -718,7 +718,7 @@ namespace AglonaReader
             }
 
             var urlString = webBrowser.Url != null ? webBrowser.Url.ToString() : string.Empty;
-            var match = Regex.Match(urlString, @"https://translate.google.com/#([a-z0-9]+?)/([a-z0-9]+?)/.*");
+            var match = Regex.Match(urlString, getGoogleTranslateUrl() + "#([a-z0-9]+?)/([a-z0-9]+?)/.*");
             var currentSrcLang = srcLang;
             var currentDestLang = destLang;
 
@@ -729,14 +729,14 @@ namespace AglonaReader
             }
 
             // preserve current destination language if it differs from source language
-            // Use case: user reads book in English and German, but actually is Russian-speaking,
-            // so Russian language will be permanent destination language
+            // Use case: the user is reading a book in English and German, but is actually a Russian native speaker,
+            // so the Russian language should be the permanent destination language
             if (srcLang != currentDestLang)
             {
                 destLang = currentDestLang;
             }
 
-            webBrowser.Navigate(string.Format(@"https://translate.google.com/#{0}/{1}/{2}", srcLang, destLang, text));
+            webBrowser.Navigate(string.Format(getGoogleTranslateUrl() + @"#{0}/{1}/{2}", srcLang, destLang, text));
         }
 
         private void MouseUpInEditMode()
@@ -1687,7 +1687,7 @@ namespace AglonaReader
 
             if (webBrowser.Url != null)
             {
-                webBrowser.Navigate("https://translate.google.com/");
+                webBrowser.Navigate(getGoogleTranslateUrl());
                 webBrowser.Refresh();
             }
 
@@ -1888,7 +1888,7 @@ namespace AglonaReader
                 
                 if (enabled)
                 {
-                    webBrowser.Navigate("https://translate.google.com/");
+                    webBrowser.Navigate(getGoogleTranslateUrl());
                 }
             }
         }
@@ -2188,6 +2188,11 @@ namespace AglonaReader
             splitContainer.Orientation = 
                 splitScreenVerticallyToolStripMenuItem.Checked ? Orientation.Vertical : Orientation.Horizontal;
             splitContainer.SplitterDistance = newSplitterDistance;
+        }
+
+        private string getGoogleTranslateUrl()
+        {
+            return "https://translate.google.ca/";
         }
 
     }
