@@ -62,3 +62,6 @@ packages/
 
 #Test files
 *.testsettings
+/.vs/Aglona Reader/v15/sqlite3/storage.ide
+/.idea/.idea.Aglona Reader/.idea/contentModel.xml
+/.idea/.idea.Aglona Reader/.idea/workspace.xml

@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>AglonaReader</RootNamespace>
     <AssemblyName>Aglona Reader</AssemblyName>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
@@ -150,64 +150,6 @@
       <DependentUpon>Main form.cs</DependentUpon>
     </Compile>
     <Compile Include="AudioPlayer.cs" />
-    <Compile Include="NAudio\AcmDriverAddFlags.cs" />
-    <Compile Include="NAudio\AcmDriverDetails.cs" />
-    <Compile Include="NAudio\AcmDriverDetailsSupportFlags.cs" />
-    <Compile Include="NAudio\AcmDriverEnumFlags.cs" />
-    <Compile Include="NAudio\AcmFormatChoose.cs" />
-    <Compile Include="NAudio\AcmFormatChooseStyleFlags.cs" />
-    <Compile Include="NAudio\AcmFormatDetails.cs" />
-    <Compile Include="NAudio\AcmFormatEnumFlags.cs" />
-    <Compile Include="NAudio\AcmFormatSuggestFlags.cs" />
-    <Compile Include="NAudio\AcmFormatTagDetails.cs" />
-    <Compile Include="NAudio\AcmInterop.cs" />
-    <Compile Include="NAudio\AcmMetrics.cs" />
-    <Compile Include="NAudio\AcmStream.cs" />
-    <Compile Include="NAudio\AcmStreamConvertFlags.cs" />
-    <Compile Include="NAudio\AcmStreamHeader.cs" />
-    <Compile Include="NAudio\AcmStreamHeaderStatusFlags.cs" />
-    <Compile Include="NAudio\AcmStreamHeaderStruct.cs" />
-    <Compile Include="NAudio\AcmStreamOpenFlags.cs" />
-    <Compile Include="NAudio\AcmStreamSizeFlags.cs" />
-    <Compile Include="NAudio\AdpcmWaveFormat.cs" />
-    <Compile Include="NAudio\AudioMediaSubtypes.cs" />
-    <Compile Include="NAudio\ByteArrayExtensions.cs" />
-    <Compile Include="NAudio\ChannelMode.cs" />
-    <Compile Include="NAudio\Gsm610WaveFormat.cs" />
-    <Compile Include="NAudio\Id3v2Tag.cs" />
-    <Compile Include="NAudio\IMp3FrameDecompressor.cs" />
-    <Compile Include="NAudio\IWavePlayer.cs" />
-    <Compile Include="NAudio\IWaveProvider.cs" />
-    <Compile Include="NAudio\MmException.cs" />
-    <Compile Include="NAudio\MmResult.cs" />
-    <Compile Include="NAudio\MmTime.cs" />
-    <Compile Include="NAudio\Mp3FileReader.cs" />
-    <Compile Include="NAudio\Mp3Frame.cs" />
-    <Compile Include="NAudio\Mp3FrameDecompressor.cs" />
-    <Compile Include="NAudio\Mp3WaveFormat.cs" />
-    <Compile Include="NAudio\MpegLayer.cs" />
-    <Compile Include="NAudio\MpegVersion.cs" />
-    <Compile Include="NAudio\PlaybackState.cs" />
-    <Compile Include="NAudio\StoppedEventArgs.cs" />
-    <Compile Include="NAudio\WaveCallbackInfo.cs" />
-    <Compile Include="NAudio\WaveCallbackStrategy.cs" />
-    <Compile Include="NAudio\WaveFilter.cs" />
-    <Compile Include="NAudio\WaveFormat.cs" />
-    <Compile Include="NAudio\WaveFormatCustomMarshaler.cs" />
-    <Compile Include="NAudio\WaveFormatEncoding.cs" />
-    <Compile Include="NAudio\WaveFormatExtensible.cs" />
-    <Compile Include="NAudio\WaveFormatExtraData.cs" />
-    <Compile Include="NAudio\WaveHeader.cs" />
-    <Compile Include="NAudio\WaveHeaderFlags.cs" />
-    <Compile Include="NAudio\WaveInCapabilities.cs" />
-    <Compile Include="NAudio\WaveInterop.cs" />
-    <Compile Include="NAudio\WaveOut.cs" />
-    <Compile Include="NAudio\WaveOutBuffer.cs" />
-    <Compile Include="NAudio\WaveOutCapabilities.cs" />
-    <Compile Include="NAudio\WaveOutSupport.cs" />
-    <Compile Include="NAudio\WaveStream.cs" />
-    <Compile Include="NAudio\WaveWindow.cs" />
-    <Compile Include="NAudio\XingHeader.cs" />
     <Compile Include="OpenRecentForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -312,6 +254,15 @@
   </ItemGroup>
   <ItemGroup>
     <CodeAnalysisDictionary Include="CustomDictionary.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="NAudio" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NAudio\NAudio.csproj">
+      <Project>{6e9adf71-98e2-484e-8d77-594a3abe1bab}</Project>
+      <Name>NAudio</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -495,7 +495,7 @@ namespace NAudio.Wave
             return (uint)((double)milliseconds * totalSamples / totalMilliseconds);
         }
 
-        internal void TrimToPlay(uint startMs, uint finishMs)
+        public void TrimToPlay(uint startMs, uint finishMs)
         {
 
             if (startMs > totalMilliseconds || finishMs > totalMilliseconds)
@@ -504,8 +504,6 @@ namespace NAudio.Wave
             uint firstSample = SampleByMilliseconds(startMs);
             
             int firstFrame = (int)(firstSample / samplesPerFrame);
-
-            
 
             firstSkipSamples = (int)(firstSample - firstFrame * samplesPerFrame);
 
