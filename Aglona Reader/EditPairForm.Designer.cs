@@ -62,6 +62,7 @@ namespace AglonaReader
             this.bottomPanel.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize) (this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
@@ -206,7 +207,7 @@ namespace AglonaReader
             // textBox1
             // 
             this.textBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.textBox1.Font = new System.Drawing.Font("Arial Unicode MS", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.textBox1.Font = new System.Drawing.Font("Arial Unicode MS", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte) (204)));
             this.textBox1.Location = new System.Drawing.Point(0, 0);
             this.textBox1.MaxLength = 10000000;
             this.textBox1.Multiline = true;
@@ -218,7 +219,7 @@ namespace AglonaReader
             // textBox2
             // 
             this.textBox2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.textBox2.Font = new System.Drawing.Font("Arial Unicode MS", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.textBox2.Font = new System.Drawing.Font("Arial Unicode MS", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte) (204)));
             this.textBox2.Location = new System.Drawing.Point(0, 0);
             this.textBox2.MaxLength = 10000000;
             this.textBox2.Multiline = true;
@@ -237,7 +238,7 @@ namespace AglonaReader
             this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.bottomPanel);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Icon = ((System.Drawing.Icon) (resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "EditPairForm";
@@ -254,26 +255,26 @@ namespace AglonaReader
             this.splitContainer1.Panel1.PerformLayout();
             this.splitContainer1.Panel2.ResumeLayout(false);
             this.splitContainer1.Panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize) (this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
             this.ResumeLayout(false);
-
         }
 
-        #endregion
-
         private System.Windows.Forms.Panel bottomPanel;
+        private System.Windows.Forms.Button cancelButton;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.RadioButton level0;
+        private System.Windows.Forms.RadioButton level1;
+        private System.Windows.Forms.RadioButton level2;
+        private System.Windows.Forms.RadioButton level3;
+        private System.Windows.Forms.Button okButton;
         private System.Windows.Forms.SplitContainer splitContainer1;
+        private System.Windows.Forms.CheckBox start1;
+        private System.Windows.Forms.CheckBox start2;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.TextBox textBox2;
-        private System.Windows.Forms.Button okButton;
-        private System.Windows.Forms.RadioButton level0;
-        private System.Windows.Forms.RadioButton level3;
-        private System.Windows.Forms.RadioButton level2;
-        private System.Windows.Forms.RadioButton level1;
-        private System.Windows.Forms.Button cancelButton;
-        private GroupBox groupBox2;
-        private CheckBox start2;
-        private CheckBox start1;
-        private GroupBox groupBox1;
+
+        #endregion
     }
 }

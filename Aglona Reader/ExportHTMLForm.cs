@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 
 namespace AglonaReader
@@ -11,7 +6,7 @@ namespace AglonaReader
     public partial class ExportHTMLForm : Form
     {
 
-        private ParallelTextControl pTC;
+        private readonly ParallelTextControl pTC;
 
         public ExportHTMLForm(ParallelTextControl pTC)
         {
@@ -22,13 +17,13 @@ namespace AglonaReader
         private void selectExportFileButton_Click(object sender, EventArgs e)
         {
             // Ask for the file name
-            using (SaveFileDialog d = new SaveFileDialog())
+            using (var d = new SaveFileDialog())
             {
                 d.Filter = "HTML files|*.html";
 
                 d.RestoreDirectory = true;
 
-                DialogResult dialogResult = d.ShowDialog();
+                var dialogResult = d.ShowDialog();
 
                 if (dialogResult == DialogResult.OK)
                     exportFileName.Text = d.FileName;

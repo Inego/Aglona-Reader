@@ -1,19 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 
 namespace AglonaReader
 {
     public partial class SettingsForm : Form
     {
-
-        string prevFont;
-        int prevSize;
-
+        private string prevFont;
+        private int prevSize;
 
         public ParallelTextControl pTC = null;
 
@@ -43,29 +37,29 @@ namespace AglonaReader
             alternatingColorSchemeComboBox.SelectedIndex = pTC.AlternatingColorScheme;
 
             prevFont = pTC.textFont.Name;
-            float currentFontSize = pTC.textFont.Size;
+            var currentFontSize = pTC.textFont.Size;
 
-            int newTrack = (int)((currentFontSize - 8) / 16 * 1000);
+            var newTrack = (int)((currentFontSize - 8) / 16 * 1000);
 
             fontSizeTrackBar.Value = newTrack;
 
             prevSize = newTrack;
 
-            int idx = -1;
-            int foundidx = -1;
-            foreach (FontFamily ff in FontFamily.Families)
+            var idx = -1;
+            var foundIdx = -1;
+            foreach (var ff in FontFamily.Families)
             {
                 idx++;
                 fontsComboBox.Items.Add(ff);
                 if (ff.Name == prevFont)
-                    foundidx = idx;
+                    foundIdx = idx;
             }
 
             fontsComboBox.DisplayMember = "Name";
             fontsComboBox.ValueMember = "Name";
 
-            if (foundidx != -1)
-                fontsComboBox.SelectedIndex = foundidx;
+            if (foundIdx != -1)
+                fontsComboBox.SelectedIndex = foundIdx;
 
             fontNameLabel.Text = prevFont;
             brightnessBar.Value = (int)(pTC.Brightness * 1000);
@@ -74,7 +68,7 @@ namespace AglonaReader
 
         private void brightnessBar_Scroll(object sender, EventArgs e)
         {
-            pTC.Brightness = (float)(brightnessBar.Value) / 1000;
+            pTC.Brightness = (float)brightnessBar.Value / 1000;
             pTC.RenderPairs(true);
         }
 
@@ -85,8 +79,7 @@ namespace AglonaReader
 
         private void UpdateFont()
         {
-
-            FontFamily ff = (FontFamily)fontsComboBox.Items[fontsComboBox.SelectedIndex];
+            var ff = (FontFamily)fontsComboBox.Items[fontsComboBox.SelectedIndex];
 
             if (!ff.IsStyleAvailable(FontStyle.Regular))
                 return;

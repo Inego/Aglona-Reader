@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 using System.IO;
 
@@ -11,9 +6,6 @@ namespace AglonaReader
 {
     public partial class ImportTextForm : Form
     {
-
-        public bool Result { get; set; }
-
         public ImportTextForm()
         {
             InitializeComponent();
@@ -23,7 +15,7 @@ namespace AglonaReader
 
         private void selectFile1Button_Click(object sender, EventArgs e)
         {
-            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            using (var openFileDialog = new OpenFileDialog())
             {
                 openFileDialog.Filter = "Text files (*.txt)|*.txt";
                 openFileDialog.RestoreDirectory = true;
@@ -36,7 +28,7 @@ namespace AglonaReader
         private void selectFile2Button_Click(object sender, EventArgs e)
         {
 
-            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            using (var openFileDialog = new OpenFileDialog())
             {
                 openFileDialog.Filter = "Text files (*.txt)|*.txt";
                 openFileDialog.RestoreDirectory = true;
@@ -81,7 +73,6 @@ namespace AglonaReader
 
         private void ImportTextForm_Shown(object sender, EventArgs e)
         {
-            Result = false;   
         }
 
         private void cancelButton_Click(object sender, EventArgs e)

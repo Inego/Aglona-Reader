@@ -24,7 +24,7 @@ namespace AglonaReader
             base.Dispose(disposing);
             drawBrush.Dispose();
             popUpBrush.Dispose();
-            AdvancedHighlightFrame.Dispose();
+            advancedHighlightFrame.Dispose();
             textFont.Dispose();
         }
 
@@ -75,8 +75,8 @@ namespace AglonaReader
         
         #region Component Designer generated code
 
-        /// <summary> 
-        /// Required method for Designer support - do not modify 
+        /// <summary>
+        /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent()
@@ -90,7 +90,6 @@ namespace AglonaReader
             this.BackColor = System.Drawing.SystemColors.Info;
             this.Name = "ParallelTextControl";
             this.ResumeLayout(false);
-
         }
 
         #endregion

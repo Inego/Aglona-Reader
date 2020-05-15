@@ -132,7 +132,7 @@ namespace AglonaReader
             // 
             // lang1
             // 
-            this.lang1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.lang1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte) (204)));
             this.lang1.Location = new System.Drawing.Point(75, 276);
             this.lang1.MaxLength = 2;
             this.lang1.Name = "lang1";
@@ -141,7 +141,7 @@ namespace AglonaReader
             // 
             // lang2
             // 
-            this.lang2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.lang2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte) (204)));
             this.lang2.Location = new System.Drawing.Point(370, 276);
             this.lang2.MaxLength = 2;
             this.lang2.Name = "lang2";
@@ -257,7 +257,7 @@ namespace AglonaReader
             // pairCountLabel
             // 
             this.pairCountLabel.AutoSize = true;
-            this.pairCountLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.pairCountLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte) (204)));
             this.pairCountLabel.Location = new System.Drawing.Point(75, 439);
             this.pairCountLabel.Name = "pairCountLabel";
             this.pairCountLabel.Size = new System.Drawing.Size(14, 13);
@@ -294,7 +294,7 @@ namespace AglonaReader
             this.Controls.Add(this.author1);
             this.Controls.Add(this.label1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Icon = ((System.Drawing.Icon) (resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "BookInfoForm";
@@ -304,32 +304,31 @@ namespace AglonaReader
             this.Load += new System.EventHandler(this.BookInfoForm_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
-
         }
 
-        #endregion
-
-        private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox author1;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox title1;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TextBox information1;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.TextBox lang1;
-        private System.Windows.Forms.TextBox lang2;
-        private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.TextBox information2;
-        private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.TextBox title2;
-        private System.Windows.Forms.Label label7;
         private System.Windows.Forms.TextBox author2;
+        private System.Windows.Forms.Button cancelButton;
+        private System.Windows.Forms.TextBox information;
+        private System.Windows.Forms.TextBox information1;
+        private System.Windows.Forms.TextBox information2;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Label label9;
-        private System.Windows.Forms.TextBox information;
+        private System.Windows.Forms.TextBox lang1;
+        private System.Windows.Forms.TextBox lang2;
         private System.Windows.Forms.Button okButton;
-        private System.Windows.Forms.Button cancelButton;
-        private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Label pairCountLabel;
+        private System.Windows.Forms.TextBox title1;
+        private System.Windows.Forms.TextBox title2;
+
+        #endregion
     }
 }

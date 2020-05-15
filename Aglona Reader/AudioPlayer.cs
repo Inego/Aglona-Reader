@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using NAudio.Wave;
-using System.Windows.Forms;
 using System.IO;
-using System.Threading;
 
 namespace AglonaReader.Mp3Player
 {
-
-    class AudioPlayer : IDisposable
+    internal class AudioPlayer : IDisposable
         
     {
         private Mp3FileReader mp3Stream;
@@ -56,7 +51,7 @@ namespace AglonaReader.Mp3Player
             if (m_WavePlayer.PlaybackState == PlaybackState.Stopped)
                 return;
 
-            bool needToReInit = reInit && m_WavePlayer.PlaybackState == PlaybackState.Playing;
+            var needToReInit = reInit && m_WavePlayer.PlaybackState == PlaybackState.Playing;
 
             if (needToReInit)
             {
@@ -84,13 +79,7 @@ namespace AglonaReader.Mp3Player
 
 
         // returns approximate time based by the current frame in the Mp3FileReader
-        public uint CurrentTime
-        {
-            get
-            {
-                return mp3Stream.CurrentTimeMs;
-            }
-        }
+        public uint CurrentTime => mp3Stream.CurrentTimeMs;
 
         public bool Playing
         {
@@ -103,7 +92,7 @@ namespace AglonaReader.Mp3Player
         }
 
         #region IDisposable Support
-        private bool disposedValue = false; // To detect redundant calls
+        private bool disposedValue; // To detect redundant calls
 
         protected virtual void Dispose(bool disposing)
         {

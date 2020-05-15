@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 
 namespace AglonaReader
@@ -22,7 +17,7 @@ namespace AglonaReader
             if (ParallelTC == null)
                 return;
 
-            ParallelText pText = ParallelTC.PText;
+            var pText = ParallelTC.PText;
 
             if (ParallelTC.Reversed)
             {
@@ -58,7 +53,7 @@ namespace AglonaReader
         private void okButton_Click(object sender, EventArgs e)
         {
 
-            ParallelText pText = ParallelTC.PText;
+            var pText = ParallelTC.PText;
 
             if (ParallelTC.Reversed)
             {

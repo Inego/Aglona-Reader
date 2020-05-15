@@ -5,8 +5,6 @@ using System.Xml;
 using System.ComponentModel;
 using System.IO;
 using System;
-using System.Web;
-
 
 
 namespace AglonaReader
@@ -23,14 +21,13 @@ namespace AglonaReader
 
         public WordInfo(string word, int line, int wordX, int wordX2, int position, bool eastern)
         {
-            this.Word = word;
-            this.Line = line;
-            this.X1 = wordX;
-            this.X2 = wordX2;
-            this.Position = position;
-            this.Eastern = eastern;
+            Word = word;
+            Line = line;
+            X1 = wordX;
+            X2 = wordX2;
+            Position = position;
+            Eastern = eastern;
         }
-
     }
 
     public class RenderedTextInfo
@@ -63,8 +60,8 @@ namespace AglonaReader
         public bool StartParagraph2 { get; set; }
 
 
-        public int aggregateSize = 0;
-        public int totalTextSize = 0;
+        public int aggregateSize;
+        public int totalTextSize;
 
         public string Substring(byte side, int startPosition, int length)
         {
@@ -73,11 +70,9 @@ namespace AglonaReader
                     return Text1.Substring(startPosition, length);
                 else
                     return SB1.ToString(startPosition, length);
-            else
-                if (SB2 == null)
-                    return Text2.Substring(startPosition, length);
-                else
-                    return SB2.ToString(startPosition, length);
+            if (SB2 == null)
+                return Text2.Substring(startPosition, length);
+            return SB2.ToString(startPosition, length);
         }
 
         public string Substring(byte side, int startPosition)
@@ -87,11 +82,9 @@ namespace AglonaReader
                     return Text1.Substring(startPosition);
                 else
                     return SB1.ToString(startPosition, SB1.Length - startPosition);
-            else
-                if (SB2 == null)
-                    return Text2.Substring(startPosition);
-                else
-                    return SB2.ToString(startPosition, SB2.Length - startPosition);
+            if (SB2 == null)
+                return Text2.Substring(startPosition);
+            return SB2.ToString(startPosition, SB2.Length - startPosition);
         }
 
         public RenderedTextInfo RenderedInfo(byte side)
@@ -140,8 +133,8 @@ namespace AglonaReader
         /// </summary>
         public int Height { get; set; }
 
-        public RenderedTextInfo RenderedInfo1 { get; set; }
-        public RenderedTextInfo RenderedInfo2 { get; set; }
+        public RenderedTextInfo RenderedInfo1 { get; }
+        public RenderedTextInfo RenderedInfo2 { get; }
 
         private Collection<WordInfo> computedWords1;
         private Collection<WordInfo> computedWords2;
@@ -155,30 +148,21 @@ namespace AglonaReader
                     return Text1[charIndex];
                 else
                     return SB1[charIndex];
-            else
-                if (SB2 == null)
-                    return Text2[charIndex];
-                else
-                    return SB2[charIndex];
+            if (SB2 == null)
+                return Text2[charIndex];
+            return SB2[charIndex];
         }
 
-        public Collection<WordInfo> ComputedWords(byte side, bool createNew)
+        public Collection<WordInfo> ComputedWords(byte side, bool createNew = false)
         {
             if (side == 1)
             {
                 if (createNew && computedWords1 == null) computedWords1 = new Collection<WordInfo>();
                 return computedWords1;
             }
-            else
-            {
-                if (createNew && computedWords2 == null) computedWords2 = new Collection<WordInfo>();
-                return computedWords2;
-            }
-        }
 
-        public Collection<WordInfo> ComputedWords(byte side)
-        {
-            return ComputedWords(side, false);
+            if (createNew && computedWords2 == null) computedWords2 = new Collection<WordInfo>();
+            return computedWords2;
         }
 
         public TextPair()
@@ -201,18 +185,18 @@ namespace AglonaReader
         {
             if (text1 != null)
                 if (text1.Length >= ParallelTextControl.BigTextSize)
-                    this.SB1 = new StringBuilder(text1);
+                    SB1 = new StringBuilder(text1);
                 else
-                    this.Text1 = text1;
+                    Text1 = text1;
 
             if (text2 != null)
                 if (text2.Length >= ParallelTextControl.BigTextSize)
-                    this.SB2 = new StringBuilder(text2);
+                    SB2 = new StringBuilder(text2);
                 else
-                    this.Text2 = text2;
+                    Text2 = text2;
 
-            this.StartParagraph1 = startParagraph1;
-            this.StartParagraph2 = startParagraph2;
+            StartParagraph1 = startParagraph1;
+            StartParagraph2 = startParagraph2;
 
         }
 
@@ -222,31 +206,29 @@ namespace AglonaReader
         {
             if (text1 != null)
                 if (text1.Length >= ParallelTextControl.BigTextSize)
-                    this.SB1 = new StringBuilder(text1);
+                    SB1 = new StringBuilder(text1);
                 else
-                    this.Text1 = text1;
+                    Text1 = text1;
 
             if (text2 != null)
                 if (text2.Length >= ParallelTextControl.BigTextSize)
-                    this.SB2 = new StringBuilder(text2);
+                    SB2 = new StringBuilder(text2);
                 else
-                    this.Text2 = text2;
+                    Text2 = text2;
 
-            this.StartParagraph1 = startParagraph1;
-            this.StartParagraph2 = startParagraph2;
+            StartParagraph1 = startParagraph1;
+            StartParagraph2 = startParagraph2;
 
-            this.AudioFileNumber = audioFileNum;
-            this.TimeBeg = timeBeg;
-            this.TimeEnd = timeEnd;
+            AudioFileNumber = audioFileNum;
+            TimeBeg = timeBeg;
+            TimeEnd = timeEnd;
 
         }
 
         internal void ClearComputedWords()
         {
-            if (computedWords1 != null)
-                computedWords1.Clear();
-            if (computedWords2 != null)
-                computedWords2.Clear();
+            computedWords1?.Clear();
+            computedWords2?.Clear();
 
             Height = -1;
 
@@ -260,16 +242,8 @@ namespace AglonaReader
 
         internal int GetLength(byte side)
         {
-            if (side == 1)
-                if (SB1 == null)
-                    return Text1.Length;
-                else
-                    return SB1.Length;
-            else
-                if (SB2 == null)
-                    return Text2.Length;
-                else
-                    return SB2.Length;
+            if (side == 1) return SB1?.Length ?? Text1.Length;
+            return SB2?.Length ?? Text2.Length;
         }
 
         internal void SetStructureLevel(byte p)
@@ -283,12 +257,12 @@ namespace AglonaReader
         {
             byte state = 0;
 
-            int currentWordStart = -1;
-            int prevNatural = -1;
+            var currentWordStart = -1;
+            var prevNatural = -1;
 
-            int length = text.Length;
+            var length = text.Length;
 
-            int pos = 0;
+            var pos = 0;
 
             char c;
 
@@ -399,12 +373,12 @@ namespace AglonaReader
         {
             byte state = 0;
 
-            int currentWordStart = -1;
-            int prevNatural = -1;
+            var currentWordStart = -1;
+            var prevNatural = -1;
 
-            int length = text.Length;
+            var length = text.Length;
 
-            int pos = 0;
+            var pos = 0;
 
             char c;
 
@@ -519,12 +493,9 @@ namespace AglonaReader
                     return NaturalDividerPosition(Text1, startingPos, forward);
                 else
                     return NaturalDividerPosition(SB1, startingPos, forward);
-            else
-                if (SB2 == null)
-                    return NaturalDividerPosition(Text2, startingPos, forward);
-                else
-                    return NaturalDividerPosition(SB2, startingPos, forward);
-
+            if (SB2 == null)
+                return NaturalDividerPosition(Text2, startingPos, forward);
+            return NaturalDividerPosition(SB2, startingPos, forward);
         }
 
         internal string GetText(byte side)
@@ -534,11 +505,9 @@ namespace AglonaReader
                     return Text1;
                 else
                     return SB1.ToString();
-            else
-                if (SB2 == null)
-                    return Text2;
-                else
-                    return SB2.ToString();
+            if (SB2 == null)
+                return Text2;
+            return SB2.ToString();
         }
 
         internal bool StartParagraph(byte side)
@@ -563,8 +532,7 @@ namespace AglonaReader
         {
             if (side == 1)
                 return AllLinesComputed1;
-            else
-                return AllLinesComputed2;
+            return AllLinesComputed2;
 
         }
     }
@@ -590,7 +558,7 @@ namespace AglonaReader
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public List<TextPair> TextPairs { get; set; }
+        public List<TextPair> TextPairs { get; }
 
         /// <summary>
         /// Contains a list of pairs which are at least partially computed.
@@ -600,7 +568,7 @@ namespace AglonaReader
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public List<TextPair> ComputedPairs { get; set; }
+        public List<TextPair> ComputedPairs { get; }
 
         public int Number()
         { return TextPairs.Count; }
@@ -624,14 +592,11 @@ namespace AglonaReader
 
         }
 
-        public TextPair this[int pairIndex]
-        {
-            get { return TextPairs[pairIndex]; }
-        }
+        public TextPair this[int pairIndex] => TextPairs[pairIndex];
 
-        public void AddPair(string text1, string text2, bool startParagraph1, bool startParagraph2)
+        public void AddPair(string text1, string text2, bool startParagraph1 = true, bool startParagraph2 = true)
         {
-            TextPair newPair = TextPairs.Count == 0 ?
+            var newPair = TextPairs.Count == 0 ?
                 new TextPair(text1, text2, true, true) :
                 new TextPair(text1, text2, startParagraph1, startParagraph2);
 
@@ -639,20 +604,9 @@ namespace AglonaReader
 
         }
 
-        public void AddPair(string text1, string text2, uint audioFileNum, uint timeBeg, uint timeEnd)
-        {
-            TextPair newPair = new TextPair(text1, text2, true, true, audioFileNum, timeBeg, timeEnd);
-            TextPairs.Add(newPair);
-        }
-
-        public void AddPair(string text1, string text2)
-        {
-            AddPair(text1, text2, true, true);
-        }
-
         public void Truncate()
         {
-            foreach (TextPair p in ComputedPairs)
+            foreach (var p in ComputedPairs)
                 p.ClearComputedWords();
             ComputedPairs.Clear();
         }
@@ -664,12 +618,10 @@ namespace AglonaReader
                 return;
 
             Collection<WordInfo> l = null;
-            TextPair prev_p = null;
-            byte prev_side = 0;
+            TextPair prevP = null;
+            byte prevSide = 0;
 
-
-            int bias = 0;
-
+            var bias = 0;
 
             // Spaces can be only in cases like W E or E W or W W,
             // where W is a "western" word and E is an eastern character
@@ -677,10 +629,10 @@ namespace AglonaReader
 
             CommonWordInfo previousWord = null;
 
-            int numberOfSpacesLeft = 0;
+            var numberOfSpacesLeft = 0;
 
             // So before extending spaces we must know their number.
-            foreach (CommonWordInfo r in list)
+            foreach (var r in list)
             {
                 if (previousWord != null)
                     if (!(r.Eastern && previousWord.Eastern))
@@ -690,27 +642,27 @@ namespace AglonaReader
 
             previousWord = null;
 
-            foreach (CommonWordInfo r in list)
+            foreach (var r in list)
             {
 
                 if (spaceLeft != 0 && previousWord != null && !(r.Eastern && previousWord.Eastern))
                 {
-                    int inc = (spaceLeft / numberOfSpacesLeft);
+                    var inc = spaceLeft / numberOfSpacesLeft;
                     bias += inc;
                     spaceLeft -= inc;
                     numberOfSpacesLeft--;
                 }
 
-                if (prev_p != r.TextPair)
+                if (prevP != r.TextPair)
                 {
-                    prev_p = r.TextPair;
-                    prev_side = 0;
+                    prevP = r.TextPair;
+                    prevSide = 0;
                 }
 
-                if (r.side != prev_side)
+                if (r.side != prevSide)
                 {
-                    prev_side = r.side;
-                    l = prev_p.ComputedWords(r.side, true);
+                    prevSide = r.side;
+                    l = prevP.ComputedWords(r.side, true);
                 }
 
                 l.Add(new WordInfo(r.Word, r.Line, r.X1 + bias, r.X2 + bias, r.Position, r.Eastern));
@@ -727,7 +679,7 @@ namespace AglonaReader
 
             byte level;
 
-            using (XmlTextWriter writer = new XmlTextWriter(newFileName, Encoding.UTF8))
+            using (var writer = new XmlTextWriter(newFileName, Encoding.UTF8))
             {
 
                 writer.WriteStartElement("ParallelBook");
@@ -744,7 +696,7 @@ namespace AglonaReader
 
                 writer.WriteAttributeString("info", Info);
 
-                foreach (TextPair p in TextPairs)
+                foreach (var p in TextPairs)
                 {
                     writer.WriteStartElement("p");
 
@@ -781,7 +733,7 @@ namespace AglonaReader
                     else
                         writer.WriteAttributeString("t", p.SB2.ToString());
 
-                    if (WithAudio && (p.AudioFileNumber > 0))
+                    if (WithAudio && p.AudioFileNumber > 0)
                     {
                         writer.WriteAttributeString("f", p.AudioFileNumber.ToString());
                         writer.WriteAttributeString("b", p.TimeBeg.ToString());
@@ -795,7 +747,7 @@ namespace AglonaReader
                 writer.Flush();
             }
 
-            this.FileName = newFileName;
+            FileName = newFileName;
         }
 
 
@@ -803,7 +755,7 @@ namespace AglonaReader
         {
             WithAudio = newFileName.EndsWith(".pbs");
 
-            using (XmlTextReader reader = new XmlTextReader(newFileName))
+            using (var reader = new XmlTextReader(newFileName))
             {
                 try
                 {
@@ -904,7 +856,7 @@ namespace AglonaReader
                     if (!reader.MoveToNextAttribute())
                         return false;
 
-                    TextPair p = new TextPair();
+                    var p = new TextPair();
 
                     if (reader.Name == "l")
                     {
@@ -950,7 +902,7 @@ namespace AglonaReader
                     else
                         p.Text2 = reader.Value;
 
-                    if (WithAudio && (reader.MoveToNextAttribute()))
+                    if (WithAudio && reader.MoveToNextAttribute())
                     {
                         if (reader.Name != "f")
                             return false;
@@ -1007,7 +959,7 @@ namespace AglonaReader
 
             TextPair tp;
 
-            for (int i = pairIndex; i < Number(); i++)
+            for (var i = pairIndex; i < Number(); i++)
             {
                 tp = TextPairs[i];
                 accLength += 2 + tp.totalTextSize;
@@ -1016,9 +968,9 @@ namespace AglonaReader
         }
 
 
-        void WriteIfNotEmpty(StreamWriter outfile, string s)
+        private void WriteIfNotEmpty(StreamWriter outfile, string s)
         {
-            if (!String.IsNullOrEmpty(s))
+            if (!string.IsNullOrEmpty(s))
             {
                 outfile.WriteLine(s);
                 outfile.WriteLine();
@@ -1027,7 +979,7 @@ namespace AglonaReader
 
         private string EscapeForHtml(string src)
         {
-            StringBuilder sb = new StringBuilder(src);
+            var sb = new StringBuilder(src);
 
             sb.Replace("&", "&amp;");
             sb.Replace("<", "&lt;");
@@ -1063,7 +1015,7 @@ namespace AglonaReader
         internal void ExportHTML(string fileName)
         {
 
-            using (StreamWriter outfile = new StreamWriter(fileName, false, Encoding.UTF8))
+            using (var outfile = new StreamWriter(fileName, false, Encoding.UTF8))
             {
 
                 TextPair p = null;
@@ -1077,12 +1029,12 @@ namespace AglonaReader
                 
                 outfile.WriteLine("<table  class=\"tg\">");
 
-                string c1 = "";
-                string c2 = "";
+                var c1 = "";
+                var c2 = "";
 
-                int leftNumber = 0;
+                var leftNumber = 0;
                 
-                for (int i = 0; i < Number(); i++)
+                for (var i = 0; i < Number(); i++)
                 {
 
                     p = this[i];
@@ -1107,7 +1059,7 @@ namespace AglonaReader
 
                     if (leftNumber < i + 1)
                     {
-                        string q = " <sup>" + ((i + 1) % 100).ToString() + "</sup> ";
+                        var q = " <sup>" + ((i + 1) % 100).ToString() + "</sup> ";
                         c1 += (p.StartParagraph1 ? "<br>" : " ") + q + EscapeForHtml(p.Text1);
                         c2 += (p.StartParagraph2 ? "<br>" : " ") + q + EscapeForHtml(p.Text2);
                     }
@@ -1130,7 +1082,7 @@ namespace AglonaReader
         internal void ExportText(string fileName, int sideToExport)
         {
 
-            using (StreamWriter outfile = new StreamWriter(fileName, false, Encoding.UTF8))
+            using (var outfile = new StreamWriter(fileName, false, Encoding.UTF8))
             {
 
                 TextPair p = null;
@@ -1143,7 +1095,7 @@ namespace AglonaReader
                     WriteIfNotEmpty(outfile, Info1);
                     WriteIfNotEmpty(outfile, Info);
 
-                    for (int i = 0; i < Number(); i++)
+                    for (var i = 0; i < Number(); i++)
                     {
                         p = this[i];
 
@@ -1173,7 +1125,7 @@ namespace AglonaReader
                     WriteIfNotEmpty(outfile, Info2);
                     WriteIfNotEmpty(outfile, Info);
 
-                    for (int i = 0; i < Number(); i++)
+                    for (var i = 0; i < Number(); i++)
                     {
                         p = this[i];
 
@@ -1228,9 +1180,8 @@ namespace AglonaReader
             Lang2 = tmp;
 
             StringBuilder tmp_sb;
-            bool tmp_bool;
 
-            foreach (TextPair tp in TextPairs)
+            foreach (var tp in TextPairs)
             {
                 tmp_sb = tp.SB1;
                 tp.SB1 = tp.SB2;
@@ -1240,9 +1191,9 @@ namespace AglonaReader
                 tp.Text1 = tp.Text2;
                 tp.Text2 = tmp;
 
-                tmp_bool = tp.StartParagraph1;
+                var tmpBool = tp.StartParagraph1;
                 tp.StartParagraph1 = tp.StartParagraph2;
-                tp.StartParagraph2 = tmp_bool;
+                tp.StartParagraph2 = tmpBool;
             }
 
 
@@ -1254,7 +1205,7 @@ namespace AglonaReader
 
             if (p == 0 && TextPairs.Count > 0)
             {
-                TextPair tp0 = TextPairs[0];
+                var tp0 = TextPairs[0];
                 tp0.StartParagraph1 = true;
                 tp0.StartParagraph2 = true;
             }
@@ -1264,13 +1215,13 @@ namespace AglonaReader
 
     public class CommonWordInfo : WordInfo
     {
-        public TextPair TextPair { get; set; }
-        public byte side;
+        public TextPair TextPair { get; }
+        public readonly byte side;
 
         public CommonWordInfo(TextPair textPair, string word, int line, int wordX, int wordX2, int pos, bool eastern, byte side)
             : base(word, line, wordX, wordX2, pos, eastern)
         {
-            this.TextPair = textPair;
+            TextPair = textPair;
             this.side = side;
         }
     }

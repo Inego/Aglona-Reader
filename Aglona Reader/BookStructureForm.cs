@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Windows.Forms;
 
 namespace AglonaReader
@@ -35,24 +31,20 @@ namespace AglonaReader
             TreeNode selected = null;
             TreeNode previousNode = null;
 
-            byte side = (byte) (parallelTextControl.Reversed ? 3 - screenSide : screenSide);
+            var side = (byte) (parallelTextControl.Reversed ? 3 - screenSide : screenSide);
 
-            TextPair p;
             TreeNode t = null;
             TreeNode newNode = null;
 
-            for (int i = 0; i < parallelTextControl.Number; i++)
+            for (var i = 0; i < parallelTextControl.Number; i++)
             {
-                p = parallelTextControl[i];
+                var p = parallelTextControl[i];
                 if (p.StructureLevel > 0)
                 {
                     newNode = new TreeNode();
 
                     if (side == 1)
-                        if (p.SB1 == null)
-                            newNode.Text = p.Text1;
-                        else
-                            newNode.Text = p.SB1.ToString();
+                        newNode.Text = p.SB1 == null ? p.Text1 : p.SB1.ToString();
                     else
                         if (p.SB2 == null)
                             newNode.Text = p.Text2;
@@ -93,7 +85,7 @@ namespace AglonaReader
 
             if (t == null)
             {
-                TreeNode emptyNode = new TreeNode();
+                var emptyNode = new TreeNode();
                 AddToParentRecursively(emptyNode, t, structureLevel - 1);
                 emptyNode.Nodes.Add(newNode);
             }
@@ -107,7 +99,7 @@ namespace AglonaReader
 
                 else
                 {
-                    TreeNode emptyNode = new TreeNode();
+                    var emptyNode = new TreeNode();
                     AddToParentRecursively(emptyNode, t, structureLevel - 1);
                     emptyNode.Nodes.Add(newNode);
                 }

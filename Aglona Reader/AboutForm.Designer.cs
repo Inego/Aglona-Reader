@@ -138,23 +138,22 @@
             this.tableLayoutPanel1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
-
         }
 
-        #endregion
-
+        private System.Windows.Forms.Label bugFixedAndImprovementsLabel;
+        private System.Windows.Forms.Label colorLabel;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label programVersionLabel;
-        private System.Windows.Forms.Label releaseDateLabel;
-        private System.Windows.Forms.Label colorLabel;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label ListOfContributorsLabel;
-        private System.Windows.Forms.Label bugFixedAndImprovementsLabel;
         private System.Windows.Forms.Label otherContributorsList;
+        private System.Windows.Forms.Label programVersionLabel;
+        private System.Windows.Forms.Label releaseDateLabel;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+
+        #endregion
     }
 }

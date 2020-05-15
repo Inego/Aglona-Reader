@@ -16,14 +16,14 @@ namespace AglonaReader
         public ColorRGB(Color value) : this()
         {
             
-            this.Red = value.R;
-            this.Green = value.G;
-            this.Blue = value.B;
+            Red = value.R;
+            Green = value.G;
+            Blue = value.B;
         }
 
         public static implicit operator Color(ColorRGB rgb)
         {
-            Color c = Color.FromArgb(rgb.Red, rgb.Green, rgb.Blue);
+            var c = Color.FromArgb(rgb.Red, rgb.Green, rgb.Blue);
             return c;
         }
 
@@ -42,7 +42,7 @@ namespace AglonaReader
             r = lighting;   // default to gray
             g = lighting;
             b = lighting;
-            v = (lighting <= 0.5) ? (lighting * (1.0 + saturation)) : (lighting + saturation - lighting * saturation);
+            v = lighting <= 0.5 ? lighting * (1.0 + saturation) : lighting + saturation - lighting * saturation;
             
             if (v > 0)
             {
@@ -95,7 +95,7 @@ namespace AglonaReader
             }
 
 
-            ColorRGB rgb = new ColorRGB();
+            var rgb = new ColorRGB();
             
             rgb.Red = Convert.ToByte(r * 255.0f);
             rgb.Green = Convert.ToByte(g * 255.0f);

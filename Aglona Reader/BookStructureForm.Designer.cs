@@ -81,13 +81,12 @@
             this.Text = "Book structure";
             this.Shown += new System.EventHandler(this.BookStructureForm_Shown);
             this.ResumeLayout(false);
-
         }
 
-        #endregion
-
-        private System.Windows.Forms.Button okButton;
         private System.Windows.Forms.Button cancelButton;
+        private System.Windows.Forms.Button okButton;
         private System.Windows.Forms.TreeView treeView;
+
+        #endregion
     }
 }

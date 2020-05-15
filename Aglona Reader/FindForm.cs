@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 
 namespace AglonaReader
@@ -33,45 +28,38 @@ namespace AglonaReader
 
             textToFindBox.SelectAll();
 
-            String textToFind = textToFindBox.Text;
+            var textToFind = textToFindBox.Text;
 
-            if (String.IsNullOrEmpty(textToFind))
+            if (string.IsNullOrEmpty(textToFind))
             {
                 MessageBox.Show("Specify a text to find.", "Text not specified");
                 return;
             }
 
-            bool checkLeft = (leftTextRadioButton.Checked || bothTextsRadioButton.Checked);
-            bool checkRight = (rightTextRadioButton.Checked || bothTextsRadioButton.Checked);
+            var checkLeft = leftTextRadioButton.Checked || bothTextsRadioButton.Checked;
+            var checkRight = rightTextRadioButton.Checked || bothTextsRadioButton.Checked;
 
             if (pTC.Reversed)
             {
-                bool tmp = checkLeft;
+                var tmp = checkLeft;
                 checkLeft = checkRight;
                 checkRight = tmp;
             }
 
-            int start;
-            
-            if (pTC.EditMode)
-                start = pTC.HighlightedPair;
-            else
-                start = pTC.CurrentPair;
+            var start = pTC.EditMode ? pTC.HighlightedPair : pTC.CurrentPair;
 
-            int current = start;
+            var current = start;
 
-            TextPair p;
-            
             while (true)
             {
 
-                current = current + 1;
+                current += 1;
 
                 if (current == pTC.Number)
                 {
-                    DialogResult d = MessageBox.Show("Continue from the start?", "End of the document reached", MessageBoxButtons.YesNo);
+                    var d = MessageBox.Show("Continue from the start?", "End of the document reached", MessageBoxButtons.YesNo);
 
-                    if (d == System.Windows.Forms.DialogResult.No)
+                    if (d == DialogResult.No)
                         return;
 
                     current = 0;
@@ -84,7 +72,7 @@ namespace AglonaReader
                     return;
                 }
 
-                p = pTC[current];
+                var p = pTC[current];
 
                 if (checkLeft && (p.SB1 == null ? p.Text1 : p.SB1.ToString()).Contains(textToFind)
                     || checkRight && (p.SB2 == null ? p.Text2 : p.SB2.ToString()).Contains(textToFind))

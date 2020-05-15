@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 
@@ -28,8 +27,7 @@ namespace AglonaReader
 
         protected AbstractFrame(Collection<AbstractFrame> list)
         {
-            if (list != null)
-                list.Add(this);
+            list?.Add(this);
         }
 
         public void FillByRenderInfo(RenderedTextInfo renderedTextInfo, byte newSide)
@@ -37,19 +35,19 @@ namespace AglonaReader
             if (renderedTextInfo == null
                 || !renderedTextInfo.Valid)
             {
-                this.Visible = false;
+                Visible = false;
                 return;
             }
 
-            this.Visible = true;
+            Visible = true;
 
-            this.Side = newSide;
+            Side = newSide;
 
-            this.Line1 = renderedTextInfo.Line1;
-            this.Line2 = renderedTextInfo.Line2;
+            Line1 = renderedTextInfo.Line1;
+            Line2 = renderedTextInfo.Line2;
 
-            this.X1 = renderedTextInfo.X1;
-            this.X2 = renderedTextInfo.X2;
+            X1 = renderedTextInfo.X1;
+            X2 = renderedTextInfo.X2;
         }
 
         public abstract void Draw(ParallelTextControl parallelTextControl);
@@ -63,20 +61,15 @@ namespace AglonaReader
 
         public DoubleFrame(Pen pen, Collection<AbstractFrame> list)
         {
-            F1 = new Frame(pen, list);
-            F1.Side = 1;
+            F1 = new Frame(pen, list) {Side = 1};
 
-            F2 = new Frame(pen, list);
-            F2.Side = 2;
+            F2 = new Frame(pen, list) {Side = 2};
         }
 
         public DoubleFrame(Brush brush, Collection<AbstractFrame> list)
         {
-            this.F1 = new Background(brush, list);
-            this.F1.Side = 1;
-
-            this.F2 = new Background(brush, list);
-            this.F2.Side = 2;
+            F1 = new Background(brush, list) {Side = 1};
+            F2 = new Background(brush, list) {Side = 2};
         }
 
         public void SetPen(Pen pen)
@@ -93,8 +86,8 @@ namespace AglonaReader
 
         public void SetVisibility(bool visibility)
         {
-            this.F1.Visible = visibility;
-            this.F2.Visible = visibility;
+            F1.Visible = visibility;
+            F2.Visible = visibility;
         }
 
     }
@@ -106,19 +99,17 @@ namespace AglonaReader
         
         public Background(Brush brush, Collection<AbstractFrame> list) : base(list)
         {
-            this.BackgroundBrush = brush;
+            BackgroundBrush = brush;
         }
 
         public void Dispose()
         {
-            if (BackgroundBrush != null)
-                BackgroundBrush.Dispose();
+            BackgroundBrush?.Dispose();
         }
 
         public override void Draw(ParallelTextControl parallelTextControl)
         {
-            if (parallelTextControl != null)
-                parallelTextControl.DrawBackground(this);
+            parallelTextControl?.DrawBackground(this);
         }
     }
 
@@ -129,10 +120,10 @@ namespace AglonaReader
 
         public static Pen CreatePen(Color color, DashStyle dashStyle, float width)
         {
-            Pen result = new Pen(color, width);
-            result.StartCap = LineCap.Round;
-            result.EndCap = LineCap.Round;
-            result.DashStyle = dashStyle;
+            var result = new Pen(color, width)
+            {
+                StartCap = LineCap.Round, EndCap = LineCap.Round, DashStyle = dashStyle
+            };
             return result;
         }
 
@@ -140,9 +131,8 @@ namespace AglonaReader
         {
             Visible = false;
             if (pen != null)
-                this.FramePen = pen;
-            if (list != null)
-                list.Add(this);
+                FramePen = pen;
+            list?.Add(this);
         }
 
         // Dispose() calls Dispose(true)
@@ -164,22 +154,18 @@ namespace AglonaReader
         // The bulk of the clean-up code is implemented in Dispose(bool)
         protected virtual void Dispose(bool disposing)
         {
-            if (disposing)
-            {
-                // free managed resources
-                if (FramePen != null)
-                {
-                    FramePen.Dispose();
-                    FramePen = null;
-                }
-            }
+            if (!disposing) return;
 
+            if (FramePen == null) return;
+            
+            // free managed resources
+            FramePen.Dispose();
+            FramePen = null;
         }
 
         public override void Draw(ParallelTextControl parallelTextControl)
         {
-            if (parallelTextControl != null)
-                parallelTextControl.DrawFrame(this);
+            parallelTextControl?.DrawFrame(this);
         }
 
     }

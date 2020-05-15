@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Globalization;
-using System.Text;
 using System.Windows.Forms;
 
 namespace AglonaReader
@@ -12,7 +7,7 @@ namespace AglonaReader
     public partial class EditPairForm : Form
     {
 
-        public bool Result { get; set; }
+        public bool Result { get; private set; }
 
         public ParallelTextControl ParallelTextControl { get; set; }
 
@@ -123,7 +118,7 @@ namespace AglonaReader
             if (ParallelTextControl.Reversed)
                 side = 3 - side;
 
-            string langCode = (side == 1 ? ParallelTextControl.PText.Lang1 : ParallelTextControl.PText.Lang2);
+            var langCode = side == 1 ? ParallelTextControl.PText.Lang1 : ParallelTextControl.PText.Lang2;
             
             if (langCode == null)
                 return;

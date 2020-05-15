@@ -95,7 +95,7 @@
             this.Controls.Add(this.exportFileName);
             this.Controls.Add(this.fileNameLabel);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Icon = ((System.Drawing.Icon) (resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "ExportHTMLForm";
@@ -104,15 +104,14 @@
             this.Text = "Export to HTML";
             this.ResumeLayout(false);
             this.PerformLayout();
-
         }
 
-        #endregion
-
-        private System.Windows.Forms.Label fileNameLabel;
-        private System.Windows.Forms.TextBox exportFileName;
-        private System.Windows.Forms.Button selectExportFileButton;
-        private System.Windows.Forms.Button exportButton;
         private System.Windows.Forms.Button cancelButton;
+        private System.Windows.Forms.Button exportButton;
+        private System.Windows.Forms.TextBox exportFileName;
+        private System.Windows.Forms.Label fileNameLabel;
+        private System.Windows.Forms.Button selectExportFileButton;
+
+        #endregion
     }
 }

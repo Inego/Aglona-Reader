@@ -110,16 +110,15 @@
             this.Text = "Open recent files";
             this.Shown += new System.EventHandler(this.OpenRecentForm_Shown);
             this.ResumeLayout(false);
-
         }
 
-        #endregion
-
+        private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button formCancelButton;
         private System.Windows.Forms.Button formOKButton;
         private System.Windows.Forms.ListBox listBox;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.ToolTip toolTip1;
         private System.Windows.Forms.Button removeAllButton;
+        private System.Windows.Forms.ToolTip toolTip1;
+
+        #endregion
     }
 }

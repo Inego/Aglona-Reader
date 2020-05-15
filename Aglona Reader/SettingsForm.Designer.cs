@@ -44,10 +44,10 @@ namespace AglonaReader
             this.readingModeComboBox = new System.Windows.Forms.ComboBox();
             this.label3 = new System.Windows.Forms.Label();
             this.alternatingColorSchemeComboBox = new System.Windows.Forms.ComboBox();
-            ((System.ComponentModel.ISupportInitialize)(this.fontSizeTrackBar)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize) (this.fontSizeTrackBar)).BeginInit();
             this.fontGroupBox.SuspendLayout();
             this.groupBox1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.brightnessBar)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize) (this.brightnessBar)).BeginInit();
             this.SuspendLayout();
             // 
             // fontNameLabel
@@ -129,10 +129,7 @@ namespace AglonaReader
             // 
             this.readingModeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.readingModeComboBox.FormattingEnabled = true;
-            this.readingModeComboBox.Items.AddRange(new object[] {
-            resources.GetString("readingModeComboBox.Items"),
-            resources.GetString("readingModeComboBox.Items1"),
-            resources.GetString("readingModeComboBox.Items2")});
+            this.readingModeComboBox.Items.AddRange(new object[] {resources.GetString("readingModeComboBox.Items"), resources.GetString("readingModeComboBox.Items1"), resources.GetString("readingModeComboBox.Items2")});
             resources.ApplyResources(this.readingModeComboBox, "readingModeComboBox");
             this.readingModeComboBox.Name = "readingModeComboBox";
             this.readingModeComboBox.SelectedIndexChanged += new System.EventHandler(this.readingModeComboBox_SelectedIndexChanged);
@@ -146,9 +143,7 @@ namespace AglonaReader
             // 
             this.alternatingColorSchemeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.alternatingColorSchemeComboBox.FormattingEnabled = true;
-            this.alternatingColorSchemeComboBox.Items.AddRange(new object[] {
-            resources.GetString("alternatingColorSchemeComboBox.Items"),
-            resources.GetString("alternatingColorSchemeComboBox.Items1")});
+            this.alternatingColorSchemeComboBox.Items.AddRange(new object[] {resources.GetString("alternatingColorSchemeComboBox.Items"), resources.GetString("alternatingColorSchemeComboBox.Items1")});
             resources.ApplyResources(this.alternatingColorSchemeComboBox, "alternatingColorSchemeComboBox");
             this.alternatingColorSchemeComboBox.Name = "alternatingColorSchemeComboBox";
             this.alternatingColorSchemeComboBox.SelectedIndexChanged += new System.EventHandler(this.alternatingColorSchemeComboBox_SelectedIndexChanged);
@@ -172,32 +167,30 @@ namespace AglonaReader
             this.ShowInTaskbar = false;
             this.Shown += new System.EventHandler(this.SettingsForm_Shown);
             this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.SettingsForm_KeyPress);
-            ((System.ComponentModel.ISupportInitialize)(this.fontSizeTrackBar)).EndInit();
+            ((System.ComponentModel.ISupportInitialize) (this.fontSizeTrackBar)).EndInit();
             this.fontGroupBox.ResumeLayout(false);
             this.fontGroupBox.PerformLayout();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.brightnessBar)).EndInit();
+            ((System.ComponentModel.ISupportInitialize) (this.brightnessBar)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
-
         }
 
-        #endregion
-
+        private System.Windows.Forms.ComboBox alternatingColorSchemeComboBox;
+        private System.Windows.Forms.TrackBar brightnessBar;
+        private System.Windows.Forms.GroupBox fontGroupBox;
         private System.Windows.Forms.Label fontNameLabel;
         private System.Windows.Forms.ComboBox fontsComboBox;
         private System.Windows.Forms.TrackBar fontSizeTrackBar;
-        private System.Windows.Forms.GroupBox fontGroupBox;
-        private System.Windows.Forms.CheckBox highlightFirstWordsCheckBox;
         private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TrackBar brightnessBar;
+        private System.Windows.Forms.CheckBox highlightFirstWordsCheckBox;
         private System.Windows.Forms.CheckBox highlightFragmentsCheckBox;
-        private Label label2;
-        private ComboBox readingModeComboBox;
-        private Label label3;
-        private ComboBox alternatingColorSchemeComboBox;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.ComboBox readingModeComboBox;
 
+        #endregion
     }
 }
