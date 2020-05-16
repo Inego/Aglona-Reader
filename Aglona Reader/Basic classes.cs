@@ -690,7 +690,13 @@ namespace AglonaReader
         {
             WithAudio = newFileName.EndsWith(".pbs");
 
-            using (var reader = new XmlTextReader(newFileName))
+            var xmlReaderSettings = new XmlReaderSettings
+            {
+                IgnoreComments = true,
+                IgnoreWhitespace = true
+            };
+            
+            using (var reader = XmlReader.Create(newFileName, xmlReaderSettings))
             {
                 try
                 {
