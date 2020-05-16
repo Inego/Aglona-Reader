@@ -773,81 +773,73 @@ namespace AglonaReader
 
                 if (reader.Name == "p" && reader.NodeType == XmlNodeType.Element)
                 {
-                    if (!reader.MoveToNextAttribute()) return;
-
                     var p = new TextPair();
 
-                    if (reader.Name == "l")
+                    while (reader.MoveToNextAttribute())
                     {
-                        switch (reader.Value)
+                        switch (reader.Name)
                         {
-                            case "3":
-                                p.StartParagraph1 = true;
-                                p.StartParagraph2 = true;
+                            case "l":
+                                switch (reader.Value)
+                                {
+                                    case "1":
+                                        p.StartParagraph1 = true;
+                                        break;
+                                    case "2":
+                                        p.StartParagraph2 = true;
+                                        break;
+                                    case "3":
+                                        p.StartParagraph1 = true;
+                                        p.StartParagraph2 = true;
+                                        break;
+                                    case "4":
+                                        p.SetStructureLevel(1);
+                                        break;
+                                    case "5":
+                                        p.SetStructureLevel(2);
+                                        break;
+                                    case "6":
+                                        p.SetStructureLevel(3);
+                                        break;
+                                }
                                 break;
-                            case "1":
-                                p.StartParagraph1 = true;
+                            
+                            case "s":
+                                if (reader.Value.Length >= ParallelTextControl.BigTextSize)
+                                    p.Sb1 = new StringBuilder(reader.Value);
+                                else
+                                    p.Text1 = reader.Value;
+                                p.totalTextSize = reader.Value.Length;
                                 break;
-                            case "2":
-                                p.StartParagraph2 = true;
+                            
+                            case "t":
+                                if (reader.Value.Length >= ParallelTextControl.BigTextSize)
+                                    p.Sb2 = new StringBuilder(reader.Value);
+                                else
+                                    p.Text2 = reader.Value;
+                                p.totalTextSize += reader.Value.Length;
                                 break;
-                            case "4":
-                                p.SetStructureLevel(1);
+                            
+                            case "f":
+                                if (WithAudio)
+                                    p.AudioFileNumber = uint.Parse(reader.Value);
                                 break;
-                            case "5":
-                                p.SetStructureLevel(2);
+                            
+                            case "b":
+                                if (WithAudio)
+                                    p.TimeBeg = uint.Parse(reader.Value);
                                 break;
-                            case "6":
-                                p.SetStructureLevel(3);
+                            
+                            case "e":
+                                if (WithAudio)
+                                    p.TimeEnd = uint.Parse(reader.Value);
                                 break;
                         }
-
-                        if (!reader.MoveToNextAttribute()) return;
                     }
-
-                    if (reader.Name != "s") return;
-
-                    if (reader.Value.Length >= ParallelTextControl.BigTextSize)
-                        p.Sb1 = new StringBuilder(reader.Value);
-                    else
-                        p.Text1 = reader.Value;
-
-                    p.totalTextSize = reader.Value.Length;
-
-                    if (!reader.MoveToNextAttribute()) return;
-
-                    if (reader.Name != "t") return;
-
-                    if (reader.Value.Length >= ParallelTextControl.BigTextSize)
-                        p.Sb2 = new StringBuilder(reader.Value);
-                    else
-                        p.Text2 = reader.Value;
-
-                    if (WithAudio && reader.MoveToNextAttribute())
-                    {
-                        if (reader.Name != "f") return;
-
-                        p.AudioFileNumber = uint.Parse(reader.Value);
-
-                        if (!reader.MoveToNextAttribute()) return;
-
-                        if (reader.Name != "b") return;
-
-                        p.TimeBeg = uint.Parse(reader.Value);
-
-                        if (!reader.MoveToNextAttribute()) return;
-
-                        if (reader.Name != "e") return;
-
-                        p.TimeEnd = uint.Parse(reader.Value);
-                    }
-                    
-                    p.totalTextSize += reader.Value.Length;
 
                     TextPairs.Add(p);
 
                     goto NextPair;
-
                 }
 
                 reader.Close();
