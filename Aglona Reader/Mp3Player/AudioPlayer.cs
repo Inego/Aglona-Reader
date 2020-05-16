@@ -1,10 +1,10 @@
 ﻿using System;
-using NAudio.Wave;
 using System.IO;
+using NAudio.Wave;
 
 namespace AglonaReader.Mp3Player
 {
-    internal class AudioPlayer : IDisposable
+    internal sealed class AudioPlayer : IDisposable
         
     {
         private Mp3FileReader mp3Stream;
@@ -94,21 +94,20 @@ namespace AglonaReader.Mp3Player
         #region IDisposable Support
         private bool disposedValue; // To detect redundant calls
 
-        protected virtual void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
-            if (!disposedValue)
+            if (disposedValue) return;
+            
+            if (disposing)
             {
-                if (disposing)
-                {
-                    mWavePlayer.Dispose();
-                    mp3Stream.Dispose();
-                }
-
-                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
-                // TODO: set large fields to null.
-
-                disposedValue = true;
+                mWavePlayer.Dispose();
+                mp3Stream.Dispose();
             }
+
+            // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+            // TODO: set large fields to null.
+
+            disposedValue = true;
         }
 
         // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.

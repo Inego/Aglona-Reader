@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 
@@ -25,7 +25,7 @@ namespace AglonaReader
         public int X1 { get; set; }
         public int X2 { get; set; }
 
-        protected AbstractFrame(Collection<AbstractFrame> list)
+        protected AbstractFrame(ICollection<AbstractFrame> list)
         {
             list?.Add(this);
         }
@@ -56,20 +56,13 @@ namespace AglonaReader
 
     public class DoubleFrame
     {
-        public AbstractFrame F1 { get; set; }
-        public AbstractFrame F2 { get; set; }
+        public AbstractFrame F1 { get; }
+        public AbstractFrame F2 { get; }
 
-        public DoubleFrame(Pen pen, Collection<AbstractFrame> list)
+        public DoubleFrame(Pen pen, ICollection<AbstractFrame> list)
         {
             F1 = new Frame(pen, list) {Side = 1};
-
             F2 = new Frame(pen, list) {Side = 2};
-        }
-
-        public DoubleFrame(Brush brush, Collection<AbstractFrame> list)
-        {
-            F1 = new Background(brush, list) {Side = 1};
-            F2 = new Background(brush, list) {Side = 2};
         }
 
         public void SetPen(Pen pen)
@@ -77,7 +70,6 @@ namespace AglonaReader
             F1.framePen = pen;
             F2.framePen = pen;
         }
-
 
         internal AbstractFrame Frame(byte side)
         {
@@ -93,11 +85,11 @@ namespace AglonaReader
     }
 
 
-    public class Background : AbstractFrame, IDisposable
+    public abstract class Background : AbstractFrame, IDisposable
     {
-        public Brush BackgroundBrush { get; set; }
-        
-        public Background(Brush brush, Collection<AbstractFrame> list) : base(list)
+        public Brush BackgroundBrush { get; }
+
+        protected Background(Brush brush, ICollection<AbstractFrame> list) : base(list)
         {
             BackgroundBrush = brush;
         }
@@ -115,7 +107,7 @@ namespace AglonaReader
 
 
 
-    public class Frame : AbstractFrame, IDisposable
+    public sealed class Frame : AbstractFrame, IDisposable
     {
 
         public static Pen CreatePen(Color color, DashStyle dashStyle, float width)
@@ -127,7 +119,7 @@ namespace AglonaReader
             return result;
         }
 
-        public Frame(Pen pen, Collection<AbstractFrame> list) : base(list)
+        public Frame(Pen pen, ICollection<AbstractFrame> list) : base(list)
         {
             Visible = false;
             if (pen != null)
@@ -152,7 +144,7 @@ namespace AglonaReader
         }
         
         // The bulk of the clean-up code is implemented in Dispose(bool)
-        protected virtual void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (!disposing) return;
 

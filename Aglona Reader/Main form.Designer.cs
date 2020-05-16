@@ -360,7 +360,7 @@
             this.startpauseStopwatchToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F5;
             this.startpauseStopwatchToolStripMenuItem.Size = new System.Drawing.Size(220, 22);
             this.startpauseStopwatchToolStripMenuItem.Text = "Start/pause stopwatch";
-            this.startpauseStopwatchToolStripMenuItem.Click += new System.EventHandler(this.startpauseStopwatchToolStripMenuItem_Click);
+            this.startpauseStopwatchToolStripMenuItem.Click += new System.EventHandler(this.startPauseStopwatchToolStripMenuItem_Click);
             // 
             // resetStopwatchToolStripMenuItem
             // 

@@ -149,7 +149,7 @@
     <Compile Include="Main form.Designer.cs">
       <DependentUpon>Main form.cs</DependentUpon>
     </Compile>
-    <Compile Include="AudioPlayer.cs" />
+    <Compile Include="Mp3Player\AudioPlayer.cs" />
     <Compile Include="OpenRecentForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -164,7 +164,7 @@
     <Compile Include="ParallelTextControl.Designer.cs">
       <DependentUpon>ParallelTextControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="Settings.cs" />
+    <Compile Include="Properties\Settings.cs" />
     <Compile Include="SettingsForm.cs">
       <SubType>Form</SubType>
     </Compile>

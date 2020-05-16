@@ -74,10 +74,10 @@ namespace AglonaReader
 
                 var p = pTc[current];
 
+                // ReSharper disable once InvertIf
                 if (checkLeft && (p.Sb1 == null ? p.Text1 : p.Sb1.ToString()).Contains(textToFind)
                     || checkRight && (p.Sb2 == null ? p.Text2 : p.Sb2.ToString()).Contains(textToFind))
                 {
-
                     if (!pTc.EditMode || current > pTc.LastRenderedPair || current < pTc.CurrentPair)
                         mainForm.GotoPair(current, false, false, 1);
                     else
@@ -87,9 +87,7 @@ namespace AglonaReader
                     }
                     
                     return;
-
                 }
-
             }
 
         }

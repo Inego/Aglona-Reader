@@ -7,10 +7,13 @@ using System.Text;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 
 namespace AglonaReader
 {
+    [SuppressMessage("ReSharper", "ConvertIfStatementToSwitchStatement")]
     public partial class ParallelTextControl : UserControl
     {
         public float startingPercent;
@@ -368,10 +371,6 @@ namespace AglonaReader
             ComputeNumberOfScreenLines();
         }
 
-        /// <summary>
-        /// Calculates NumberOfScreenLines variable
-        /// </summary>
-        /// <param name="vSize">Vertical size of screen in pixels</param>
         private void ComputeNumberOfScreenLines()
         {
             NumberOfScreenLines = (Height - 2 * VMargin) / lineHeight;
@@ -731,7 +730,7 @@ namespace AglonaReader
         /// and runs them if that's the case
         /// </summary>
         /// <param name="startPair">Index of the start Pair</param>
-        /// <param name="limit">Number of lines</param>
+        /// <param name="requiredLines">Number of lines required to be shown</param>
         public void PrepareScreen(int startPair, int requiredLines)
         {
             if (PText.Number() == 0)
@@ -763,8 +762,6 @@ namespace AglonaReader
 
             var txtWidth = Width - 2 * PanelMargin;
 
-            TextPair p;
-
             // If the startPair is not starting from a new Line on both texts (i. e. it is not a true-true Pair)
             // then we must ensure that all of the preceding pairs starting from the previous true-true pairs are computed,
             // because we need to know where exactly in the Line our Pair starts on both sides.
@@ -777,7 +774,7 @@ namespace AglonaReader
 
         Upstairs2:
 
-            p = PText.TextPairs[cPair];
+            var p = PText.TextPairs[cPair];
 
             // Look for the closest true-true or partially computed Pair
             if (!p.StartParagraph(side) && p.Height == -1)
@@ -789,10 +786,6 @@ namespace AglonaReader
             var words = new Collection<CommonWordInfo>();
 
             var occLength = 0; // Occupied length in the current Line
-
-            int height;
-
-            TextPair prevPair = null;
 
             var lastFont = SelectObject(secondaryHdc, textFont.ToHfont());
 
@@ -808,7 +801,7 @@ namespace AglonaReader
                 requiredHeight = remainder;
             }
 
-            height = p.Height;
+            var height = p.Height;
 
             if (!p.AllLinesComputed(side))
             {
@@ -853,7 +846,7 @@ namespace AglonaReader
 
             cPair++;
 
-            prevPair = p;
+            var prevPair = p;
 
             p = PText.TextPairs[cPair];
 
@@ -926,10 +919,6 @@ namespace AglonaReader
 
             var occLength = 0; // Occupied length in the current Line
 
-            int height;
-
-            TextPair prevPair = null;
-
             var lastFont = SelectObject(secondaryHdc, textFont.ToHfont());
 
             byte side1;
@@ -947,7 +936,7 @@ namespace AglonaReader
             }
 
 
-        NextPair1:
+            NextPair1:
 
             if (cPair < startPair || requiredLines == -1)
                 requiredHeight = -1;
@@ -962,7 +951,7 @@ namespace AglonaReader
 
             }
 
-            height = p.Height;
+            var height = p.Height;
 
             if (!(p.AllLinesComputed1 && p.AllLinesComputed2))
             {
@@ -1013,7 +1002,7 @@ namespace AglonaReader
 
             cPair++;
 
-            prevPair = p;
+            var prevPair = p;
 
             p = PText.TextPairs[cPair];
 
@@ -1058,8 +1047,6 @@ namespace AglonaReader
 
             var remainder = requiredLines;
 
-            TextPair p;
-
             // If the startPair is not starting from a new Line on both texts (i. e. it is not a true-true Pair)
             // then we must ensure that all of the preceding pairs starting from the previous true-true pairs are computed,
             // because we need to know where exactly in the Line our Pair starts on both sides.
@@ -1070,7 +1057,7 @@ namespace AglonaReader
 
         Upstairs:
 
-            p = PText.TextPairs[cPair];
+            var p = PText.TextPairs[cPair];
 
             // Look for the closest true-true or partially computed Pair
             if (!(p.StartParagraph1 && p.StartParagraph2) && p.Height == -1)
@@ -1085,11 +1072,7 @@ namespace AglonaReader
             var occLength1 = 0; // Occupied length in the current Line
             var occLength2 = 0;
 
-            int height1;
-            int height2;
             int height;
-
-            TextPair prevPair = null;
 
             var width1 = (Reversed ? RightWidth : LeftWidth) - 2 * PanelMargin;
             var width2 = (Reversed ? LeftWidth : RightWidth) - 2 * PanelMargin;
@@ -1114,9 +1097,8 @@ namespace AglonaReader
 
             else
             {
-
-                height1 = p.Height;
-                height2 = p.Height;
+                var height1 = p.Height;
+                var height2 = p.Height;
 
                 if (p.Height == -1)
                     PText.ComputedPairs.Add(p);
@@ -1179,7 +1161,7 @@ namespace AglonaReader
 
             cPair++;
 
-            prevPair = p;
+            var prevPair = p;
 
             p = PText.TextPairs[cPair];
 
@@ -1310,23 +1292,17 @@ namespace AglonaReader
                 DrawBackground(side, renderedInfo.Line1, renderedInfo.X1, renderedInfo.Line2, renderedInfo.X2B, SecondaryBg.Graphics,
                     brushTable[pairIndex % numberOfColors]);
 
-            if (HighlightFirstWords
-                && !(big && HighlightFragments)
-                && list != null
-                && list.Count > 0
-                && first.X2 >= first.X1)
-            {
-                var wordRect = new Rectangle(offset + first.X1, VMargin + (cLine + first.Line) * lineHeight, first.X2 - first.X1 + 1, lineHeight);
+            if (!HighlightFirstWords || big && HighlightFragments || list.Count <= 0 ||
+                first.X2 < first.X1) return;
+            var wordRect = new Rectangle(offset + first.X1, VMargin + (cLine + first.Line) * lineHeight, first.X2 - first.X1 + 1, lineHeight);
 
-                using (var brush = new LinearGradientBrush(
-                    wordRect,
-                    big ? grayColor : darkColorTable[pairIndex % numberOfColors],
-                    HighlightFragments && !big ? lightColorTable[pairIndex % numberOfColors] : Color.White,
-                    LinearGradientMode.Horizontal))
+            using (var brush = new LinearGradientBrush(
+                wordRect,
+                big ? grayColor : darkColorTable[pairIndex % numberOfColors],
+                HighlightFragments && !big ? lightColorTable[pairIndex % numberOfColors] : Color.White,
+                LinearGradientMode.Horizontal))
 
-                    g.FillRectangle(brush, wordRect);
-
-            }
+                g.FillRectangle(brush, wordRect);
 
         }
 
@@ -1345,6 +1321,7 @@ namespace AglonaReader
 
             var p = PText[pairIndex];
 
+            // ReSharper disable once InvertIf
             if (layoutMode == LayoutModeAdvanced)
             {
                 if (Reversed)
@@ -1399,16 +1376,10 @@ namespace AglonaReader
                 switch (AlternatingColorScheme)
                 {
                     case FileUsageInfo.AlternatingColorSchemeGreenBlack:
-                        if (Reversed == (side == 2))
-                            newColor = 3;
-                        else
-                            newColor = 1;
+                        newColor = Reversed == (side == 2) ? 3 : 1;
                         break;
                     case FileUsageInfo.AlternatingColorSchemeBlackGreen:
-                        if (Reversed == (side == 2))
-                            newColor = 1;
-                        else
-                            newColor = 3;
+                        newColor = Reversed == (side == 2) ? 1 : 3;
                         break;
                     default:
                         newColor = 1;
@@ -1513,19 +1484,14 @@ namespace AglonaReader
         private static extern int SetBkMode(IntPtr hdc, int iBkMode);
 
         [DllImport("gdi32.dll")]
+        // ReSharper disable once IdentifierTypo
         private static extern IntPtr SelectObject(IntPtr hdc, IntPtr hgdiobj);
 
         [DllImport("gdi32.dll")]
         private static extern bool DeleteObject(IntPtr objectHandle);
 
-        /// <summary>
-        /// Renders a newSide
-        /// </summary>
-        /// <param name="newSide">Number of newSide in SCREEN terms, not in Pair terms</param>
         private void RenderPairText(byte side, int startPair, int negHeight)
         {
-            var g = SecondaryBg.Graphics;
-
             DefineVarsByLayoutMode(side, out var offset, out var textSide);
 
             var cPair = startPair;
@@ -1575,13 +1541,11 @@ namespace AglonaReader
             if (PText.Number() == 0)
                 return;
 
-            TextPair p;
-
             var negHeight = 0;
 
             var startPair = CurrentPair;
 
-            p = PText.TextPairs[startPair];
+            var p = PText.TextPairs[startPair];
 
             FirstRenderedPair = -1;
             LastRenderedPair = -1;
@@ -1716,30 +1680,18 @@ namespace AglonaReader
                     else
                         offset = SplitterPosition + SplitterWidth + PanelMargin;
 
-                    if (Reversed == (side == 1))
-                        textSide = 2;
-                    else
-                        textSide = 1;
+                    textSide = Reversed == (side == 1) ? (byte) 2 : (byte) 1;
 
                     break;
 
                 case LayoutModeAlternating:
-
-                    if (Reversed == (side == 1))
-                        textSide = 1;
-                    else
-                        textSide = 2;
-
+                    textSide = Reversed == (side == 1) ? (byte) 1 : (byte) 2;
                     offset = PanelMargin;
-
                     break;
 
                 case LayoutModeAdvanced:
-
                     offset = PanelMargin;
-
                     textSide = (byte)side;
-
                     break;
 
                 default:
@@ -1822,9 +1774,7 @@ namespace AglonaReader
 
             // Current Word complete, let's get its length
 
-            int wordLength;
-
-            wordLength = WordWidth(word.ToString());
+            var wordLength = WordWidth(word.ToString());
 
             var newStart = occLength + (words.Count == 0 || eastern && words.Count > 0 && words[words.Count - 1].Eastern ? 0 : SpaceLength);
 
@@ -1857,7 +1807,6 @@ namespace AglonaReader
                 return;
 
             int pos;
-            int wordPos;
 
             if (height == -1)
             {
@@ -1892,9 +1841,7 @@ namespace AglonaReader
                 
             }
 
-            wordPos = -1;
-
-            char c;
+            var wordPos = -1;
 
             var word = new StringBuilder();
 
@@ -1903,11 +1850,10 @@ namespace AglonaReader
             while (pos < textLength)
             {
                 // Must be slow
-                c = p.GetChar(side, pos);
+                var c = p.GetChar(side, pos);
 
                 if (c == ' ' || c == '\t' || c == '\r')
                 {
-
                     if (word.Length == 0)
                     {
                         pos++;
@@ -1950,8 +1896,6 @@ namespace AglonaReader
                             p.continueFromNewLine2 = true;
                         goto CommonExit;
                     }
-
-
                 }
 
                 else if (IsEasternCharacter(c))
@@ -1986,7 +1930,6 @@ namespace AglonaReader
                 }
 
                 pos++;
-
             }
 
             // Reached the end, process current Word (if there is any)
@@ -2015,7 +1958,6 @@ namespace AglonaReader
             {
                 p.CurrentPos2 = wordPos;
             }
-
         }
 
         private static bool IsEasternCharacter(char c)
@@ -2032,23 +1974,16 @@ namespace AglonaReader
             UpdateScreen();
         }
 
-        private ScreenWord FindScreenWordByPosition(int pairIndex, int pos, byte side)
-        {
-            if (pos != -1)
-                foreach (var kv in wordsOnScreen)
-                    foreach (var sw in kv.Value)
-                        if (sw.PairIndex == pairIndex && sw.Pos == pos && sw.Side == side)
-                            return sw;
-
-            return null;
-
-        }
+        private ScreenWord FindScreenWordByPosition(int pairIndex, int pos, byte side) =>
+            pos == -1
+                ? null
+                : wordsOnScreen.SelectMany(kv => kv.Value)
+                    .FirstOrDefault(sw => sw.PairIndex == pairIndex && sw.Pos == pos && sw.Side == side);
 
         private bool PosIsOnOrAfterLastScreenWord(int pairIndex, int pos1, int pos2)
         {
             var lastPos1 = -1;
             var lastPos2 = -1;
-
 
             foreach (var kv in wordsOnScreen)
                 foreach (var sw in kv.Value)
@@ -2069,7 +2004,6 @@ namespace AglonaReader
                     }
 
             return pos1 > lastPos1 || pos2 > lastPos2;
-
         }
 
 
@@ -2077,7 +2011,7 @@ namespace AglonaReader
         {
             var f = (Frame)NippingFrame.Frame(side);
 
-            if (sw == null || sw.Prev == null)
+            if (sw?.Prev == null)
                 f.Visible = false;
             else
             {
@@ -2157,12 +2091,10 @@ namespace AglonaReader
 
             var j = HighlightedPair;
 
-            TextPair q;
-
             while (j < PText.Number() - 1)
             {
                 j++;
-                q = PText[j];
+                var q = PText[j];
                 if (q.StartParagraph1 && q.StartParagraph2)
                     break;
                 q.ClearComputedWords();
@@ -2207,7 +2139,6 @@ namespace AglonaReader
         //
         public void ResetStopwatch(int mode)
         {
-
             var whatToDo = mode == 0 ? stopWatch.IsRunning ? 1 : 2 : mode;
 
             stopwatchStarted = true;
@@ -2226,12 +2157,11 @@ namespace AglonaReader
         }
 
 
-
         private void NipASide(TextPair sourcePair, TextPair targetPair, byte side)
         {
             int finalPos;
 
-            StringBuilder sourceSb = null;
+            StringBuilder sourceSb;
 
             if (side == 1)
             {
@@ -2258,13 +2188,12 @@ namespace AglonaReader
             var sb = new StringBuilder();
 
             var state = 0;
-            char c;
 
             var pos = 0;
 
             while (pos < finalPos)
             {
-                c = sourceSb[pos];
+                var c = sourceSb[pos];
 
                 switch (c)
                 {
@@ -2313,18 +2242,17 @@ namespace AglonaReader
 
             sourceSb.Remove(0, finalPos);
 
-            if (sourceSb.Length < BigTextSize)
+            if (sourceSb.Length >= BigTextSize) return;
+            
+            if (side == 1)
             {
-                if (side == 1)
-                {
-                    sourcePair.Text1 = sourceSb.ToString();
-                    sourcePair.Sb1 = null;
-                }
-                else
-                {
-                    sourcePair.Text2 = sourceSb.ToString();
-                    sourcePair.Sb2 = null;
-                }
+                sourcePair.Text1 = sourceSb.ToString();
+                sourcePair.Sb1 = null;
+            }
+            else
+            {
+                sourcePair.Text2 = sourceSb.ToString();
+                sourcePair.Sb2 = null;
             }
 
         }
@@ -2475,22 +2403,19 @@ namespace AglonaReader
 
             var j = pairIndex;
 
-            TextPair q;
-
             while (j < PText.Number() - 1)
             {
                 j++;
-                q = PText.TextPairs[j];
+                var q = PText.TextPairs[j];
                 if (q.StartParagraph1 && q.StartParagraph2)
                     break;
                 q.ClearComputedWords();
             }
 
-            if (forceUpdate)
-            {
-                FindFirstNaturalDividers();
-                UpdateScreen();
-            }
+            if (!forceUpdate) return;
+            
+            FindFirstNaturalDividers();
+            UpdateScreen();
         }
 
         public void UpdateScreen()
@@ -2516,17 +2441,14 @@ namespace AglonaReader
 
             ScreenWord lastWord = null;
 
-            if (wordsOnScreen.TryGetValue(GetLineNumberAtPosition(y), out var listOfWords))
+            if (!wordsOnScreen.TryGetValue(GetLineNumberAtPosition(y), out var listOfWords)) return null;
+            
+            foreach (var s in listOfWords)
             {
-                // let's see...
-
-                foreach (var s in listOfWords)
-                {
-                    if (side != -1 && s.Side != side)
-                        continue;
-                    if (x >= s.X1 && (lastWord == null || lastWord.X1 < s.X1))
-                        lastWord = s;
-                }
+                if (side != -1 && s.Side != side)
+                    continue;
+                if (x >= s.X1 && (lastWord == null || lastWord.X1 < s.X1))
+                    lastWord = s;
             }
 
             return lastWord;
@@ -2591,7 +2513,6 @@ namespace AglonaReader
 
                                 if (r.Valid)
                                 {
-
                                     advancedHighlightFrame.Visible = true;
                                     advancedHighlightFrame.Side = mouseTextWord.Side;
                                     advancedHighlightFrame.Line1 = r.Line1;
@@ -2678,23 +2599,10 @@ namespace AglonaReader
 
             // h: height
 
-            int h1;
-            int up;
-            int down;
+            var up = r.Line1 == -1 ? 0 : r.Line1;
+            var down = r.Line2 == -1 ? 0 : LastFullScreenLine - r.Line2;
 
-
-            if (r.Line1 == -1)
-                up = 0;
-            else
-                up = r.Line1;
-
-            if (r.Line2 == -1)
-                down = 0;
-            else
-                down = LastFullScreenLine - r.Line2;
-
-            h1 = r.Line1 == -1 || r.Line2 == -1 ? LastFullScreenLine + 1 : r.Line2 - r.Line1 + 1;
-
+            var h1 = r.Line1 == -1 || r.Line2 == -1 ? LastFullScreenLine + 1 : r.Line2 - r.Line1 + 1;
             var h2 = last.Line + 1;
 
             // s: single
@@ -2788,45 +2696,40 @@ namespace AglonaReader
                 editPairForm.SetFocusNewPair();
             editPairForm.ShowDialog();
 
-            if (editPairForm.Result)
+            if (!editPairForm.Result) return false;
+            
+            if (pairIndex == 0)
             {
-                if (pairIndex == 0)
-                {
-                    PText[pairIndex].StartParagraph1 = true;
-                    PText[pairIndex].StartParagraph2 = true;
-                }
-
-
-                if (PText[pairIndex].StructureLevel > 0
-                    && pairIndex < PText.Number() - 1
-                    && !(PText[pairIndex + 1].StartParagraph1 && PText[pairIndex + 1].StartParagraph2))
-                {
-                    PText[pairIndex + 1].StartParagraph1 = true;
-                    PText[pairIndex + 1].StartParagraph2 = true;
-                    PairChanged(pairIndex + 1, false);
-                }
-                PairChanged(pairIndex, true);
-                PText[pairIndex].UpdateTotalSize();
-                PText.UpdateAggregates(pairIndex);
-                Modified = true;
-                return true;
+                PText[pairIndex].StartParagraph1 = true;
+                PText[pairIndex].StartParagraph2 = true;
             }
 
-            return false;
+            if (PText[pairIndex].StructureLevel > 0
+                && pairIndex < PText.Number() - 1
+                && !(PText[pairIndex + 1].StartParagraph1 && PText[pairIndex + 1].StartParagraph2))
+            {
+                PText[pairIndex + 1].StartParagraph1 = true;
+                PText[pairIndex + 1].StartParagraph2 = true;
+                PairChanged(pairIndex + 1, false);
+            }
+            PairChanged(pairIndex, true);
+            PText[pairIndex].UpdateTotalSize();
+            PText.UpdateAggregates(pairIndex);
+            Modified = true;
+            return true;
+
         }
 
         private void PrepareEditForm()
         {
-            if (editPairForm == null)
-            {
-                editPairForm = new EditPairForm();
+            if (editPairForm != null) return;
+            
+            editPairForm = new EditPairForm();
 
-                var parentForm = FindForm();
+            var parentForm = FindForm();
 
-                editPairForm.Left = parentForm.Left + (parentForm.Width - editPairForm.Width) / 2;
-                editPairForm.Top = parentForm.Top + (parentForm.Height - editPairForm.Height) / 2;
-
-            }
+            editPairForm.Left = parentForm.Left + (parentForm.Width - editPairForm.Width) / 2;
+            editPairForm.Top = parentForm.Top + (parentForm.Height - editPairForm.Height) / 2;
         }
 
         internal bool WesternJoint(int firstPair, byte side)
@@ -3029,12 +2932,8 @@ namespace AglonaReader
 
         internal ScreenWord FindFirstScreenWord(int pairIndex, byte side)
         {
-            foreach (var kv in wordsOnScreen)
-                    foreach (var sw in kv.Value)
-                        if (sw.PairIndex == pairIndex && sw.Side == side)
-                            return sw;
-
-            return null;
+            return wordsOnScreen.SelectMany(kv => kv.Value)
+                .FirstOrDefault(sw => sw.PairIndex == pairIndex && sw.Side == side);
         }
 
         internal ScreenWord FindLastScreenWord(int pairIndex, byte side)
@@ -3053,10 +2952,7 @@ namespace AglonaReader
 
         internal bool NextRecommended(byte side, bool forward)
         {
-
-            int divPos;
-
-            divPos = side == 1 ? NaturalDividerPosition1 : NaturalDividerPosition2;
+            var divPos = side == 1 ? NaturalDividerPosition1 : NaturalDividerPosition2;
 
             var newPos = PText[HighlightedPair].NaturalDividerPosition(side, divPos, forward);
 

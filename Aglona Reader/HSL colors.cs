@@ -9,11 +9,11 @@ namespace AglonaReader
 
     public struct ColorRgb
     {
-        public byte Red { get; set; }
-        public byte Green { get; set; }
-        public byte Blue { get; set; }
-       
-        public ColorRgb(Color value) : this()
+        private byte Red { get; set; }
+        private byte Green { get; set; }
+        private byte Blue { get; set; }
+
+        private ColorRgb(Color value) : this()
         {
             
             Red = value.R;
@@ -36,29 +36,22 @@ namespace AglonaReader
         // Returns a Color (RGB struct) in range of 0-255
         public static ColorRgb Hsl2Rgb(double hue, double saturation, double lighting)
         {
-            double v;
-            double r, g, b;
-
-            r = lighting;   // default to gray
-            g = lighting;
-            b = lighting;
-            v = lighting <= 0.5 ? lighting * (1.0 + saturation) : lighting + saturation - lighting * saturation;
+            var r = lighting;
+            var g = lighting;
+            var b = lighting;
+            
+            var v = lighting <= 0.5 ? lighting * (1.0 + saturation) : lighting + saturation - lighting * saturation;
             
             if (v > 0)
             {
-                double m;
-                double sv;
-                int sextant;
-                double fract, vsf, mid1, mid2;
-
-                m = lighting + lighting - v;
-                sv = (v - m) / v;
+                var m = lighting + lighting - v;
+                var sv = (v - m) / v;
                 hue *= 6.0;
-                sextant = (int)hue;
-                fract = hue - sextant;
-                vsf = v * sv * fract;
-                mid1 = m + vsf;
-                mid2 = v - vsf;
+                var sextant = (int)hue;
+                var fraction = hue - sextant;
+                var vsf = v * sv * fraction;
+                var mid1 = m + vsf;
+                var mid2 = v - vsf;
                 switch (sextant)
                 {
                     case 0:
@@ -95,12 +88,13 @@ namespace AglonaReader
             }
 
 
-            var rgb = new ColorRgb();
-            
-            rgb.Red = Convert.ToByte(r * 255.0f);
-            rgb.Green = Convert.ToByte(g * 255.0f);
-            rgb.Blue = Convert.ToByte(b * 255.0f);
-            
+            var rgb = new ColorRgb
+            {
+                Red = Convert.ToByte(r * 255.0f),
+                Green = Convert.ToByte(g * 255.0f),
+                Blue = Convert.ToByte(b * 255.0f)
+            };
+
             return rgb;
         }
     }

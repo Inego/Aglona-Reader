@@ -4,14 +4,16 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.Text;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
-using AglonaReader.Mp3Player;
 using System.Text.RegularExpressions;
+using AglonaReader.Mp3Player;
 
 namespace AglonaReader
 {
     
+    [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
     internal partial class MainForm : Form
     {
         private const string DefaultTranslationSourceLanguage = "auto";
@@ -50,10 +52,7 @@ namespace AglonaReader
 
         protected override bool ProcessDialogKey(Keys keyData)
         {
-            if (keyData == (Keys.Alt | Keys.RButton | Keys.ShiftKey))
-                return true;
-            
-            return base.ProcessDialogKey(keyData);
+            return keyData == (Keys.Alt | Keys.RButton | Keys.ShiftKey) || base.ProcessDialogKey(keyData);
         }
 
         private void pTC_MouseWheel(object sender, MouseEventArgs e)
@@ -69,7 +68,7 @@ namespace AglonaReader
         {
             InitializeComponent();
 
-            pTC.MouseWheel += new MouseEventHandler(pTC_MouseWheel);
+            pTC.MouseWheel += pTC_MouseWheel;
 
             opState = 0;
             ctrlPressed = false;
@@ -86,44 +85,41 @@ namespace AglonaReader
         {
             var currentTime = player.CurrentTime;
 
-            if (currentTime >= nextTime || !player.Playing)
+            if (player.Playing && currentTime < nextTime) return;
+            
+            if (nextPairToPlay == -1)
             {
-
-                if (nextPairToPlay == -1)
-                {
-                    playbackTimer.Enabled = false;
-                    StopPlayback();
-                    return;
-                }
-                
-                // Update selection
-
-                if (pTC[nextPairToPlay].AudioFileNumber != currentAudioFileNumber)
-                {
-                    playbackTimer.Enabled = false;
-                    pTC.HighlightedPair = nextPairToPlay - 1;
-                    StartPlayback(true);
-                    return;
-                }
-
-                pTC.HighlightedPair = nextPairToPlay;
-
-                DetermineNextTime();
-
-                if (pTC.NotFitOnScreen(pTC.HighlightedPair))
-                {
-                    pTC.CurrentPair = pTC.HighlightedPair;
-                    pTC.PrepareScreen();
-                    pTC.RenderPairs(false);
-                }
-
-                pTC.UpdateFramesOnScreen(0);
-
-                pTC.Render();
-
-                UpdateStatusBar(true);
-                
+                playbackTimer.Enabled = false;
+                StopPlayback();
+                return;
             }
+                
+            // Update selection
+
+            if (pTC[nextPairToPlay].AudioFileNumber != currentAudioFileNumber)
+            {
+                playbackTimer.Enabled = false;
+                pTC.HighlightedPair = nextPairToPlay - 1;
+                StartPlayback(true);
+                return;
+            }
+
+            pTC.HighlightedPair = nextPairToPlay;
+
+            DetermineNextTime();
+
+            if (pTC.NotFitOnScreen(pTC.HighlightedPair))
+            {
+                pTC.CurrentPair = pTC.HighlightedPair;
+                pTC.PrepareScreen();
+                pTC.RenderPairs(false);
+            }
+
+            pTC.UpdateFramesOnScreen(0);
+
+            pTC.Render();
+
+            UpdateStatusBar(true);
         }
 
         private void DetermineNextTime()
@@ -142,6 +138,7 @@ namespace AglonaReader
                     nextPairToPlay = i;
                     break;
                 }
+                // ReSharper disable once InvertIf
                 if (pTC[i].TimeBeg != 0)
                 {
                     nextTime = pTC[i].TimeBeg - TimerHalfInterval;
@@ -178,16 +175,15 @@ namespace AglonaReader
             
             var hp = pTC.Hp;
 
-            if (SetFileToAudioPlayer(hp.AudioFileNumber))
-            {
-                DetermineNextTime();
-                player.PlayFromTo(hp.TimeBeg, 0);
-                playbackTimer.Enabled = true;
-            }
+            if (!SetFileToAudioPlayer(hp.AudioFileNumber)) return;
+            
+            DetermineNextTime();
+            player.PlayFromTo(hp.TimeBeg, 0);
+            playbackTimer.Enabled = true;
 
         }
 
-        // Stops both single and countinuous playback
+        // Stops both single and continuous playback
         private void StopPlayback()
         {
             playbackTimer.Enabled = false;
@@ -379,7 +375,6 @@ namespace AglonaReader
                 Cursor = Cursors.VSplit;
             else if (pTC.MousePressed && pTC.EditMode)
             {
-
                 if (!startedXMoving)
                 {
                     var distanceY = pTC.verticalStartingPosition - e.Y;
@@ -401,12 +396,9 @@ namespace AglonaReader
 
                     if (distance != prevHorizontalDistance)
                     {
-
                         Cursor = Cursors.SizeWE;
 
                         startedXMoving = true;
-
-                        var p = pTC.Hp;
 
                         var forward = distance > prevHorizontalDistance;
 
@@ -514,8 +506,6 @@ namespace AglonaReader
 
                 pTC.horizontalStartingPosition = e.X;
                 pTC.verticalStartingPosition = e.Y;
-
-                var p = pTC.Hp;
 
                 startedXMoving = false;
                 startedYMoving = false;
@@ -770,6 +760,7 @@ namespace AglonaReader
             pTC.ProcessLayoutChange();
         }
 
+        [SuppressMessage("ReSharper", "ConvertIfStatementToSwitchStatement")]
         private void pTC_KeyDown(object sender, KeyEventArgs e)
         {
             if ((e.KeyData & Keys.ControlKey) == Keys.ControlKey)
@@ -884,12 +875,11 @@ namespace AglonaReader
 
             else if (e.KeyData == Keys.Escape)
             {
-                if (!pTC.EditMode && pTC.SelectionSide != 0)
-                {
-                    pTC.SelectionSide = 0;
-                    pTC.UpdateSelectionFrame();
-                    pTC.Render();
-                }
+                if (pTC.EditMode || pTC.SelectionSide == 0) return;
+                
+                pTC.SelectionSide = 0;
+                pTC.UpdateSelectionFrame();
+                pTC.Render();
             }
 
             else if (!pTC.EditMode && e.KeyData == (Keys.Control | Keys.C))
@@ -1029,7 +1019,7 @@ namespace AglonaReader
                 while (true)
                 {
                     if (currentPair > y1)
-                        // Insert space or linebreak, depending on Startparagraph
+                        // Insert space or linebreak, depending on StartParagraph
                         if (pTC[currentPair].StartParagraph(pTC.SelectionSide))
                             selectedText.Append("\r\n");
                         else if (pTC.WesternJoint(currentPair - 1, pTC.SelectionSide))
@@ -1166,7 +1156,7 @@ namespace AglonaReader
                 return;
             }
 
-            ssPosition.Text = (pTC.HighlightedPair + 1).ToString() + " / " + pTC.Number;
+            ssPosition.Text = $"{pTC.HighlightedPair + 1} / {pTC.Number}";
 
             var totalVolume = pTC[pTC.Number - 1].aggregateSize;
 
@@ -1175,9 +1165,7 @@ namespace AglonaReader
 
             else
             {
-                int prevVolume;
-
-                prevVolume = pTC.HighlightedPair == 0 ? 0 : pTC[pTC.HighlightedPair - 1].aggregateSize;
+                var prevVolume = pTC.HighlightedPair == 0 ? 0 : pTC[pTC.HighlightedPair - 1].aggregateSize;
 
                 var s = ((float)prevVolume / totalVolume).ToString("P3");
 
@@ -1194,7 +1182,7 @@ namespace AglonaReader
                             // Let's count speed
                             var elapsed = pTC.stopWatch.ElapsedMilliseconds;
 
-                            s += "  " + ((long)((double)(pTC.Number - pTC.startingNumberOfFrags) * 3600000 / elapsed)).ToString() + " f/hr";
+                            s += $"  {(long) ((double) (pTC.Number - pTC.startingNumberOfFrags) * 3600000 / elapsed)} f/hr";
 
                             // current top percent
 
@@ -1302,8 +1290,6 @@ namespace AglonaReader
 
             if (pTC.EditMode || pTC.WithAudio())
             {
-                var prevP = pTC.Hp;
-
                 pTC.HighlightedPair--;
 
                 if (pTC.EditMode)
@@ -1393,12 +1379,13 @@ namespace AglonaReader
 
                 UpdateStatusBar(true);
 
-                if (pTC.WithAudio())
-                    if (withPlayback)
-                        PlayCurrentPhrase();
-                    else
-                        StopPlayback();
-    
+                if (!pTC.WithAudio()) return;
+                
+                if (withPlayback)
+                    PlayCurrentPhrase();
+                else
+                    StopPlayback();
+
             }
             else
             {
@@ -1418,8 +1405,6 @@ namespace AglonaReader
         {
             if (!pTC.EditMode)
                 return;
-
-            var p = pTC.Hp;
 
             byte side;
 
@@ -1556,12 +1541,12 @@ namespace AglonaReader
             }
         }
 
-        private bool LoadFromFile(string fileName)
+        private void LoadFromFile(string fileName)
         {
             pTC.PText = new ParallelText();
             pTC.mouseTextLine = -1;
 
-            var result = pTC.PText.Load(fileName);
+            pTC.PText.Load(fileName);
 
             ctrlPressed = false;
 
@@ -1590,13 +1575,10 @@ namespace AglonaReader
 
             UpdateWindowTitle();
 
-            if (webBrowser.Url != null)
-            {
-                webBrowser.Navigate(GetGoogleTranslateUrl());
-                webBrowser.Refresh();
-            }
-
-            return result;
+            if (webBrowser.Url == null) return;
+            
+            webBrowser.Navigate(GetGoogleTranslateUrl());
+            webBrowser.Refresh();
         }
 
         private void SaveAppSettings()
@@ -1775,19 +1757,18 @@ namespace AglonaReader
 
         private void SetGoogleTranslatorEnabled(bool enabled)
         {
-            if (googleTranslatorEnabled != enabled)
-            {
-                googleTranslatorEnabled = enabled;
-                splitContainer.Panel2Collapsed = !enabled;
+            if (googleTranslatorEnabled == enabled) return;
+            
+            googleTranslatorEnabled = enabled;
+            splitContainer.Panel2Collapsed = !enabled;
 
-                pTC.ResizeBufferedGraphic();
-                pTC.SetSplitterPositionByRatio();
-                Recompute();
+            pTC.ResizeBufferedGraphic();
+            pTC.SetSplitterPositionByRatio();
+            Recompute();
                 
-                if (enabled)
-                {
-                    webBrowser.Navigate(GetGoogleTranslateUrl());
-                }
+            if (enabled)
+            {
+                webBrowser.Navigate(GetGoogleTranslateUrl());
             }
         }
 
@@ -1844,6 +1825,7 @@ namespace AglonaReader
 
         private void VScrollBar_Scroll(object sender, ScrollEventArgs e)
         {
+            // ReSharper disable once ConvertIfStatementToSwitchStatement
             if (e.Type == ScrollEventType.LargeDecrement)
                 ProcessPageUp();
             else if (e.Type == ScrollEventType.LargeIncrement)
@@ -1877,7 +1859,7 @@ namespace AglonaReader
             findForm.ShowDialog();
         }
 
-        private void startpauseStopwatchToolStripMenuItem_Click(object sender, EventArgs e)
+        private void startPauseStopwatchToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (!pTC.EditMode)
                 return;
@@ -1954,7 +1936,7 @@ namespace AglonaReader
             OpenSite("https://sites.google.com/site/aglonareader/");
         }
 
-        private void OpenSite(string p)
+        private static void OpenSite(string p)
         {
             Process.Start(p);
         }
@@ -2075,7 +2057,7 @@ namespace AglonaReader
             splitContainer.SplitterDistance = newSplitterDistance;
         }
 
-        private string GetGoogleTranslateUrl()
+        private static string GetGoogleTranslateUrl()
         {
             return "https://translate.google.ca/";
         }
@@ -2115,7 +2097,7 @@ namespace AglonaReader
         public float WindowSplitterDistance { get; set; }
         public bool SplitScreenVertically { get; set; }
 
-        public Collection<FileUsageInfo> FileUsages { get; set; }
+        public Collection<FileUsageInfo> FileUsages { get; }
 
         public AppSettings()
         {
@@ -2128,7 +2110,5 @@ namespace AglonaReader
             WindowSplitterDistance = 0.66f;
             SplitScreenVertically = true;
         }
-
     }
-
 }
