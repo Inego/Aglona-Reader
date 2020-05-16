@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
@@ -621,9 +622,10 @@ namespace AglonaReader
 
         public void Save(string newFileName)
         {
+            var whitespace = Environment.NewLine;
+            
             using (var writer = new XmlTextWriter(newFileName, Encoding.UTF8))
             {
-
                 writer.WriteStartElement("ParallelBook");
 
                 writer.WriteAttributeString("lang1", Lang1);
@@ -637,6 +639,8 @@ namespace AglonaReader
                 writer.WriteAttributeString("info2", Info2);
 
                 writer.WriteAttributeString("info", Info);
+                
+                writer.WriteWhitespace(whitespace);
 
                 foreach (var p in TextPairs)
                 {
@@ -676,6 +680,8 @@ namespace AglonaReader
                     }
                     
                     writer.WriteEndElement();
+                    
+                    writer.WriteWhitespace(whitespace);
                 }
 
                 writer.WriteEndElement();

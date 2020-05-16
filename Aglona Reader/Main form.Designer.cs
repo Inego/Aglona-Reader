@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Drawing.StringFormat stringFormat1 = new System.Drawing.StringFormat();
             AglonaReader.ParallelText parallelText1 = new AglonaReader.ParallelText();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.mainMenu = new System.Windows.Forms.MenuStrip();
@@ -536,11 +535,6 @@
             this.pTC.EditMode = false;
             this.pTC.EditWhenNipped = false;
             this.pTC.FirstRenderedPair = 0;
-            stringFormat1.Alignment = System.Drawing.StringAlignment.Near;
-            stringFormat1.FormatFlags = ((System.Drawing.StringFormatFlags) (((System.Drawing.StringFormatFlags.FitBlackBox | System.Drawing.StringFormatFlags.LineLimit) | System.Drawing.StringFormatFlags.NoClip)));
-            stringFormat1.HotkeyPrefix = System.Drawing.Text.HotkeyPrefix.None;
-            stringFormat1.LineAlignment = System.Drawing.StringAlignment.Near;
-            stringFormat1.Trimming = System.Drawing.StringTrimming.None;
             this.pTC.HighlightedPair = 0;
             this.pTC.HighlightFirstWords = true;
             this.pTC.HighlightFragments = true;

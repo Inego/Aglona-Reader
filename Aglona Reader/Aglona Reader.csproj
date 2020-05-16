@@ -98,6 +98,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AboutForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AboutForm.Designer.cs">
+      <DependentUpon>AboutForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Basic classes.cs" />
     <Compile Include="BookInfoForm.cs">
       <SubType>Form</SubType>
@@ -110,12 +116,6 @@
     </Compile>
     <Compile Include="BookStructureForm.Designer.cs">
       <DependentUpon>BookStructureForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="AboutForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="AboutForm.Designer.cs">
-      <DependentUpon>AboutForm.cs</DependentUpon>
     </Compile>
     <Compile Include="ExportHTMLForm.cs">
       <SubType>Form</SubType>
@@ -171,14 +171,14 @@
     <Compile Include="SettingsForm.Designer.cs">
       <DependentUpon>SettingsForm.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="AboutForm.resx">
+      <DependentUpon>AboutForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="BookInfoForm.resx">
       <DependentUpon>BookInfoForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="BookStructureForm.resx">
       <DependentUpon>BookStructureForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="AboutForm.resx">
-      <DependentUpon>AboutForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="EditPairForm.resx">
       <DependentUpon>EditPairForm.cs</DependentUpon>
@@ -254,9 +254,6 @@
   </ItemGroup>
   <ItemGroup>
     <CodeAnalysisDictionary Include="CustomDictionary.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="NAudio" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NAudio\NAudio.csproj">
