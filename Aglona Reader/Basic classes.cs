@@ -47,8 +47,8 @@ namespace AglonaReader
         public string Text2 { get; set; }
 
         // Used if texts are large (typically in aligning mode for the "big block")
-        public StringBuilder SB1 { get; set; }
-        public StringBuilder SB2 { get; set; }
+        public StringBuilder Sb1 { get; set; }
+        public StringBuilder Sb2 { get; set; }
 
         /// <summary>
         /// Indicates that Text1 begins a paragraph
@@ -66,25 +66,25 @@ namespace AglonaReader
         public string Substring(byte side, int startPosition, int length)
         {
             if (side == 1)
-                if (SB1 == null)
+                if (Sb1 == null)
                     return Text1.Substring(startPosition, length);
                 else
-                    return SB1.ToString(startPosition, length);
-            if (SB2 == null)
+                    return Sb1.ToString(startPosition, length);
+            if (Sb2 == null)
                 return Text2.Substring(startPosition, length);
-            return SB2.ToString(startPosition, length);
+            return Sb2.ToString(startPosition, length);
         }
 
         public string Substring(byte side, int startPosition)
         {
             if (side == 1)
-                if (SB1 == null)
+                if (Sb1 == null)
                     return Text1.Substring(startPosition);
                 else
-                    return SB1.ToString(startPosition, SB1.Length - startPosition);
-            if (SB2 == null)
+                    return Sb1.ToString(startPosition, Sb1.Length - startPosition);
+            if (Sb2 == null)
                 return Text2.Substring(startPosition);
-            return SB2.ToString(startPosition, SB2.Length - startPosition);
+            return Sb2.ToString(startPosition, Sb2.Length - startPosition);
         }
 
         public RenderedTextInfo RenderedInfo(byte side)
@@ -94,7 +94,7 @@ namespace AglonaReader
 
         public bool IsBig()
         {
-            return SB1 != null || SB2 != null;
+            return Sb1 != null || Sb2 != null;
         }
 
         public byte StructureLevel { get; set; }
@@ -138,19 +138,19 @@ namespace AglonaReader
 
         private Collection<WordInfo> computedWords1;
         private Collection<WordInfo> computedWords2;
-        public bool ContinueFromNewLine1;
-        public bool ContinueFromNewLine2;
+        public bool continueFromNewLine1;
+        public bool continueFromNewLine2;
 
         public char GetChar(byte side, int charIndex)
         {
             if (side == 1)
-                if (SB1 == null)
+                if (Sb1 == null)
                     return Text1[charIndex];
                 else
-                    return SB1[charIndex];
-            if (SB2 == null)
+                    return Sb1[charIndex];
+            if (Sb2 == null)
                 return Text2[charIndex];
-            return SB2[charIndex];
+            return Sb2[charIndex];
         }
 
         public Collection<WordInfo> ComputedWords(byte side, bool createNew = false)
@@ -185,13 +185,13 @@ namespace AglonaReader
         {
             if (text1 != null)
                 if (text1.Length >= ParallelTextControl.BigTextSize)
-                    SB1 = new StringBuilder(text1);
+                    Sb1 = new StringBuilder(text1);
                 else
                     Text1 = text1;
 
             if (text2 != null)
                 if (text2.Length >= ParallelTextControl.BigTextSize)
-                    SB2 = new StringBuilder(text2);
+                    Sb2 = new StringBuilder(text2);
                 else
                     Text2 = text2;
 
@@ -206,13 +206,13 @@ namespace AglonaReader
         {
             if (text1 != null)
                 if (text1.Length >= ParallelTextControl.BigTextSize)
-                    SB1 = new StringBuilder(text1);
+                    Sb1 = new StringBuilder(text1);
                 else
                     Text1 = text1;
 
             if (text2 != null)
                 if (text2.Length >= ParallelTextControl.BigTextSize)
-                    SB2 = new StringBuilder(text2);
+                    Sb2 = new StringBuilder(text2);
                 else
                     Text2 = text2;
 
@@ -242,8 +242,8 @@ namespace AglonaReader
 
         internal int GetLength(byte side)
         {
-            if (side == 1) return SB1?.Length ?? Text1.Length;
-            return SB2?.Length ?? Text2.Length;
+            if (side == 1) return Sb1?.Length ?? Text1.Length;
+            return Sb2?.Length ?? Text2.Length;
         }
 
         internal void SetStructureLevel(byte p)
@@ -329,8 +329,9 @@ namespace AglonaReader
 
                         if ((c == '\'' || c == '\"' || c == '«' || c == '»' || c == '‹' || c == '›'
                             || c == '“' || c == '”') && state != 2 && currentWordStart != pos)
+                        {
                             // do nothing
-                            ;
+                        }
                         else
                             if (state == 0)
                                 state = 1;
@@ -445,8 +446,9 @@ namespace AglonaReader
 
                         if ((c == '\'' || c == '\"' || c == '«' || c == '»' || c == '‹' || c == '›'
                             || c == '“' || c == '”') && state != 2 && currentWordStart != pos)
+                        {
                             // do nothing
-                            ;
+                        }
                         else
                             if (state == 0)
                                 state = 1;
@@ -489,25 +491,25 @@ namespace AglonaReader
         public int NaturalDividerPosition(byte side, int startingPos, bool forward)
         {
             if (side == 1)
-                if (SB1 == null)
+                if (Sb1 == null)
                     return NaturalDividerPosition(Text1, startingPos, forward);
                 else
-                    return NaturalDividerPosition(SB1, startingPos, forward);
-            if (SB2 == null)
+                    return NaturalDividerPosition(Sb1, startingPos, forward);
+            if (Sb2 == null)
                 return NaturalDividerPosition(Text2, startingPos, forward);
-            return NaturalDividerPosition(SB2, startingPos, forward);
+            return NaturalDividerPosition(Sb2, startingPos, forward);
         }
 
         internal string GetText(byte side)
         {
             if (side == 1)
-                if (SB1 == null)
+                if (Sb1 == null)
                     return Text1;
                 else
-                    return SB1.ToString();
-            if (SB2 == null)
+                    return Sb1.ToString();
+            if (Sb2 == null)
                 return Text2;
-            return SB2.ToString();
+            return Sb2.ToString();
         }
 
         internal bool StartParagraph(byte side)
@@ -517,15 +519,15 @@ namespace AglonaReader
 
         internal void UpdateTotalSize()
         {
-            if (SB1 == null)
+            if (Sb1 == null)
                 totalTextSize = Text1.Length;
             else
-                totalTextSize = SB1.Length;
+                totalTextSize = Sb1.Length;
 
-            if (SB2 == null)
+            if (Sb2 == null)
                 totalTextSize += Text2.Length;
             else
-                totalTextSize += SB2.Length;
+                totalTextSize += Sb2.Length;
         }
 
         internal bool AllLinesComputed(byte side)
@@ -723,15 +725,15 @@ namespace AglonaReader
                         writer.WriteEndAttribute();
                     }
 
-                    if (p.SB1 == null)
+                    if (p.Sb1 == null)
                         writer.WriteAttributeString("s", p.Text1);
                     else
-                        writer.WriteAttributeString("s", p.SB1.ToString());
+                        writer.WriteAttributeString("s", p.Sb1.ToString());
 
-                    if (p.SB2 == null)
+                    if (p.Sb2 == null)
                         writer.WriteAttributeString("t", p.Text2);
                     else
-                        writer.WriteAttributeString("t", p.SB2.ToString());
+                        writer.WriteAttributeString("t", p.Sb2.ToString());
 
                     if (WithAudio && p.AudioFileNumber > 0)
                     {
@@ -885,7 +887,7 @@ namespace AglonaReader
                         return false;
 
                     if (reader.Value.Length >= ParallelTextControl.BigTextSize)
-                        p.SB1 = new StringBuilder(reader.Value);
+                        p.Sb1 = new StringBuilder(reader.Value);
                     else
                         p.Text1 = reader.Value;
 
@@ -898,7 +900,7 @@ namespace AglonaReader
                         return false;
 
                     if (reader.Value.Length >= ParallelTextControl.BigTextSize)
-                        p.SB2 = new StringBuilder(reader.Value);
+                        p.Sb2 = new StringBuilder(reader.Value);
                     else
                         p.Text2 = reader.Value;
 
@@ -995,7 +997,7 @@ namespace AglonaReader
         }
 
 
-        private void WriteHTMLRow(StreamWriter outfile, int leftNumber, string c1, string c2)
+        private void WriteHtmlRow(StreamWriter outfile, int leftNumber, string c1, string c2)
         {
 
             outfile.WriteLine("<tr>");
@@ -1012,7 +1014,7 @@ namespace AglonaReader
 
         }
 
-        internal void ExportHTML(string fileName)
+        internal void ExportHtml(string fileName)
         {
 
             using (var outfile = new StreamWriter(fileName, false, Encoding.UTF8))
@@ -1042,7 +1044,7 @@ namespace AglonaReader
                     if (p.StartParagraph1 || p.StartParagraph2)
                     {
                         if (leftNumber > 0)
-                            WriteHTMLRow(outfile, leftNumber, c1, c2);
+                            WriteHtmlRow(outfile, leftNumber, c1, c2);
 
                         c1 = EscapeForHtml(p.Text1);
                         c2 = EscapeForHtml(p.Text2);
@@ -1067,7 +1069,7 @@ namespace AglonaReader
                 }
 
                 if (leftNumber > 0)
-                    WriteHTMLRow(outfile, leftNumber, c1, c2);
+                    WriteHtmlRow(outfile, leftNumber, c1, c2);
 
                 outfile.WriteLine("</table>");
                 outfile.WriteLine("</body>");
@@ -1107,10 +1109,10 @@ namespace AglonaReader
                         else
                             outfile.Write(' ');
 
-                        if (p.SB1 == null)
+                        if (p.Sb1 == null)
                             outfile.Write(p.Text1);
                         else
-                            outfile.Write(p.SB1);
+                            outfile.Write(p.Sb1);
 
                         pprev = p;
 
@@ -1137,10 +1139,10 @@ namespace AglonaReader
                         else
                             outfile.Write(' ');
 
-                        if (p.SB2 == null)
+                        if (p.Sb2 == null)
                             outfile.Write(p.Text2);
                         else
-                            outfile.Write(p.SB2);
+                            outfile.Write(p.Sb2);
 
                         pprev = p;
 
@@ -1179,13 +1181,13 @@ namespace AglonaReader
             Lang1 = Lang2;
             Lang2 = tmp;
 
-            StringBuilder tmp_sb;
+            StringBuilder tmpSb;
 
             foreach (var tp in TextPairs)
             {
-                tmp_sb = tp.SB1;
-                tp.SB1 = tp.SB2;
-                tp.SB2 = tmp_sb;
+                tmpSb = tp.Sb1;
+                tp.Sb1 = tp.Sb2;
+                tp.Sb2 = tmpSb;
 
                 tmp = tp.Text1;
                 tp.Text1 = tp.Text2;

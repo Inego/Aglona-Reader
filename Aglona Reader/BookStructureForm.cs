@@ -44,12 +44,12 @@ namespace AglonaReader
                     newNode = new TreeNode();
 
                     if (side == 1)
-                        newNode.Text = p.SB1 == null ? p.Text1 : p.SB1.ToString();
+                        newNode.Text = p.Sb1 == null ? p.Text1 : p.Sb1.ToString();
                     else
-                        if (p.SB2 == null)
+                        if (p.Sb2 == null)
                             newNode.Text = p.Text2;
                         else
-                            newNode.Text = p.SB2.ToString();
+                            newNode.Text = p.Sb2.ToString();
 
                     newNode.Tag = i;
                     

@@ -7,13 +7,13 @@ namespace AglonaReader
     // Code taken from:
     // http://www.geekymonkey.com/Programming/CSharp/RGB2HSL_HSL2RGB.htm
 
-    public struct ColorRGB
+    public struct ColorRgb
     {
         public byte Red { get; set; }
         public byte Green { get; set; }
         public byte Blue { get; set; }
        
-        public ColorRGB(Color value) : this()
+        public ColorRgb(Color value) : this()
         {
             
             Red = value.R;
@@ -21,20 +21,20 @@ namespace AglonaReader
             Blue = value.B;
         }
 
-        public static implicit operator Color(ColorRGB rgb)
+        public static implicit operator Color(ColorRgb rgb)
         {
             var c = Color.FromArgb(rgb.Red, rgb.Green, rgb.Blue);
             return c;
         }
 
-        public static explicit operator ColorRGB(Color color)
+        public static explicit operator ColorRgb(Color color)
         {
-            return new ColorRGB(color);
+            return new ColorRgb(color);
         }
 
         // Given H,S,L in range of 0-1
         // Returns a Color (RGB struct) in range of 0-255
-        public static ColorRGB HSL2RGB(double hue, double saturation, double lighting)
+        public static ColorRgb Hsl2Rgb(double hue, double saturation, double lighting)
         {
             double v;
             double r, g, b;
@@ -95,7 +95,7 @@ namespace AglonaReader
             }
 
 
-            var rgb = new ColorRGB();
+            var rgb = new ColorRgb();
             
             rgb.Red = Convert.ToByte(r * 255.0f);
             rgb.Green = Convert.ToByte(g * 255.0f);

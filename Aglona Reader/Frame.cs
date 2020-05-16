@@ -9,7 +9,7 @@ namespace AglonaReader
     public abstract class AbstractFrame
     {
 
-        public Pen FramePen;
+        public Pen framePen;
 
         /// <summary>
         /// Denotes the newSide of the text where the frame is applied.
@@ -74,8 +74,8 @@ namespace AglonaReader
 
         public void SetPen(Pen pen)
         {
-            F1.FramePen = pen;
-            F2.FramePen = pen;
+            F1.framePen = pen;
+            F2.framePen = pen;
         }
 
 
@@ -131,7 +131,7 @@ namespace AglonaReader
         {
             Visible = false;
             if (pen != null)
-                FramePen = pen;
+                framePen = pen;
             list?.Add(this);
         }
 
@@ -156,11 +156,11 @@ namespace AglonaReader
         {
             if (!disposing) return;
 
-            if (FramePen == null) return;
+            if (framePen == null) return;
             
             // free managed resources
-            FramePen.Dispose();
-            FramePen = null;
+            framePen.Dispose();
+            framePen = null;
         }
 
         public override void Draw(ParallelTextControl parallelTextControl)

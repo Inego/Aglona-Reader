@@ -9,7 +9,7 @@ namespace AglonaReader
         private string prevFont;
         private int prevSize;
 
-        public ParallelTextControl pTC = null;
+        public ParallelTextControl pTc = null;
 
         public SettingsForm()
         {
@@ -18,10 +18,10 @@ namespace AglonaReader
 
         private void SettingsForm_Shown(object sender, EventArgs e)
         {
-            highlightFirstWordsCheckBox.Checked = pTC.HighlightFirstWords;
-            highlightFragmentsCheckBox.Checked = pTC.HighlightFragments;
+            highlightFirstWordsCheckBox.Checked = pTc.HighlightFirstWords;
+            highlightFragmentsCheckBox.Checked = pTc.HighlightFragments;
 
-            switch (pTC.ReadingMode)
+            switch (pTc.ReadingMode)
             {
                 case FileUsageInfo.NormalMode:
                     readingModeComboBox.SelectedIndex = 0;
@@ -34,10 +34,10 @@ namespace AglonaReader
                     break;
             }
 
-            alternatingColorSchemeComboBox.SelectedIndex = pTC.AlternatingColorScheme;
+            alternatingColorSchemeComboBox.SelectedIndex = pTc.AlternatingColorScheme;
 
-            prevFont = pTC.textFont.Name;
-            var currentFontSize = pTC.textFont.Size;
+            prevFont = pTc.textFont.Name;
+            var currentFontSize = pTc.textFont.Size;
 
             var newTrack = (int)((currentFontSize - 8) / 16 * 1000);
 
@@ -62,14 +62,14 @@ namespace AglonaReader
                 fontsComboBox.SelectedIndex = foundIdx;
 
             fontNameLabel.Text = prevFont;
-            brightnessBar.Value = (int)(pTC.Brightness * 1000);
+            brightnessBar.Value = (int)(pTc.Brightness * 1000);
 
         }
 
         private void brightnessBar_Scroll(object sender, EventArgs e)
         {
-            pTC.Brightness = (float)brightnessBar.Value / 1000;
-            pTC.RenderPairs(true);
+            pTc.Brightness = (float)brightnessBar.Value / 1000;
+            pTc.RenderPairs(true);
         }
 
         private void fontsComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -89,9 +89,8 @@ namespace AglonaReader
 
             fontNameLabel.Text = ff.Name;
 
-            pTC.SetFont(
-                new Font(ff.Name, (float)fontSizeTrackBar.Value * 16 / 1000 + 8),
-                new Font(ff.Name, (float)fontSizeTrackBar.Value * 16 / 1000 + 8, FontStyle.Italic));
+            pTc.SetFont(
+                new Font(ff.Name, (float)fontSizeTrackBar.Value * 16 / 1000 + 8));
 
             prevFont = ff.Name;
             prevSize = fontSizeTrackBar.Value;
@@ -104,16 +103,16 @@ namespace AglonaReader
 
         private void highlightFirstWordsCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            pTC.HighlightFirstWords = highlightFirstWordsCheckBox.Checked;
+            pTc.HighlightFirstWords = highlightFirstWordsCheckBox.Checked;
 
-            pTC.RenderPairs(true);
+            pTc.RenderPairs(true);
         }
 
         private void highlightFragmentsCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            pTC.HighlightFragments= highlightFragmentsCheckBox.Checked;
+            pTc.HighlightFragments= highlightFragmentsCheckBox.Checked;
 
-            pTC.RenderPairs(true);
+            pTc.RenderPairs(true);
         }
 
         private void SettingsForm_KeyPress(object sender, KeyPressEventArgs e)
@@ -124,7 +123,7 @@ namespace AglonaReader
 
         private void readingModeComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            pTC.ChangeReadingMode(readingModeComboBox.SelectedIndex);
+            pTc.ChangeReadingMode(readingModeComboBox.SelectedIndex);
         }
 
         private void alternatingColorSchemeComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -132,14 +131,14 @@ namespace AglonaReader
             switch (alternatingColorSchemeComboBox.SelectedIndex)
             {
                 case 0:
-                    pTC.AlternatingColorScheme = FileUsageInfo.AlternatingColorScheme_BlackGreen;
+                    pTc.AlternatingColorScheme = FileUsageInfo.AlternatingColorSchemeBlackGreen;
                     break;
                 case 1:
-                    pTC.AlternatingColorScheme = FileUsageInfo.AlternatingColorScheme_GreenBlack;
+                    pTc.AlternatingColorScheme = FileUsageInfo.AlternatingColorSchemeGreenBlack;
                     break;
             }
 
-            pTC.RenderPairs(true);
+            pTc.RenderPairs(true);
         }
 
     }

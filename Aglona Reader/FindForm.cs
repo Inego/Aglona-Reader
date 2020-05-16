@@ -6,7 +6,7 @@ namespace AglonaReader
     internal partial class FindForm : Form
     {
 
-        public ParallelTextControl pTC;
+        public ParallelTextControl pTc;
         internal MainForm mainForm;
 
         public FindForm()
@@ -39,14 +39,14 @@ namespace AglonaReader
             var checkLeft = leftTextRadioButton.Checked || bothTextsRadioButton.Checked;
             var checkRight = rightTextRadioButton.Checked || bothTextsRadioButton.Checked;
 
-            if (pTC.Reversed)
+            if (pTc.Reversed)
             {
                 var tmp = checkLeft;
                 checkLeft = checkRight;
                 checkRight = tmp;
             }
 
-            var start = pTC.EditMode ? pTC.HighlightedPair : pTC.CurrentPair;
+            var start = pTc.EditMode ? pTc.HighlightedPair : pTc.CurrentPair;
 
             var current = start;
 
@@ -55,7 +55,7 @@ namespace AglonaReader
 
                 current += 1;
 
-                if (current == pTC.Number)
+                if (current == pTc.Number)
                 {
                     var d = MessageBox.Show("Continue from the start?", "End of the document reached", MessageBoxButtons.YesNo);
 
@@ -72,17 +72,17 @@ namespace AglonaReader
                     return;
                 }
 
-                var p = pTC[current];
+                var p = pTc[current];
 
-                if (checkLeft && (p.SB1 == null ? p.Text1 : p.SB1.ToString()).Contains(textToFind)
-                    || checkRight && (p.SB2 == null ? p.Text2 : p.SB2.ToString()).Contains(textToFind))
+                if (checkLeft && (p.Sb1 == null ? p.Text1 : p.Sb1.ToString()).Contains(textToFind)
+                    || checkRight && (p.Sb2 == null ? p.Text2 : p.Sb2.ToString()).Contains(textToFind))
                 {
 
-                    if (!pTC.EditMode || current > pTC.LastRenderedPair || current < pTC.CurrentPair)
+                    if (!pTc.EditMode || current > pTc.LastRenderedPair || current < pTc.CurrentPair)
                         mainForm.GotoPair(current, false, false, 1);
                     else
                     {
-                        pTC.HighlightedPair = current - 1;
+                        pTc.HighlightedPair = current - 1;
                         mainForm.ProcessDownArrow(true);
                     }
                     

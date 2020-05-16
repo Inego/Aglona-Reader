@@ -3,15 +3,15 @@ using System.Windows.Forms;
 
 namespace AglonaReader
 {
-    public partial class ExportHTMLForm : Form
+    public partial class ExportHtmlForm : Form
     {
 
-        private readonly ParallelTextControl pTC;
+        private readonly ParallelTextControl pTc;
 
-        public ExportHTMLForm(ParallelTextControl pTC)
+        public ExportHtmlForm(ParallelTextControl pTc)
         {
             InitializeComponent();
-            this.pTC = pTC;
+            this.pTc = pTc;
         }
 
         private void selectExportFileButton_Click(object sender, EventArgs e)
@@ -42,7 +42,7 @@ namespace AglonaReader
 
             Close();
 
-            pTC.PText.ExportHTML(exportFileName.Text);
+            pTc.PText.ExportHtml(exportFileName.Text);
 
             //MessageBox.Show("Done.");
 

@@ -232,8 +232,7 @@ namespace AglonaReader
             pTC.Brightness = appSettings.Brightness;
             
             pTC.SetFont(
-                new Font(appSettings.FontName, appSettings.FontSize),
-                new Font(appSettings.FontName, appSettings.FontSize, FontStyle.Italic));
+                new Font(appSettings.FontName, appSettings.FontSize));
 
             var args = Environment.GetCommandLineArgs();
 
@@ -338,7 +337,7 @@ namespace AglonaReader
 
         private bool XonSplitter(int x)
         {
-            return pTC.layoutMode == ParallelTextControl.LayoutMode_Normal
+            return pTC.layoutMode == ParallelTextControl.LayoutModeNormal
                    && x >= pTC.SplitterPosition
                    && x < pTC.SplitterPosition + pTC.SplitterWidth;
         }
@@ -542,8 +541,8 @@ namespace AglonaReader
                     pTC.SelectionFrame.Side = pTC.mouseTextWord.Side;
                     pTC.SelectionFrame.Line1 = pTC.mouseTextWord.Line;
                     pTC.SelectionFrame.Line2 = pTC.mouseTextWord.Line;
-                    pTC.SelectionFrame.X1 = pTC.mouseTextWord.FX1;
-                    pTC.SelectionFrame.X2 = pTC.mouseTextWord.FX2;
+                    pTC.SelectionFrame.X1 = pTC.mouseTextWord.Fx1;
+                    pTC.SelectionFrame.X2 = pTC.mouseTextWord.Fx2;
                     pTC.Render();
                 }
                 else
@@ -564,7 +563,7 @@ namespace AglonaReader
                     SeparateCurrentPair();
                 else
                 {
-                    if (pTC.layoutMode == ParallelTextControl.LayoutMode_Advanced)
+                    if (pTC.layoutMode == ParallelTextControl.LayoutModeAdvanced)
                         pTC.SwitchAdvancedShowPopups();
                 }
 
@@ -679,7 +678,7 @@ namespace AglonaReader
             }
 
             var urlString = webBrowser.Url != null ? webBrowser.Url.ToString() : string.Empty;
-            var match = Regex.Match(urlString, getGoogleTranslateUrl() + "#([a-z0-9]+?)/([a-z0-9]+?)/.*");
+            var match = Regex.Match(urlString, GetGoogleTranslateUrl() + "#([a-z0-9]+?)/([a-z0-9]+?)/.*");
             
             var currentDestLang = destLang;
 
@@ -696,7 +695,7 @@ namespace AglonaReader
                 destLang = currentDestLang;
             }
 
-            webBrowser.Navigate(string.Format(getGoogleTranslateUrl() + @"#{0}/{1}/{2}", srcLang, destLang, text));
+            webBrowser.Navigate(string.Format(GetGoogleTranslateUrl() + @"#{0}/{1}/{2}", srcLang, destLang, text));
         }
 
         private void MouseUpInEditMode()
@@ -716,7 +715,7 @@ namespace AglonaReader
                         pTC.NaturalDividerPosition1W = pTC.MouseCurrentWord.Next;
                         pTC.NaturalDividerPosition1 = pTC.NaturalDividerPosition1W.Pos;
                         pTC.SetNippingFrameByScreenWord(1, pTC.NaturalDividerPosition1W);
-                        ((Frame) pTC.NippingFrame.F1).FramePen = pTC.CorrectedPen;
+                        ((Frame) pTC.NippingFrame.F1).framePen = pTC.CorrectedPen;
                         pTC.Side1Set = true;
                     }
                 }
@@ -729,7 +728,7 @@ namespace AglonaReader
                         pTC.NaturalDividerPosition2W = pTC.MouseCurrentWord.Next;
                         pTC.NaturalDividerPosition2 = pTC.NaturalDividerPosition2W.Pos;
                         pTC.SetNippingFrameByScreenWord(2, pTC.NaturalDividerPosition2W);
-                        ((Frame) pTC.NippingFrame.F2).FramePen = pTC.CorrectedPen;
+                        ((Frame) pTC.NippingFrame.F2).framePen = pTC.CorrectedPen;
                         pTC.Side2Set = true;
                     }
                 }
@@ -768,7 +767,7 @@ namespace AglonaReader
         {
             pTC.mouseTextLine = -1;
             pTC.MouseCurrentWord = null;
-            pTC.ProcessLayoutChange(true);
+            pTC.ProcessLayoutChange();
         }
 
         private void pTC_KeyDown(object sender, KeyEventArgs e)
@@ -956,14 +955,14 @@ namespace AglonaReader
             {
                 pTC.NaturalDividerPosition1W = current;
                 pTC.NaturalDividerPosition1 = current.Pos;
-                ((Frame) pTC.NippingFrame.F1).FramePen = pTC.CorrectedPen;
+                ((Frame) pTC.NippingFrame.F1).framePen = pTC.CorrectedPen;
                 pTC.Side1Set = true;
             }
             else
             {
                 pTC.NaturalDividerPosition2W = current;
                 pTC.NaturalDividerPosition2 = current.Pos;
-                ((Frame) pTC.NippingFrame.F2).FramePen = pTC.CorrectedPen;
+                ((Frame) pTC.NippingFrame.F2).framePen = pTC.CorrectedPen;
                 pTC.Side2Set = true;
             }
 
@@ -1476,7 +1475,7 @@ namespace AglonaReader
         {
             using (var f = new BookInfoForm())
             {
-                f.ParallelTC = pTC;
+                f.ParallelTc = pTC;
                 f.ShowDialog();
                 UpdateWindowTitle();
             }
@@ -1593,7 +1592,7 @@ namespace AglonaReader
 
             if (webBrowser.Url != null)
             {
-                webBrowser.Navigate(getGoogleTranslateUrl());
+                webBrowser.Navigate(GetGoogleTranslateUrl());
                 webBrowser.Refresh();
             }
 
@@ -1717,7 +1716,7 @@ namespace AglonaReader
 
             pTC.SetLayoutMode();
 
-            pTC.ProcessLayoutChange(false);
+            pTC.ProcessLayoutChange();
 
             pTC.HighlightedFrame.SetVisibility(false);
             pTC.NippingFrame.SetVisibility(false);
@@ -1732,7 +1731,7 @@ namespace AglonaReader
             newBook = true;
         }
                 
-        private void structureleftToolStripMenuItem_Click(object sender, EventArgs e)
+        private void structureLeftToolStripMenuItem_Click(object sender, EventArgs e)
         {
             BrowseBookStructure(1);
         }
@@ -1755,7 +1754,7 @@ namespace AglonaReader
             Close();
         }
 
-        private void structurerightToolStripMenuItem_Click(object sender, EventArgs e)
+        private void structureRightToolStripMenuItem_Click(object sender, EventArgs e)
         {
             BrowseBookStructure(2);
         }
@@ -1787,7 +1786,7 @@ namespace AglonaReader
                 
                 if (enabled)
                 {
-                    webBrowser.Navigate(getGoogleTranslateUrl());
+                    webBrowser.Navigate(GetGoogleTranslateUrl());
                 }
             }
         }
@@ -1819,9 +1818,8 @@ namespace AglonaReader
             UpdateStatusBar(updateStatusBar);
         }
 
-        private void openRecentToolStripMenuItem_Click(object sender, EventArgs e)
+        private void OpenRecentToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
             if (AskToSaveModified(sender) == DialogResult.Cancel)
                 return;
 
@@ -1835,19 +1833,16 @@ namespace AglonaReader
 
         }
 
-        private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
+        private void SettingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
             using (var settingsForm = new SettingsForm())
             {
-                settingsForm.pTC = pTC;
+                settingsForm.pTc = pTC;
                 settingsForm.ShowDialog();
-
             }
-
         }
 
-        private void vScrollBar_Scroll(object sender, ScrollEventArgs e)
+        private void VScrollBar_Scroll(object sender, ScrollEventArgs e)
         {
             if (e.Type == ScrollEventType.LargeDecrement)
                 ProcessPageUp();
@@ -1866,28 +1861,24 @@ namespace AglonaReader
                 return;
 
             e.NewValue = pTC.HighlightedPair;
-
-            
         }
 
-        private void findToolStripMenuItem_Click(object sender, EventArgs e)
+        private void FindToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (findForm == null)
             {
                 findForm = new FindForm();
                 findForm.Left = (Width - findForm.Width) / 2;
                 findForm.Top = (Height - findForm.Height) / 2;
-                findForm.pTC = pTC;
+                findForm.pTc = pTC;
                 findForm.mainForm = this;
             }
 
             findForm.ShowDialog();
-
         }
 
         private void startpauseStopwatchToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
             if (!pTC.EditMode)
                 return;
 
@@ -1900,16 +1891,15 @@ namespace AglonaReader
                     pTC.stopWatch.Start();
 
             UpdateStatusBar(false);
-
         }
 
-        private void resetStopwatchToolStripMenuItem_Click(object sender, EventArgs e)
+        private void ResetStopwatchToolStripMenuItem_Click(object sender, EventArgs e)
         {
             pTC.ResetStopwatch(0);
             UpdateStatusBar(false);
         }
 
-        private void exportLeftTextToolStripMenuItem_Click(object sender, EventArgs e)
+        private void ExportLeftTextToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ExportText(true);
         }
@@ -1929,12 +1919,10 @@ namespace AglonaReader
                     return;
 
                 pTC.ExportText(d.FileName, leftSide);
-
             }
-
         }
 
-        private void exportRightTextToolStripMenuItem_Click(object sender, EventArgs e)
+        private void ExportRightTextToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ExportText(false);
         }
@@ -1945,7 +1933,7 @@ namespace AglonaReader
                 ctrlPressed = false;
         }
 
-        private void reverseContentsToolStripMenuItem_Click(object sender, EventArgs e)
+        private void ReverseContentsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (MessageBox.Show("Really reverse book contents?"
                 + "\r\nThis will physically reverse the two texts in the file."
@@ -1953,14 +1941,12 @@ namespace AglonaReader
                 "Reverse book contents",
                 MessageBoxButtons.YesNo) == DialogResult.No)
             {
-
                 return;
             }
 
             pTC.PText.ReverseContents();
             Recompute();
             UpdateWindowTitle();
-
         }
 
         private void aglonaReaderSiteToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1973,12 +1959,12 @@ namespace AglonaReader
             Process.Start(p);
         }
 
-        private void paraBooksMakerSiteToolStripMenuItem_Click(object sender, EventArgs e)
+        private void ParaBooksMakerSiteToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenSite("https://sites.google.com/site/parabooksmaker/");
         }
 
-        private void deletePairToolStripMenuItem_Click(object sender, EventArgs e)
+        private void DeletePairToolStripMenuItem_Click(object sender, EventArgs e)
         {
             DeletePair(true);
         }
@@ -2034,19 +2020,19 @@ namespace AglonaReader
         }
 
 
-        private void insertBeforeToolStripMenuItem_Click(object sender, EventArgs e)
+        private void InsertBeforeToolStripMenuItem_Click(object sender, EventArgs e)
         {
             InsertPair(false);
         }
 
 
-        private void normalModeToolStripMenuItem_Click(object sender, EventArgs e)
+        private void NormalModeToolStripMenuItem_Click(object sender, EventArgs e)
         {
             pTC.ChangeReadingMode(FileUsageInfo.NormalMode);
         }
 
 
-        private void alternatingModeToolStripMenuItem_Click(object sender, EventArgs e)
+        private void AlternatingModeToolStripMenuItem_Click(object sender, EventArgs e)
         {
             pTC.ChangeReadingMode(FileUsageInfo.AlternatingMode);
         }
@@ -2059,8 +2045,8 @@ namespace AglonaReader
 
         private void hTMLToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var exportHTMLForm = new ExportHTMLForm(pTC);
-            exportHTMLForm.ShowDialog();
+            var exportHtmlForm = new ExportHtmlForm(pTC);
+            exportHtmlForm.ShowDialog();
         }
 
 
@@ -2089,7 +2075,7 @@ namespace AglonaReader
             splitContainer.SplitterDistance = newSplitterDistance;
         }
 
-        private string getGoogleTranslateUrl()
+        private string GetGoogleTranslateUrl()
         {
             return "https://translate.google.ca/";
         }
@@ -2103,8 +2089,8 @@ namespace AglonaReader
         public const int AlternatingMode = 1;
         public const int AdvancedMode = 2;
 
-        public const int AlternatingColorScheme_BlackGreen = 0;
-        public const int AlternatingColorScheme_GreenBlack = 1;
+        public const int AlternatingColorSchemeBlackGreen = 0;
+        public const int AlternatingColorSchemeGreenBlack = 1;
         
 
 

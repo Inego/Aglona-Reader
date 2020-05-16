@@ -132,7 +132,6 @@
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "AboutForm";
-            this.Paint += new System.Windows.Forms.PaintEventHandler(this.AboutForm_Paint);
             this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.AboutForm_MouseMove);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();

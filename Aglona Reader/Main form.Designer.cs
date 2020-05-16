@@ -53,8 +53,8 @@
             this.reverseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.reverseContentsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            this.structureleftToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.structurerightToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.structureLeftToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.structureRightToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.findToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
@@ -143,7 +143,7 @@
             this.openRecentToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys) (((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) | System.Windows.Forms.Keys.O)));
             this.openRecentToolStripMenuItem.Size = new System.Drawing.Size(223, 22);
             this.openRecentToolStripMenuItem.Text = "Open recent";
-            this.openRecentToolStripMenuItem.Click += new System.EventHandler(this.openRecentToolStripMenuItem_Click);
+            this.openRecentToolStripMenuItem.Click += new System.EventHandler(this.OpenRecentToolStripMenuItem_Click);
             // 
             // toolStripSeparator6
             // 
@@ -182,14 +182,14 @@
             this.exportLeftTextToolStripMenuItem.Name = "exportLeftTextToolStripMenuItem";
             this.exportLeftTextToolStripMenuItem.Size = new System.Drawing.Size(171, 22);
             this.exportLeftTextToolStripMenuItem.Text = "Left text to TXT";
-            this.exportLeftTextToolStripMenuItem.Click += new System.EventHandler(this.exportLeftTextToolStripMenuItem_Click);
+            this.exportLeftTextToolStripMenuItem.Click += new System.EventHandler(this.ExportLeftTextToolStripMenuItem_Click);
             // 
             // exportRightTextToolStripMenuItem
             // 
             this.exportRightTextToolStripMenuItem.Name = "exportRightTextToolStripMenuItem";
             this.exportRightTextToolStripMenuItem.Size = new System.Drawing.Size(171, 22);
             this.exportRightTextToolStripMenuItem.Text = "Right text to TXT";
-            this.exportRightTextToolStripMenuItem.Click += new System.EventHandler(this.exportRightTextToolStripMenuItem_Click);
+            this.exportRightTextToolStripMenuItem.Click += new System.EventHandler(this.ExportRightTextToolStripMenuItem_Click);
             // 
             // hTMLToolStripMenuItem
             // 
@@ -212,7 +212,7 @@
             // 
             // bookToolStripMenuItem
             // 
-            this.bookToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {this.informationToolStripMenuItem, this.toolStripSeparator1, this.reverseToolStripMenuItem, this.reverseContentsToolStripMenuItem, this.toolStripSeparator2, this.structureleftToolStripMenuItem, this.structurerightToolStripMenuItem, this.toolStripSeparator3, this.findToolStripMenuItem, this.toolStripMenuItem1, this.editModeToolStripMenuItem});
+            this.bookToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {this.informationToolStripMenuItem, this.toolStripSeparator1, this.reverseToolStripMenuItem, this.reverseContentsToolStripMenuItem, this.toolStripSeparator2, this.structureLeftToolStripMenuItem, this.structureRightToolStripMenuItem, this.toolStripSeparator3, this.findToolStripMenuItem, this.toolStripMenuItem1, this.editModeToolStripMenuItem});
             this.bookToolStripMenuItem.Name = "bookToolStripMenuItem";
             this.bookToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys) ((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F2)));
             this.bookToolStripMenuItem.Size = new System.Drawing.Size(48, 20);
@@ -245,28 +245,28 @@
             this.reverseContentsToolStripMenuItem.Name = "reverseContentsToolStripMenuItem";
             this.reverseContentsToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
             this.reverseContentsToolStripMenuItem.Text = "Reverse contents";
-            this.reverseContentsToolStripMenuItem.Click += new System.EventHandler(this.reverseContentsToolStripMenuItem_Click);
+            this.reverseContentsToolStripMenuItem.Click += new System.EventHandler(this.ReverseContentsToolStripMenuItem_Click);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
             this.toolStripSeparator2.Size = new System.Drawing.Size(207, 6);
             // 
-            // structureleftToolStripMenuItem
+            // structureLeftToolStripMenuItem
             // 
-            this.structureleftToolStripMenuItem.Name = "structureleftToolStripMenuItem";
-            this.structureleftToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys) ((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F1)));
-            this.structureleftToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
-            this.structureleftToolStripMenuItem.Text = "Structure (left)";
-            this.structureleftToolStripMenuItem.Click += new System.EventHandler(this.structureleftToolStripMenuItem_Click);
+            this.structureLeftToolStripMenuItem.Name = "structureLeftToolStripMenuItem";
+            this.structureLeftToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys) ((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F1)));
+            this.structureLeftToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
+            this.structureLeftToolStripMenuItem.Text = "Structure (left)";
+            this.structureLeftToolStripMenuItem.Click += new System.EventHandler(this.structureLeftToolStripMenuItem_Click);
             // 
-            // structurerightToolStripMenuItem
+            // structureRightToolStripMenuItem
             // 
-            this.structurerightToolStripMenuItem.Name = "structurerightToolStripMenuItem";
-            this.structurerightToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys) ((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F2)));
-            this.structurerightToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
-            this.structurerightToolStripMenuItem.Text = "Structure (right)";
-            this.structurerightToolStripMenuItem.Click += new System.EventHandler(this.structurerightToolStripMenuItem_Click);
+            this.structureRightToolStripMenuItem.Name = "structureRightToolStripMenuItem";
+            this.structureRightToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys) ((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F2)));
+            this.structureRightToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
+            this.structureRightToolStripMenuItem.Text = "Structure (right)";
+            this.structureRightToolStripMenuItem.Click += new System.EventHandler(this.structureRightToolStripMenuItem_Click);
             // 
             // toolStripSeparator3
             // 
@@ -279,7 +279,7 @@
             this.findToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys) ((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F)));
             this.findToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
             this.findToolStripMenuItem.Text = "Find...";
-            this.findToolStripMenuItem.Click += new System.EventHandler(this.findToolStripMenuItem_Click);
+            this.findToolStripMenuItem.Click += new System.EventHandler(this.FindToolStripMenuItem_Click);
             // 
             // toolStripMenuItem1
             // 
@@ -329,7 +329,7 @@
             this.insertBeforeToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys) ((System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.Insert)));
             this.insertBeforeToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
             this.insertBeforeToolStripMenuItem.Text = "Insert before";
-            this.insertBeforeToolStripMenuItem.Click += new System.EventHandler(this.insertBeforeToolStripMenuItem_Click);
+            this.insertBeforeToolStripMenuItem.Click += new System.EventHandler(this.InsertBeforeToolStripMenuItem_Click);
             // 
             // insertPairToolStripMenuItem
             // 
@@ -345,7 +345,7 @@
             this.deletePairToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Delete;
             this.deletePairToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
             this.deletePairToolStripMenuItem.Text = "Delete";
-            this.deletePairToolStripMenuItem.Click += new System.EventHandler(this.deletePairToolStripMenuItem_Click);
+            this.deletePairToolStripMenuItem.Click += new System.EventHandler(this.DeletePairToolStripMenuItem_Click);
             // 
             // statsToolStripMenuItem
             // 
@@ -368,7 +368,7 @@
             this.resetStopwatchToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys) ((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F5)));
             this.resetStopwatchToolStripMenuItem.Size = new System.Drawing.Size(220, 22);
             this.resetStopwatchToolStripMenuItem.Text = "Reset stopwatch";
-            this.resetStopwatchToolStripMenuItem.Click += new System.EventHandler(this.resetStopwatchToolStripMenuItem_Click);
+            this.resetStopwatchToolStripMenuItem.Click += new System.EventHandler(this.ResetStopwatchToolStripMenuItem_Click);
             // 
             // settingsToolStripMenuItem
             // 
@@ -385,7 +385,7 @@
             this.normalModeToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys) ((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D1)));
             this.normalModeToolStripMenuItem.Size = new System.Drawing.Size(250, 22);
             this.normalModeToolStripMenuItem.Text = "Normal mode";
-            this.normalModeToolStripMenuItem.Click += new System.EventHandler(this.normalModeToolStripMenuItem_Click);
+            this.normalModeToolStripMenuItem.Click += new System.EventHandler(this.NormalModeToolStripMenuItem_Click);
             // 
             // alternatingModeToolStripMenuItem
             // 
@@ -393,7 +393,7 @@
             this.alternatingModeToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys) ((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D2)));
             this.alternatingModeToolStripMenuItem.Size = new System.Drawing.Size(250, 22);
             this.alternatingModeToolStripMenuItem.Text = "Alternating mode";
-            this.alternatingModeToolStripMenuItem.Click += new System.EventHandler(this.alternatingModeToolStripMenuItem_Click);
+            this.alternatingModeToolStripMenuItem.Click += new System.EventHandler(this.AlternatingModeToolStripMenuItem_Click);
             // 
             // advancedModeToolStripMenuItem
             // 
@@ -435,7 +435,7 @@
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
             this.optionsToolStripMenuItem.Size = new System.Drawing.Size(250, 22);
             this.optionsToolStripMenuItem.Text = "Options";
-            this.optionsToolStripMenuItem.Click += new System.EventHandler(this.settingsToolStripMenuItem_Click);
+            this.optionsToolStripMenuItem.Click += new System.EventHandler(this.SettingsToolStripMenuItem_Click);
             // 
             // helpToolStripMenuItem
             // 
@@ -456,7 +456,7 @@
             this.paraBooksMakerSiteToolStripMenuItem.Name = "paraBooksMakerSiteToolStripMenuItem";
             this.paraBooksMakerSiteToolStripMenuItem.Size = new System.Drawing.Size(191, 22);
             this.paraBooksMakerSiteToolStripMenuItem.Text = "ParaBooksMaker site";
-            this.paraBooksMakerSiteToolStripMenuItem.Click += new System.EventHandler(this.paraBooksMakerSiteToolStripMenuItem_Click);
+            this.paraBooksMakerSiteToolStripMenuItem.Click += new System.EventHandler(this.ParaBooksMakerSiteToolStripMenuItem_Click);
             // 
             // toolStripMenuItem3
             // 
@@ -501,7 +501,7 @@
             this.vScrollBar.Name = "vScrollBar";
             this.vScrollBar.Size = new System.Drawing.Size(18, 182);
             this.vScrollBar.TabIndex = 5;
-            this.vScrollBar.Scroll += new System.Windows.Forms.ScrollEventHandler(this.vScrollBar_Scroll);
+            this.vScrollBar.Scroll += new System.Windows.Forms.ScrollEventHandler(this.VScrollBar_Scroll);
             // 
             // splitContainer
             // 
@@ -541,7 +541,6 @@
             stringFormat1.HotkeyPrefix = System.Drawing.Text.HotkeyPrefix.None;
             stringFormat1.LineAlignment = System.Drawing.StringAlignment.Near;
             stringFormat1.Trimming = System.Drawing.StringTrimming.None;
-            this.pTC.GT = stringFormat1;
             this.pTC.HighlightedPair = 0;
             this.pTC.HighlightFirstWords = true;
             this.pTC.HighlightFragments = true;
@@ -555,7 +554,6 @@
             this.pTC.Modified = false;
             this.pTC.MouseCurrentWord = null;
             this.pTC.MousePressed = false;
-            this.pTC.MouseStatus = ((byte) (0));
             this.pTC.Name = "pTC";
             this.pTC.NaturalDividerPosition1 = 0;
             this.pTC.NaturalDividerPosition1W = null;
@@ -563,7 +561,7 @@
             this.pTC.NaturalDividerPosition2W = null;
             this.pTC.NumberOfScreenLines = 0;
             this.pTC.PanelMargin = 10;
-            this.pTC.PrimaryBG = null;
+            this.pTC.PrimaryBg = null;
             parallelText1.Author1 = null;
             parallelText1.Author2 = null;
             parallelText1.FileName = null;
@@ -578,8 +576,7 @@
             this.pTC.PText = parallelText1;
             this.pTC.ReadingMode = 0;
             this.pTC.Reversed = false;
-            this.pTC.RightPosition = 445;
-            this.pTC.SecondaryBG = null;
+            this.pTC.SecondaryBg = null;
             this.pTC.Selection1Pair = 0;
             this.pTC.Selection1Position = 0;
             this.pTC.Selection2Pair = 0;
@@ -687,8 +684,8 @@
         private System.Windows.Forms.ToolStripMenuItem startpauseStopwatchToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem statsToolStripMenuItem;
         private System.Windows.Forms.StatusStrip statusStrip;
-        private System.Windows.Forms.ToolStripMenuItem structureleftToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem structurerightToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem structureLeftToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem structureRightToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem2;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem3;

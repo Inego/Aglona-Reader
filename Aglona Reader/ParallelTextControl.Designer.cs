@@ -44,12 +44,12 @@ namespace AglonaReader
             }
 
             //base.OnPaint(e);
-            if (PrimaryBG == null)
+            if (PrimaryBg == null)
                 e.Graphics.Clear(this.BackColor);
             else
             //{
             //    SecondaryBG.Render();
-                PrimaryBG.Render();
+                PrimaryBg.Render();
             //}
 
         }

@@ -29,7 +29,7 @@ namespace AglonaReader
 
             if (keyData == (Keys.Enter | Keys.Control))
             {
-                PressOK();
+                PressOk();
                 return false;
             }
 

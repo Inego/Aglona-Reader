@@ -8,29 +8,29 @@ namespace AglonaReader.Mp3Player
         
     {
         private Mp3FileReader mp3Stream;
-        private WaveOut m_WavePlayer;
+        private WaveOut mWavePlayer;
         
-        private string m_FileName = "";
+        private string mFileName = "";
         
         public void Open(string mp3FileName)
         {
             if (!File.Exists(mp3FileName)) return;
-            if (mp3FileName == m_FileName) return;
+            if (mp3FileName == mFileName) return;
 
             Close();
             
             mp3Stream = new Mp3FileReader(mp3FileName);
             
-            m_WavePlayer = new WaveOut();
-            m_WavePlayer.Init(mp3Stream);
+            mWavePlayer = new WaveOut();
+            mWavePlayer.Init(mp3Stream);
 
-            m_FileName = mp3FileName;
+            mFileName = mp3FileName;
 
         }
 
         public void PlayFromTo(uint startMs, uint finishMs)
         {
-            if (m_WavePlayer == null)
+            if (mWavePlayer == null)
                 return;
             
             if (startMs >= finishMs && finishMs != 0)
@@ -40,39 +40,39 @@ namespace AglonaReader.Mp3Player
 
             mp3Stream.TrimToPlay(startMs, finishMs);
 
-            m_WavePlayer.Play();
+            mWavePlayer.Play();
         }
 
         public void Stop(bool reInit)
         {
-            if (m_WavePlayer == null)
+            if (mWavePlayer == null)
                 return;
 
-            if (m_WavePlayer.PlaybackState == PlaybackState.Stopped)
+            if (mWavePlayer.PlaybackState == PlaybackState.Stopped)
                 return;
 
-            var needToReInit = reInit && m_WavePlayer.PlaybackState == PlaybackState.Playing;
+            var needToReInit = reInit && mWavePlayer.PlaybackState == PlaybackState.Playing;
 
             if (needToReInit)
             {
-                m_WavePlayer.Dispose();
+                mWavePlayer.Dispose();
 
-                m_WavePlayer = new WaveOut();
-                m_WavePlayer.Init(mp3Stream);
+                mWavePlayer = new WaveOut();
+                mWavePlayer.Init(mp3Stream);
             }
             else
-                m_WavePlayer.Stop();
+                mWavePlayer.Stop();
 
         }
 
         public void Close()
         {
-            if (m_WavePlayer == null)
+            if (mWavePlayer == null)
                 return;
 
-            m_FileName = "";
-            m_WavePlayer.Dispose();
-            m_WavePlayer = null;
+            mFileName = "";
+            mWavePlayer.Dispose();
+            mWavePlayer = null;
             mp3Stream.Dispose();
             mp3Stream = null;
         }
@@ -85,9 +85,9 @@ namespace AglonaReader.Mp3Player
         {
             get
             {
-                if (m_WavePlayer == null)
+                if (mWavePlayer == null)
                     return false;
-                return m_WavePlayer.PlaybackState == PlaybackState.Playing;
+                return mWavePlayer.PlaybackState == PlaybackState.Playing;
             } 
         }
 
@@ -100,7 +100,7 @@ namespace AglonaReader.Mp3Player
             {
                 if (disposing)
                 {
-                    m_WavePlayer.Dispose();
+                    mWavePlayer.Dispose();
                     mp3Stream.Dispose();
                 }
 

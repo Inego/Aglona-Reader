@@ -24,7 +24,7 @@ namespace AglonaReader
             InitializeComponent();
         }
 
-        private void PressOK()
+        private void PressOk()
         {
             Result = true;
 
@@ -43,8 +43,8 @@ namespace AglonaReader
                 TextPair.StartParagraph2 = start2.Checked;
             }
 
-            TextPair.SB1 = null;
-            TextPair.SB2 = null;
+            TextPair.Sb1 = null;
+            TextPair.Sb2 = null;
 
             if (level0.Checked)
                 TextPair.StructureLevel = 0;
@@ -60,7 +60,7 @@ namespace AglonaReader
 
         private void okButton_Click(object sender, EventArgs e)
         {
-            PressOK();
+            PressOk();
         }
 
         private void EditPairForm_Shown(object sender, EventArgs e)
@@ -69,15 +69,15 @@ namespace AglonaReader
 
             if (ParallelTextControl.Reversed)
             {
-                textBox1.Text = TextPair.SB2 == null ? TextPair.Text2 : TextPair.SB2.ToString();
-                textBox2.Text = TextPair.SB1 == null ? TextPair.Text1 : TextPair.SB1.ToString();
+                textBox1.Text = TextPair.Sb2 == null ? TextPair.Text2 : TextPair.Sb2.ToString();
+                textBox2.Text = TextPair.Sb1 == null ? TextPair.Text1 : TextPair.Sb1.ToString();
                 start1.Checked = TextPair.StartParagraph2;
                 start2.Checked = TextPair.StartParagraph1;
             }
             else
             {
-                textBox1.Text = TextPair.SB1 == null ? TextPair.Text1 : TextPair.SB1.ToString();
-                textBox2.Text = TextPair.SB2 == null ? TextPair.Text2 : TextPair.SB2.ToString();
+                textBox1.Text = TextPair.Sb1 == null ? TextPair.Text1 : TextPair.Sb1.ToString();
+                textBox2.Text = TextPair.Sb2 == null ? TextPair.Text2 : TextPair.Sb2.ToString();
                 start1.Checked = TextPair.StartParagraph1;
                 start2.Checked = TextPair.StartParagraph2;
             }
@@ -169,7 +169,7 @@ namespace AglonaReader
         }
 
 
-        internal void setFocusNewPair()
+        internal void SetFocusNewPair()
         {
             ActiveControl = textBox1;
         }
