@@ -862,12 +862,12 @@ namespace AglonaReader
         {
             int accLength;
 
-            if (pairIndex == 0)
+            if (pairIndex <= 0)
                 accLength = -2;
             else
                 accLength = TextPairs[pairIndex - 1].aggregateSize;
 
-            for (var i = pairIndex; i < Number(); i++)
+            for (var i = Math.Max(pairIndex, 0); i < Number(); i++)
             {
                 var tp = TextPairs[i];
                 accLength += 2 + tp.totalTextSize;

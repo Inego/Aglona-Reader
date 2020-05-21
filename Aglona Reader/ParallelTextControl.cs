@@ -2380,6 +2380,8 @@ namespace AglonaReader
 
         public void PairChanged(int pairIndex, bool forceUpdate)
         {
+            if (pairIndex < 0)  return;
+            
             var p = PText.TextPairs[pairIndex];
 
             p.ClearComputedWords();

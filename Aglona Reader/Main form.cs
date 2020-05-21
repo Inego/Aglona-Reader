@@ -292,7 +292,7 @@ namespace AglonaReader
                 if (f.Pair >= pTC.Number)
                     pTC.HighlightedPair = pTC.Number - 1;
                 else
-                    pTC.HighlightedPair = f.Pair;
+                    pTC.HighlightedPair = Math.Max(f.Pair, 0);
 
                 if (f.TopPair >= pTC.Number)
                     pTC.CurrentPair = pTC.Number - 1;
@@ -985,7 +985,8 @@ namespace AglonaReader
             pTC.PairChanged(pTC.HighlightedPair, true);
             GotoPair(pTC.HighlightedPair, false, true, 2);
 
-            pTC.Hp.UpdateTotalSize();
+            pTC.Hp?.UpdateTotalSize();
+            
             pTC.PText.UpdateAggregates(pTC.HighlightedPair);
             UpdateStatusBar(true);
             pTC.Side1Set = false;
@@ -1119,7 +1120,8 @@ namespace AglonaReader
 
             pTC.HighlightedPair = newCurrentPair;
 
-            pTC.FindFirstNaturalDividers();
+            if (newCurrentPair >= 0)
+                pTC.FindFirstNaturalDividers();
 
             if (setCurrentPair && pTC.CurrentPair != newCurrentPair
                 || pTC.NotFitOnScreen(pTC.HighlightedPair))
