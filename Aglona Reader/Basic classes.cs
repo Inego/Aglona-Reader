@@ -256,6 +256,8 @@ namespace AglonaReader
                     case '…':
                     case '(':
                     case ')':
+                    case '[':
+                    case ']':    
 
                         if (currentWordStart == -1)
                             currentWordStart = pos;
@@ -367,6 +369,8 @@ namespace AglonaReader
                     case '…':
                     case '(':
                     case ')':
+                    case '[':
+                    case ']':
 
                         if (currentWordStart == -1)
                             currentWordStart = pos;
