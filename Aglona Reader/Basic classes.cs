@@ -438,19 +438,14 @@ namespace AglonaReader
                                 state = 1;
                             }
 
-
-
                         break;
                 }
 
                 pos++;
-
             }
 
             return -1;
-
         }
-
 
 
         public int NaturalDividerPosition(byte side, int startingPos, bool forward)

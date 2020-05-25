@@ -379,7 +379,6 @@ namespace AglonaReader
 
             if (lineHeight * NumberOfScreenLines < Height - 2 * VMargin)
                 NumberOfScreenLines++;
-
         }
 
 
@@ -3040,7 +3039,6 @@ namespace AglonaReader
             }
             
             ProcessLayoutChange();
-
         }
 
         [DllImport("user32")]

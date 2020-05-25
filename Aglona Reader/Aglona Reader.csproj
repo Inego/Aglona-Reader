@@ -104,6 +104,7 @@
     <Compile Include="AboutForm.Designer.cs">
       <DependentUpon>AboutForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="AppSettings.cs" />
     <Compile Include="Basic classes.cs" />
     <Compile Include="BookInfoForm.cs">
       <SubType>Form</SubType>
@@ -123,6 +124,7 @@
     <Compile Include="ExportHTMLForm.Designer.cs">
       <DependentUpon>ExportHTMLForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="FileUsageInfo.cs" />
     <Compile Include="FindForm.cs">
       <SubType>Form</SubType>
     </Compile>
