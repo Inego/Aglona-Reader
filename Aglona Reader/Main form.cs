@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Collections.ObjectModel;
-using System.Drawing;
-using System.Windows.Forms;
-using System.Text;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
+using System.Text;
+using System.Windows.Forms;
 using AglonaReader.Mp3Player;
+using AglonaReader.Properties;
 
 namespace AglonaReader
 {
@@ -48,8 +47,6 @@ namespace AglonaReader
         // Set to true if at least text was dragged at least for one line
         private bool draggingPerformed;
 
-        private bool googleTranslatorEnabled;
-
         protected override bool ProcessDialogKey(Keys keyData)
         {
             return keyData == (Keys.Alt | Keys.RButton | Keys.ShiftKey) || base.ProcessDialogKey(keyData);
@@ -78,7 +75,6 @@ namespace AglonaReader
             playbackTimer.Tick += playbackTimer_Tick;
 
             currentAudioFileNumber = -1;
-            splitContainer.Panel2Collapsed = true;
         }
 
         private void playbackTimer_Tick(object sender, EventArgs e)
@@ -199,13 +195,13 @@ namespace AglonaReader
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            if (Properties.Settings.Default.UpdateRequired)
+            if (Settings.Default.UpdateRequired)
             {
-                Properties.Settings.Default.Upgrade();
-                Properties.Settings.Default.UpdateRequired = false;
+                Settings.Default.Upgrade();
+                Settings.Default.UpdateRequired = false;
             }
 
-            appSettings = Properties.Settings.Default.AppSettings;
+            appSettings = Settings.Default.AppSettings;
 
             if (appSettings == null)
                 appSettings = new AppSettings();
@@ -217,15 +213,12 @@ namespace AglonaReader
                     appSettings.FontSize = 18.0F;
             }
 
-            splitScreenVerticallyToolStripMenuItem.Checked = appSettings.SplitScreenVertically;
-            splitContainer.Orientation = appSettings.SplitScreenVertically ? Orientation.Vertical : Orientation.Horizontal;
-
-            var splitSideLength = appSettings.SplitScreenVertically ? splitContainer.Width : splitContainer.Height;
-            splitContainer.SplitterDistance = (int)(splitSideLength * appSettings.WindowSplitterDistance);
-
             pTC.HighlightFragments = appSettings.HighlightFragments;
             pTC.HighlightFirstWords = appSettings.HighlightFirstWords;
             pTC.Brightness = appSettings.Brightness;
+
+            pTC.SelectionAction = appSettings.SelectionAction;
+            pTC.GoogleTranslateTargetLanguage = appSettings.GoogleTranslateTargetLanguage;
             
             pTC.SetFont(
                 new Font(appSettings.FontName, appSettings.FontSize));
@@ -248,20 +241,16 @@ namespace AglonaReader
 
             if (outerLoad)
                 LoadFromFile(args[1]);
-
         }
 
         private void SetEditMode(bool editMode)
         {
-            pTC.EditMode = editMode;
-            showGoogleTranslatorToolStripMenuItem.Enabled = !editMode;
-            SetGoogleTranslatorEnabled(!editMode && showGoogleTranslatorToolStripMenuItem.Checked);
+            pTC.EditMode = editMode;            
             editModeToolStripMenuItem.Checked = editMode;
         }
 
         private void LoadSettingsFromFileUsageInfo(FileUsageInfo f, bool load)
         {
-
             if (load)
             {
                 pTC.PText.Load(f.FileName);
@@ -300,13 +289,9 @@ namespace AglonaReader
                     pTC.CurrentPair = f.TopPair;
 
                 pTC.FindFirstNaturalDividers();
-                //Recompute();
             }
 
             ProcessEditModeChange(true);
-
-            SetGoogleTranslatorEnabled(f.ShowGoogleTranslator);
-            showGoogleTranslatorToolStripMenuItem.Checked = f.ShowGoogleTranslator;
         }
 
         private static bool IsNullOrWhiteSpace(string value)
@@ -328,15 +313,12 @@ namespace AglonaReader
                 Text = "Aglona Reader";
             else
                 Text = cpt + " - " + "Aglona Reader";
-
         }
 
-        private bool XonSplitter(int x)
-        {
-            return pTC.layoutMode == ParallelTextControl.LayoutModeNormal
-                   && x >= pTC.SplitterPosition
-                   && x < pTC.SplitterPosition + pTC.SplitterWidth;
-        }
+        private bool XonSplitter(int x) =>
+            pTC.layoutMode == ParallelTextControl.LayoutModeNormal
+            && x >= pTC.SplitterPosition
+            && x < pTC.SplitterPosition + pTC.SplitterWidth;
 
         private void parallelTextControl_MouseMove(object sender, MouseEventArgs e)
         {
@@ -571,7 +553,7 @@ namespace AglonaReader
                 pTC.Capture = false;
                 pTC.Cursor = Cursors.Default;
 
-                if (draggingPerformed || !googleTranslatorEnabled) return;
+                if (draggingPerformed) return;
                 
                 var word = pTC.GetWordAtPosition(e.X, e.Y);
 
@@ -610,12 +592,17 @@ namespace AglonaReader
                         var selectedText = GetSelectedText();
                         
                         if (string.IsNullOrEmpty(selectedText)) return;
-                        
-                        Clipboard.SetText(selectedText);
 
-                        if (googleTranslatorEnabled)
+                        switch (pTC.SelectionAction)
                         {
-                            TranslateText(selectedText, pTC.SelectionSide);
+                            case SelectionAction.CopyToClipboard:
+                                Clipboard.SetText(selectedText);
+                                break;
+                            case SelectionAction.OpenInGoogleTranslate:
+                                TranslateText(selectedText, pTC.SelectionSide);
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException();
                         }
                     }
                     else
@@ -634,7 +621,6 @@ namespace AglonaReader
                                 pTC.Render();
                                 PlayCurrentPhrase();
                             }
-
                         }
                         else
                             PlayCurrentPhrase();
@@ -667,25 +653,16 @@ namespace AglonaReader
                 }
             }
 
-            var urlString = webBrowser.Url != null ? webBrowser.Url.ToString() : string.Empty;
-            var match = Regex.Match(urlString, GetGoogleTranslateUrl() + "#([a-z0-9]+?)/([a-z0-9]+?)/.*");
+            if (!string.IsNullOrWhiteSpace(pTC.GoogleTranslateTargetLanguage))
+            {
+                destLang = pTC.GoogleTranslateTargetLanguage.Trim();
+            }
             
-            var currentDestLang = destLang;
-
-            if (match.Groups.Count == 3)
-            {
-                currentDestLang = match.Groups[2].Value;
-            }
-
-            // preserve current destination language if it differs from source language
-            // Use case: the user is reading a book in English and German, but is actually a Russian native speaker,
-            // so the Russian language should be the permanent destination language
-            if (srcLang != currentDestLang)
-            {
-                destLang = currentDestLang;
-            }
-
-            webBrowser.Navigate(string.Format(GetGoogleTranslateUrl() + @"#{0}/{1}/{2}", srcLang, destLang, text));
+            // Example:
+            // https://translate.google.ca/#view=home&op=translate&sl=en&tl=ca&text=cat
+            
+            var url = $"https://translate.google.ca/#view=home&op=translate&sl={srcLang}&tl={destLang}&text={Uri.EscapeUriString(text)}";
+            Process.Start("chrome", url);
         }
 
         private void MouseUpInEditMode()
@@ -1575,12 +1552,7 @@ namespace AglonaReader
 
             Recompute();
 
-            UpdateWindowTitle();
-
-            if (webBrowser.Url == null) return;
-            
-            webBrowser.Navigate(GetGoogleTranslateUrl());
-            webBrowser.Refresh();
+            UpdateWindowTitle();            
         }
 
         private void SaveAppSettings()
@@ -1596,24 +1568,21 @@ namespace AglonaReader
                 f.EditMode = pTC.EditMode;
                 f.ReadingMode = pTC.ReadingMode;
                 f.AlternatingColorScheme = pTC.AlternatingColorScheme;
-                f.ShowGoogleTranslator = googleTranslatorEnabled;
             }
 
             appSettings.HighlightFragments = pTC.HighlightFragments;
             appSettings.HighlightFirstWords = pTC.HighlightFirstWords;
+
+            appSettings.SelectionAction = pTC.SelectionAction;
+            appSettings.GoogleTranslateTargetLanguage = pTC.GoogleTranslateTargetLanguage;
             
             appSettings.Brightness = pTC.Brightness;
 
             appSettings.FontName = pTC.textFont.Name;
             appSettings.FontSize = pTC.textFont.Size;
 
-            appSettings.SplitScreenVertically = splitScreenVerticallyToolStripMenuItem.Checked;
-            
-            var splitSideLength = appSettings.SplitScreenVertically ? splitContainer.Width : splitContainer.Height;
-            appSettings.WindowSplitterDistance = splitContainer.SplitterDistance / (float)splitSideLength;
-
-            Properties.Settings.Default.AppSettings = appSettings;
-            Properties.Settings.Default.Save();
+            Settings.Default.AppSettings = appSettings;
+            Settings.Default.Save();
         }
 
         private void pTC_KeyPress(object sender, KeyPressEventArgs e)
@@ -1709,9 +1678,6 @@ namespace AglonaReader
             SetEditMode(true);
             ProcessEditModeChange(false);
 
-            showGoogleTranslatorToolStripMenuItem.Checked = false;
-            SetGoogleTranslatorEnabled(false);
-
             newBook = true;
         }
                 
@@ -1745,33 +1711,11 @@ namespace AglonaReader
 
         private void editModeToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            
             pTC.EditMode = editModeToolStripMenuItem.Checked;
-
-            showGoogleTranslatorToolStripMenuItem.Enabled = !pTC.EditMode;
-            SetGoogleTranslatorEnabled(!pTC.EditMode && showGoogleTranslatorToolStripMenuItem.Checked);
 
             pTC.SetLayoutMode();
 
             ProcessEditModeChange(false);
-
-        }
-
-        private void SetGoogleTranslatorEnabled(bool enabled)
-        {
-            if (googleTranslatorEnabled == enabled) return;
-            
-            googleTranslatorEnabled = enabled;
-            splitContainer.Panel2Collapsed = !enabled;
-
-            pTC.ResizeBufferedGraphic();
-            pTC.SetSplitterPositionByRatio();
-            Recompute();
-                
-            if (enabled)
-            {
-                webBrowser.Navigate(GetGoogleTranslateUrl());
-            }
         }
 
         private void ProcessEditModeChange(bool updateStatusBar)
@@ -2031,86 +1975,6 @@ namespace AglonaReader
         {
             var exportHtmlForm = new ExportHtmlForm(pTC);
             exportHtmlForm.ShowDialog();
-        }
-
-
-        private void splitContainer_SplitterMoved(object sender, SplitterEventArgs e)
-        {
-            pTC.ResizeBufferedGraphic();
-            pTC.SetSplitterPositionByRatio();
-            Recompute();
-        }
-
-        private void showGoogleTranslatorToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (!pTC.EditMode)
-                SetGoogleTranslatorEnabled(showGoogleTranslatorToolStripMenuItem.Checked);
-        }
-
-        private void splitScreenVerticallyToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            var distanceCoef = splitContainer.Orientation == Orientation.Vertical ?
-                splitContainer.Height / (float)splitContainer.Width :
-                splitContainer.Width / (float)splitContainer.Height;
-            var newSplitterDistance = (int)(splitContainer.SplitterDistance * distanceCoef);
-
-            splitContainer.Orientation = 
-                splitScreenVerticallyToolStripMenuItem.Checked ? Orientation.Vertical : Orientation.Horizontal;
-            splitContainer.SplitterDistance = newSplitterDistance;
-        }
-
-        private static string GetGoogleTranslateUrl()
-        {
-            return "https://translate.google.ca/";
-        }
-
-    }
-        
-    
-    public class FileUsageInfo
-    {
-        public const int NormalMode = 0;
-        public const int AlternatingMode = 1;
-        public const int AdvancedMode = 2;
-
-        public const int AlternatingColorSchemeBlackGreen = 0;
-        public const int AlternatingColorSchemeGreenBlack = 1;
-        
-
-
-        public string FileName { get; set; }
-        public int Pair { get; set; }
-        public int TopPair { get; set; }
-        public bool Reversed { get; set; }
-        public float SplitterRatio { get; set; }
-        public bool EditMode { get; set; }
-        public int ReadingMode { get; set; }
-        public int AlternatingColorScheme { get; set; }
-        public bool ShowGoogleTranslator { get; set; }
-    }
-
-    public class AppSettings
-    {
-        public bool HighlightFragments { get; set; }
-        public bool HighlightFirstWords { get; set; }
-        public double Brightness { get; set; }
-        public string FontName { get; set; }
-        public float FontSize { get; set; }
-        public float WindowSplitterDistance { get; set; }
-        public bool SplitScreenVertically { get; set; }
-
-        public Collection<FileUsageInfo> FileUsages { get; }
-
-        public AppSettings()
-        {
-            HighlightFragments = true;
-            HighlightFirstWords = true;
-            Brightness = 0.974;
-            FontName = "Arial";
-            FontSize = 18.0F;
-            FileUsages = new Collection<FileUsageInfo>();
-            WindowSplitterDistance = 0.66f;
-            SplitScreenVertically = true;
         }
     }
 }

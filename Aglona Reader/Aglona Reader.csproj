@@ -104,6 +104,7 @@
     <Compile Include="AboutForm.Designer.cs">
       <DependentUpon>AboutForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="AppSettings.cs" />
     <Compile Include="Basic classes.cs" />
     <Compile Include="BookInfoForm.cs">
       <SubType>Form</SubType>
@@ -123,6 +124,7 @@
     <Compile Include="ExportHTMLForm.Designer.cs">
       <DependentUpon>ExportHTMLForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="FileUsageInfo.cs" />
     <Compile Include="FindForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -156,6 +158,7 @@
     <Compile Include="OpenRecentForm.Designer.cs">
       <DependentUpon>OpenRecentForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="ParallelText.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ParallelTextControl.cs">
@@ -171,6 +174,7 @@
     <Compile Include="SettingsForm.Designer.cs">
       <DependentUpon>SettingsForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="TextPair.cs" />
     <EmbeddedResource Include="AboutForm.resx">
       <DependentUpon>AboutForm.cs</DependentUpon>
     </EmbeddedResource>

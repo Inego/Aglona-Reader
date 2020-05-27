@@ -58,6 +58,9 @@ namespace AglonaReader
 
         public bool HighlightFirstWords { get; set; }
         public bool HighlightFragments { get; set; }
+        
+        public SelectionAction SelectionAction { get; set; }
+        public string GoogleTranslateTargetLanguage { get; set; }
 
         // Length of a string to be considered a "big block"
         public const int BigTextSize = 1000;
@@ -92,7 +95,6 @@ namespace AglonaReader
 
         private void SetColorsByBrightness()
         {
-
             if (brushTable.Count > 0)
             {
                 foreach (var s in brushTable)
@@ -107,7 +109,6 @@ namespace AglonaReader
 
                 darkColorTable.Clear();
                 lightColorTable.Clear();
-
             }
 
             for (byte i = 0; i < numberOfColors; i++)
@@ -379,7 +380,6 @@ namespace AglonaReader
 
             if (lineHeight * NumberOfScreenLines < Height - 2 * VMargin)
                 NumberOfScreenLines++;
-
         }
 
 
@@ -2878,11 +2878,8 @@ namespace AglonaReader
         internal void SetFont(Font font)
         {
             textFont?.Dispose();
-
             textFont = font;
-            
             ComputeSpaceLength();
-            
             ProcessLayoutChange();
         }
 
@@ -3040,7 +3037,6 @@ namespace AglonaReader
             }
             
             ProcessLayoutChange();
-
         }
 
         [DllImport("user32")]
@@ -3083,6 +3079,4 @@ namespace AglonaReader
             visible = false;
         }
     }
-
-
 }

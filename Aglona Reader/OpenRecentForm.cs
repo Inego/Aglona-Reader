@@ -17,7 +17,6 @@ namespace AglonaReader
 
         private void OpenRecentForm_Shown(object sender, EventArgs e)
         {
-
             foreach (var fileUsageInfo in AppSettings.FileUsages)
                 listBox.Items.Add(fileUsageInfo.FileName);
 
@@ -25,7 +24,6 @@ namespace AglonaReader
                 listBox.SelectedIndex = 0;
 
             Result = "";
-
         }
 
         private void formOKButton_Click(object sender, EventArgs e)
@@ -79,7 +77,6 @@ namespace AglonaReader
 
         private void removeAllButton_Click(object sender, EventArgs e)
         {
-
             // Ask the user
 
             var r = MessageBox.Show(
@@ -89,7 +86,6 @@ namespace AglonaReader
             
             AppSettings.FileUsages.Clear();
             listBox.Items.Clear();
-
         }
     }
 }

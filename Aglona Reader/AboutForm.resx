@@ -189,7 +189,7 @@
     <value>2</value>
   </data>
   <data name="programVersionLabel.Text" xml:space="preserve">
-    <value>1.6.0</value>
+    <value>1.6.1</value>
   </data>
   <data name="&gt;&gt;programVersionLabel.Name" xml:space="preserve">
     <value>programVersionLabel</value>
@@ -219,7 +219,7 @@
     <value>3</value>
   </data>
   <data name="releaseDateLabel.Text" xml:space="preserve">
-    <value>2020-05-16</value>
+    <value>2020-05-27</value>
   </data>
   <data name="&gt;&gt;releaseDateLabel.Name" xml:space="preserve">
     <value>releaseDateLabel</value>
