@@ -45,15 +45,15 @@ namespace AglonaReader
             this.label3 = new System.Windows.Forms.Label();
             this.alternatingColorSchemeComboBox = new System.Windows.Forms.ComboBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.translationLanguage = new System.Windows.Forms.TextBox();
+            this.label4 = new System.Windows.Forms.Label();
             this.onSelectionOpenInGtRb = new System.Windows.Forms.RadioButton();
             this.onSelectionCopyToClipboardRb = new System.Windows.Forms.RadioButton();
-            this.label4 = new System.Windows.Forms.Label();
-            this.translationLanguage = new System.Windows.Forms.TextBox();
-            this.label5 = new System.Windows.Forms.Label();
-            ((System.ComponentModel.ISupportInitialize)(this.fontSizeTrackBar)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize) (this.fontSizeTrackBar)).BeginInit();
             this.fontGroupBox.SuspendLayout();
             this.groupBox1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.brightnessBar)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize) (this.brightnessBar)).BeginInit();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -136,10 +136,7 @@ namespace AglonaReader
             // 
             this.readingModeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.readingModeComboBox.FormattingEnabled = true;
-            this.readingModeComboBox.Items.AddRange(new object[] {
-            resources.GetString("readingModeComboBox.Items"),
-            resources.GetString("readingModeComboBox.Items1"),
-            resources.GetString("readingModeComboBox.Items2")});
+            this.readingModeComboBox.Items.AddRange(new object[] {resources.GetString("readingModeComboBox.Items"), resources.GetString("readingModeComboBox.Items1"), resources.GetString("readingModeComboBox.Items2")});
             resources.ApplyResources(this.readingModeComboBox, "readingModeComboBox");
             this.readingModeComboBox.Name = "readingModeComboBox";
             this.readingModeComboBox.SelectedIndexChanged += new System.EventHandler(this.readingModeComboBox_SelectedIndexChanged);
@@ -153,9 +150,7 @@ namespace AglonaReader
             // 
             this.alternatingColorSchemeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.alternatingColorSchemeComboBox.FormattingEnabled = true;
-            this.alternatingColorSchemeComboBox.Items.AddRange(new object[] {
-            resources.GetString("alternatingColorSchemeComboBox.Items"),
-            resources.GetString("alternatingColorSchemeComboBox.Items1")});
+            this.alternatingColorSchemeComboBox.Items.AddRange(new object[] {resources.GetString("alternatingColorSchemeComboBox.Items"), resources.GetString("alternatingColorSchemeComboBox.Items1")});
             resources.ApplyResources(this.alternatingColorSchemeComboBox, "alternatingColorSchemeComboBox");
             this.alternatingColorSchemeComboBox.Name = "alternatingColorSchemeComboBox";
             this.alternatingColorSchemeComboBox.SelectedIndexChanged += new System.EventHandler(this.alternatingColorSchemeComboBox_SelectedIndexChanged);
@@ -171,12 +166,29 @@ namespace AglonaReader
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.TabStop = false;
             // 
+            // label5
+            // 
+            resources.ApplyResources(this.label5, "label5");
+            this.label5.Name = "label5";
+            // 
+            // translationLanguage
+            // 
+            resources.ApplyResources(this.translationLanguage, "translationLanguage");
+            this.translationLanguage.Name = "translationLanguage";
+            this.translationLanguage.TextChanged += new System.EventHandler(this.translationLanguage_TextChanged);
+            // 
+            // label4
+            // 
+            resources.ApplyResources(this.label4, "label4");
+            this.label4.Name = "label4";
+            // 
             // onSelectionOpenInGtRb
             // 
             resources.ApplyResources(this.onSelectionOpenInGtRb, "onSelectionOpenInGtRb");
             this.onSelectionOpenInGtRb.Name = "onSelectionOpenInGtRb";
             this.onSelectionOpenInGtRb.TabStop = true;
             this.onSelectionOpenInGtRb.UseVisualStyleBackColor = true;
+            this.onSelectionOpenInGtRb.Click += new System.EventHandler(this.onSelectionOpenInGtRb_Click);
             // 
             // onSelectionCopyToClipboardRb
             // 
@@ -184,21 +196,7 @@ namespace AglonaReader
             this.onSelectionCopyToClipboardRb.Name = "onSelectionCopyToClipboardRb";
             this.onSelectionCopyToClipboardRb.TabStop = true;
             this.onSelectionCopyToClipboardRb.UseVisualStyleBackColor = true;
-            // 
-            // label4
-            // 
-            resources.ApplyResources(this.label4, "label4");
-            this.label4.Name = "label4";
-            // 
-            // translationLanguage
-            // 
-            resources.ApplyResources(this.translationLanguage, "translationLanguage");
-            this.translationLanguage.Name = "translationLanguage";
-            // 
-            // label5
-            // 
-            resources.ApplyResources(this.label5, "label5");
-            this.label5.Name = "label5";
+            this.onSelectionCopyToClipboardRb.Click += new System.EventHandler(this.onSelectionCopyToClipboardRb_Click);
             // 
             // SettingsForm
             // 
@@ -220,17 +218,16 @@ namespace AglonaReader
             this.ShowInTaskbar = false;
             this.Shown += new System.EventHandler(this.SettingsForm_Shown);
             this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.SettingsForm_KeyPress);
-            ((System.ComponentModel.ISupportInitialize)(this.fontSizeTrackBar)).EndInit();
+            ((System.ComponentModel.ISupportInitialize) (this.fontSizeTrackBar)).EndInit();
             this.fontGroupBox.ResumeLayout(false);
             this.fontGroupBox.PerformLayout();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.brightnessBar)).EndInit();
+            ((System.ComponentModel.ISupportInitialize) (this.brightnessBar)).EndInit();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
-
         }
 
         private System.Windows.Forms.ComboBox alternatingColorSchemeComboBox;
@@ -240,20 +237,19 @@ namespace AglonaReader
         private System.Windows.Forms.ComboBox fontsComboBox;
         private System.Windows.Forms.TrackBar fontSizeTrackBar;
         private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.CheckBox highlightFirstWordsCheckBox;
         private System.Windows.Forms.CheckBox highlightFragmentsCheckBox;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.RadioButton onSelectionCopyToClipboardRb;
+        private System.Windows.Forms.RadioButton onSelectionOpenInGtRb;
         private System.Windows.Forms.ComboBox readingModeComboBox;
+        private System.Windows.Forms.TextBox translationLanguage;
 
         #endregion
-
-        private GroupBox groupBox2;
-        private RadioButton onSelectionOpenInGtRb;
-        private RadioButton onSelectionCopyToClipboardRb;
-        private Label label5;
-        private TextBox translationLanguage;
-        private Label label4;
     }
 }

@@ -21,6 +21,11 @@ namespace AglonaReader
             highlightFirstWordsCheckBox.Checked = pTc.HighlightFirstWords;
             highlightFragmentsCheckBox.Checked = pTc.HighlightFragments;
 
+            onSelectionCopyToClipboardRb.Checked = pTc.SelectionAction == SelectionAction.CopyToClipboard;
+            onSelectionOpenInGtRb.Checked = pTc.SelectionAction == SelectionAction.OpenInGoogleTranslate;
+
+            translationLanguage.Text = pTc.GoogleTranslateTargetLanguage;
+
             switch (pTc.ReadingMode)
             {
                 case FileUsageInfo.NormalMode:
@@ -63,7 +68,6 @@ namespace AglonaReader
 
             fontNameLabel.Text = prevFont;
             brightnessBar.Value = (int)(pTc.Brightness * 1000);
-
         }
 
         private void brightnessBar_Scroll(object sender, EventArgs e)
@@ -141,5 +145,19 @@ namespace AglonaReader
             pTc.RenderPairs(true);
         }
 
+        private void onSelectionCopyToClipboardRb_Click(object sender, EventArgs e)
+        {
+            pTc.SelectionAction = SelectionAction.CopyToClipboard;
+        }
+
+        private void onSelectionOpenInGtRb_Click(object sender, EventArgs e)
+        {
+            pTc.SelectionAction = SelectionAction.OpenInGoogleTranslate;
+        }
+
+        private void translationLanguage_TextChanged(object sender, EventArgs e)
+        {
+            pTc.GoogleTranslateTargetLanguage = translationLanguage.Text;
+        }
     }
 }

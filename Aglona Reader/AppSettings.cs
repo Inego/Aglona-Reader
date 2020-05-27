@@ -2,6 +2,12 @@
 
 namespace AglonaReader
 {
+    public enum SelectionAction
+    {
+        CopyToClipboard = 0,
+        OpenInGoogleTranslate = 1
+    }
+    
     public class AppSettings
     {
         public bool HighlightFragments { get; set; }
@@ -9,6 +15,10 @@ namespace AglonaReader
         public double Brightness { get; set; }
         public string FontName { get; set; }
         public float FontSize { get; set; }
+        
+        public SelectionAction SelectionAction { get; set; }
+
+        public string GoogleTranslateTargetLanguage { get; set; }
 
         public Collection<FileUsageInfo> FileUsages { get; }
 

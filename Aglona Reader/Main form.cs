@@ -216,6 +216,9 @@ namespace AglonaReader
             pTC.HighlightFragments = appSettings.HighlightFragments;
             pTC.HighlightFirstWords = appSettings.HighlightFirstWords;
             pTC.Brightness = appSettings.Brightness;
+
+            pTC.SelectionAction = appSettings.SelectionAction;
+            pTC.GoogleTranslateTargetLanguage = appSettings.GoogleTranslateTargetLanguage;
             
             pTC.SetFont(
                 new Font(appSettings.FontName, appSettings.FontSize));
@@ -238,7 +241,6 @@ namespace AglonaReader
 
             if (outerLoad)
                 LoadFromFile(args[1]);
-
         }
 
         private void SetEditMode(bool editMode)
@@ -249,7 +251,6 @@ namespace AglonaReader
 
         private void LoadSettingsFromFileUsageInfo(FileUsageInfo f, bool load)
         {
-
             if (load)
             {
                 pTC.PText.Load(f.FileName);
@@ -288,7 +289,6 @@ namespace AglonaReader
                     pTC.CurrentPair = f.TopPair;
 
                 pTC.FindFirstNaturalDividers();
-                //Recompute();
             }
 
             ProcessEditModeChange(true);
@@ -313,15 +313,12 @@ namespace AglonaReader
                 Text = "Aglona Reader";
             else
                 Text = cpt + " - " + "Aglona Reader";
-
         }
 
-        private bool XonSplitter(int x)
-        {
-            return pTC.layoutMode == ParallelTextControl.LayoutModeNormal
-                   && x >= pTC.SplitterPosition
-                   && x < pTC.SplitterPosition + pTC.SplitterWidth;
-        }
+        private bool XonSplitter(int x) =>
+            pTC.layoutMode == ParallelTextControl.LayoutModeNormal
+            && x >= pTC.SplitterPosition
+            && x < pTC.SplitterPosition + pTC.SplitterWidth;
 
         private void parallelTextControl_MouseMove(object sender, MouseEventArgs e)
         {
@@ -595,10 +592,18 @@ namespace AglonaReader
                         var selectedText = GetSelectedText();
                         
                         if (string.IsNullOrEmpty(selectedText)) return;
-                        
-                        // TODO select the action according to params
-                        //Clipboard.SetText(selectedText);
-                        TranslateText(selectedText, pTC.SelectionSide);
+
+                        switch (pTC.SelectionAction)
+                        {
+                            case SelectionAction.CopyToClipboard:
+                                Clipboard.SetText(selectedText);
+                                break;
+                            case SelectionAction.OpenInGoogleTranslate:
+                                TranslateText(selectedText, pTC.SelectionSide);
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException();
+                        }
                     }
                     else
                     {
@@ -648,15 +653,15 @@ namespace AglonaReader
                 }
             }
 
-            
+            if (!string.IsNullOrWhiteSpace(pTC.GoogleTranslateTargetLanguage))
+            {
+                destLang = pTC.GoogleTranslateTargetLanguage.Trim();
+            }
             
             // Example:
             // https://translate.google.ca/#view=home&op=translate&sl=en&tl=ca&text=cat
             
-            // TODO
-
-            var url = string.Format("https://translate.google.ca/#view=home&op=translate&sl={0}&tl={1}&text={2}", srcLang, destLang, Uri.EscapeUriString(text));
-            // webBrowser.Navigate(url);
+            var url = $"https://translate.google.ca/#view=home&op=translate&sl={srcLang}&tl={destLang}&text={Uri.EscapeUriString(text)}";
             Process.Start("chrome", url);
         }
 
@@ -1567,6 +1572,9 @@ namespace AglonaReader
 
             appSettings.HighlightFragments = pTC.HighlightFragments;
             appSettings.HighlightFirstWords = pTC.HighlightFirstWords;
+
+            appSettings.SelectionAction = pTC.SelectionAction;
+            appSettings.GoogleTranslateTargetLanguage = pTC.GoogleTranslateTargetLanguage;
             
             appSettings.Brightness = pTC.Brightness;
 
