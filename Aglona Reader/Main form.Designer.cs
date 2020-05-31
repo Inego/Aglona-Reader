@@ -482,6 +482,7 @@
             this.pTC.EditMode = false;
             this.pTC.EditWhenNipped = false;
             this.pTC.FirstRenderedPair = 0;
+            this.pTC.GoogleTranslateTargetLanguage = null;
             this.pTC.HighlightedPair = 0;
             this.pTC.HighlightFirstWords = true;
             this.pTC.HighlightFragments = true;
@@ -522,6 +523,7 @@
             this.pTC.Selection1Position = 0;
             this.pTC.Selection2Pair = 0;
             this.pTC.Selection2Position = 0;
+            this.pTC.SelectionAction = AglonaReader.SelectionAction.CopyToClipboard;
             this.pTC.SelectionFinished = true;
             this.pTC.SelectionSide = ((byte) (0));
             this.pTC.Side1Set = false;

@@ -559,7 +559,7 @@ namespace AglonaReader
 
                 if (word != null)
                 {
-                    TranslateText(word.Word, word.Side);
+                    HandleSelection(word.Word, word.Side);
                 }
 
                 return;
@@ -593,17 +593,7 @@ namespace AglonaReader
                         
                         if (string.IsNullOrEmpty(selectedText)) return;
 
-                        switch (pTC.SelectionAction)
-                        {
-                            case SelectionAction.CopyToClipboard:
-                                Clipboard.SetText(selectedText);
-                                break;
-                            case SelectionAction.OpenInGoogleTranslate:
-                                TranslateText(selectedText, pTC.SelectionSide);
-                                break;
-                            default:
-                                throw new ArgumentOutOfRangeException();
-                        }
+                        HandleSelection(selectedText, pTC.SelectionSide);
                     }
                     else
                     {
@@ -626,6 +616,21 @@ namespace AglonaReader
                             PlayCurrentPhrase();
                     }
                 }
+            }
+        }
+
+        private void HandleSelection(string selectedText, byte side)
+        {
+            switch (pTC.SelectionAction)
+            {
+                case SelectionAction.CopyToClipboard:
+                    Clipboard.SetText(selectedText);
+                    break;
+                case SelectionAction.OpenInGoogleTranslate:
+                    TranslateText(selectedText, side);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException("Unsupported selection action");
             }
         }
 
