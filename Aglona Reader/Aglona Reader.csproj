@@ -169,7 +169,14 @@
     <Compile Include="SettingsForm.Designer.cs">
       <DependentUpon>SettingsForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="StringUtils\Extensions.cs" />
+    <Compile Include="StringUtils\ICommonString.cs" />
+    <Compile Include="StringUtils\WrappedString.cs" />
+    <Compile Include="StringUtils\WrappedStringBuilder.cs" />
     <Compile Include="TextPair.cs" />
+    <Compile Include="Tokenization\BlankSpace.cs" />
+    <Compile Include="Tokenization\Token.cs" />
+    <Compile Include="Tokenization\Word.cs" />
     <EmbeddedResource Include="AboutForm.resx">
       <DependentUpon>AboutForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -216,6 +223,7 @@
     <None Include="app.config" />
     <None Include="packages.config" />
     <None Include="Properties\app.manifest" />
+    <None Include="Properties\DataSources\AppSettings.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>PublicSettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

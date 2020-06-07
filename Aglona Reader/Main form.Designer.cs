@@ -170,21 +170,22 @@
             // exportLeftTextToolStripMenuItem
             // 
             this.exportLeftTextToolStripMenuItem.Name = "exportLeftTextToolStripMenuItem";
-            this.exportLeftTextToolStripMenuItem.Size = new System.Drawing.Size(171, 22);
+            this.exportLeftTextToolStripMenuItem.Size = new System.Drawing.Size(232, 22);
             this.exportLeftTextToolStripMenuItem.Text = "Left text to TXT";
             this.exportLeftTextToolStripMenuItem.Click += new System.EventHandler(this.ExportLeftTextToolStripMenuItem_Click);
             // 
             // exportRightTextToolStripMenuItem
             // 
             this.exportRightTextToolStripMenuItem.Name = "exportRightTextToolStripMenuItem";
-            this.exportRightTextToolStripMenuItem.Size = new System.Drawing.Size(171, 22);
+            this.exportRightTextToolStripMenuItem.Size = new System.Drawing.Size(232, 22);
             this.exportRightTextToolStripMenuItem.Text = "Right text to TXT";
             this.exportRightTextToolStripMenuItem.Click += new System.EventHandler(this.ExportRightTextToolStripMenuItem_Click);
             // 
             // hTMLToolStripMenuItem
             // 
             this.hTMLToolStripMenuItem.Name = "hTMLToolStripMenuItem";
-            this.hTMLToolStripMenuItem.Size = new System.Drawing.Size(171, 22);
+            this.hTMLToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys) (((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) | System.Windows.Forms.Keys.X)));
+            this.hTMLToolStripMenuItem.Size = new System.Drawing.Size(232, 22);
             this.hTMLToolStripMenuItem.Text = "Book to HTML";
             this.hTMLToolStripMenuItem.Click += new System.EventHandler(this.hTMLToolStripMenuItem_Click);
             // 
@@ -327,7 +328,7 @@
             this.insertPairToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Insert;
             this.insertPairToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
             this.insertPairToolStripMenuItem.Text = "Insert after";
-            this.insertPairToolStripMenuItem.Click += new System.EventHandler(this.insertPairToolStripMenuItem_Click);
+            this.insertPairToolStripMenuItem.Click += new System.EventHandler(this.InsertPairToolStripMenuItem_Click);
             // 
             // deletePairToolStripMenuItem
             // 

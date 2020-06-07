@@ -213,6 +213,8 @@ namespace AglonaReader
                     appSettings.FontSize = 18.0F;
             }
 
+            pTC.AppSettings = appSettings;
+
             pTC.HighlightFragments = appSettings.HighlightFragments;
             pTC.HighlightFirstWords = appSettings.HighlightFirstWords;
             pTC.Brightness = appSettings.Brightness;
@@ -1921,7 +1923,7 @@ namespace AglonaReader
             GotoChangedPair();
         }
 
-        private void insertPairToolStripMenuItem_Click(object sender, EventArgs e)
+        private void InsertPairToolStripMenuItem_Click(object sender, EventArgs e)
         {
             InsertPair(true);
         }
@@ -1978,8 +1980,10 @@ namespace AglonaReader
 
         private void hTMLToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var exportHtmlForm = new ExportHtmlForm(pTC);
-            exportHtmlForm.ShowDialog();
+            using (ExportHtmlForm exportHtmlForm = new ExportHtmlForm(pTC))
+            {
+                exportHtmlForm.ShowDialog();
+            }
         }
     }
 }

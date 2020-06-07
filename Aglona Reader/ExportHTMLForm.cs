@@ -12,7 +12,17 @@ namespace AglonaReader
         {
             InitializeComponent();
             this.pTc = pTc;
+
+            TwoColumnStyleRb.Checked = AppSettings.HtmlExportStyle == HtmlExportStyle.TwoColumnTable;
+            AlternatingStyleRb.Checked = AppSettings.HtmlExportStyle == HtmlExportStyle.Alternating;
+
+            HtmlExportTctSettings htmlExportTctSettings = AppSettings.HtmlExportTctSettings;
+            TableBordersCb.Checked = htmlExportTctSettings.ShowBorders;
+            TableNumbersCb.Checked = htmlExportTctSettings.ShowPairNumbers;
+            TableColorsCb.Checked = htmlExportTctSettings.UseColors;
         }
+
+        private AppSettings AppSettings => pTc.AppSettings;
 
         private void selectExportFileButton_Click(object sender, EventArgs e)
         {
@@ -27,7 +37,6 @@ namespace AglonaReader
 
                 if (dialogResult == DialogResult.OK)
                     exportFileName.Text = d.FileName;
-
             }
         }
 

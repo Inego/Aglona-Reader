@@ -213,6 +213,7 @@ namespace AglonaReader
                     case ',':
                     case '，':
                     case ':':
+                    case '•':
                     case ';':
                     case '!':
                     case '?':
@@ -326,6 +327,7 @@ namespace AglonaReader
                     case ',':
                     case '，':
                     case ':':
+                    case '•':
                     case ';':
                     case '!':
                     case '?':

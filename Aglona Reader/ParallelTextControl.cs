@@ -2886,6 +2886,8 @@ namespace AglonaReader
         public int ReadingMode { get; set; }
 
         public int AlternatingColorScheme { get; set; }
+        
+        public AppSettings AppSettings { get; internal set; }
 
         public void SetLayoutMode()
         {
@@ -2963,8 +2965,6 @@ namespace AglonaReader
                 NaturalDividerPosition2 = newPos;
 
             return true;
-
-
         }
 
         internal void FindFirstNaturalDividers()
@@ -2980,12 +2980,10 @@ namespace AglonaReader
 
             NextRecommended(1, true);
             NextRecommended(2, true);
-
         }
 
         internal void ExportText(string fileName, bool leftSide)
         {
-
             var sideToExport = leftSide ? 1 : 2;
 
             if (Reversed)
@@ -3001,7 +2999,6 @@ namespace AglonaReader
 
         public void ChangeReadingMode(int modeIndex)
         {
-
             var newReadingMode = 0;
 
             switch (modeIndex)

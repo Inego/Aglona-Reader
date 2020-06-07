@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aglona Reader", "Aglona Rea
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NAudio", "NAudio\NAudio.csproj", "{6E9ADF71-98E2-484E-8D77-594A3ABE1BAB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AglonaReaderUnitTest", "AglonaReaderUnitTest\AglonaReaderUnitTest.csproj", "{4DCDD53E-8E7A-4971-A720-667E7DDCBBBD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -19,6 +21,10 @@ Global
 		{6E9ADF71-98E2-484E-8D77-594A3ABE1BAB}.Debug|x86.Build.0 = Debug|Any CPU
 		{6E9ADF71-98E2-484E-8D77-594A3ABE1BAB}.Release|x86.ActiveCfg = Release|Any CPU
 		{6E9ADF71-98E2-484E-8D77-594A3ABE1BAB}.Release|x86.Build.0 = Release|Any CPU
+		{4DCDD53E-8E7A-4971-A720-667E7DDCBBBD}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4DCDD53E-8E7A-4971-A720-667E7DDCBBBD}.Debug|x86.Build.0 = Debug|Any CPU
+		{4DCDD53E-8E7A-4971-A720-667E7DDCBBBD}.Release|x86.ActiveCfg = Release|Any CPU
+		{4DCDD53E-8E7A-4971-A720-667E7DDCBBBD}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

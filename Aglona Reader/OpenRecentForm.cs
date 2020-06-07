@@ -20,8 +20,10 @@ namespace AglonaReader
             foreach (var fileUsageInfo in AppSettings.FileUsages)
                 listBox.Items.Add(fileUsageInfo.FileName);
 
-            if (listBox.Items.Count > 0)
-                listBox.SelectedIndex = 0;
+            var selectedIndex = listBox.Items.Count - 1;
+            if (selectedIndex > 1) selectedIndex = 1;
+            
+            listBox.SelectedIndex = selectedIndex;
 
             Result = "";
         }
