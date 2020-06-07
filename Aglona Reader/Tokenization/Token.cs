@@ -16,7 +16,11 @@ namespace AglonaReader.Tokenization
             
         }
 
-        private static readonly List<char> BlankChars = new List<char> {' ', '\t', '\n', '\r', '—'};
+        protected abstract bool BreaksBefore();
+
+        protected abstract bool BreaksAfter();
+
+        private static readonly List<char> BlankChars = new List<char> {' ', '\t', '\n', '\r'};
         
         public static IEnumerable<Token> Tokenize(ICommonString input)
         {
@@ -51,6 +55,49 @@ namespace AglonaReader.Tokenization
 
             if (sourceLength > currentStart)
                 yield return ComputeToken(currentStart, sourceLength, currentIsBlank);
+        }
+        
+        public static int NaturalDividerPosition(ICommonString text, int startingPos, bool forward)
+        {
+            var prevNatural = -1;
+            var breakAtNext = false;
+            
+            foreach (var token in Token.Tokenize(text))
+            {
+                if (token is Word)
+                {
+                    if ((breakAtNext || token.BreaksBefore()) && token.Start > 0)
+                    {
+                        if (forward)
+                        {
+                            if (token.Start > startingPos)
+                            {
+                                return token.Start;
+                            }                            
+                        }
+                        else
+                        {
+                            if (token.Start >= startingPos)
+                            {
+                                return prevNatural;
+                            }                            
+                        }
+
+                        prevNatural = token.Start;
+                    }
+
+                    breakAtNext = token.BreaksAfter();
+                }
+                else
+                {
+                    if (token.BreaksAfter())
+                    {
+                        breakAtNext = true;
+                    }
+                }
+            }
+
+            return -1;
         }
     }
 }
