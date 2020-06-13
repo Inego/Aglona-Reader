@@ -41,7 +41,10 @@ namespace AglonaReader.Tokenization
             '‹',
             '›',
             '“',
-            '”'
+            '”',
+            '‘',
+            '’',
+            '‚'
         };
 
 
