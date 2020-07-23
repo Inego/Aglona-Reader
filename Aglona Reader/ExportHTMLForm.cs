@@ -33,21 +33,37 @@ namespace AglonaReader
 
         private void exportButton_Click(object sender, EventArgs e)
         {
-
             if (exportFileName.Text.Length == 0)
             {
                 MessageBox.Show("File name not specified!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
+            var exportedSuccessfully = false;
+            try
+            {
+                pTc.PText.ExportHtml(exportFileName.Text);
+                exportedSuccessfully = true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Export error!" + Environment.NewLine + Environment.NewLine + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
             Close();
 
-            pTc.PText.ExportHtml(exportFileName.Text);
-
-            //MessageBox.Show("Done.");
-
-            System.Diagnostics.Process.Start(exportFileName.Text);
-
+            if (!exportedSuccessfully) return;
+            
+            try
+            {
+                System.Diagnostics.Process.Start(exportFileName.Text);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    "Error while opening exported file!" + Environment.NewLine + Environment.NewLine + ex.Message,
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
     }
 }

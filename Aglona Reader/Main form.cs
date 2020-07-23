@@ -1851,7 +1851,14 @@ namespace AglonaReader
                 if (dialogResult != DialogResult.OK)
                     return;
 
-                pTC.ExportText(d.FileName, leftSide);
+                try
+                {
+                    pTC.ExportText(d.FileName, leftSide);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Export error!" + Environment.NewLine + Environment.NewLine + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
 
